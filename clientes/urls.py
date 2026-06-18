@@ -7,6 +7,7 @@ urlpatterns = [
     path('reportes/', views.reportes, name='reportes'),
     path('carga-masiva/', views.carga_masiva_clientes, name='carga_masiva'),
     path('', views.ClienteListView.as_view(), name='list'),
+    path('<int:pk>/', views.ClienteDetailView.as_view(), name='detail'),
     path('nuevo/', views.ClienteCreateView.as_view(), name='create'),
     path('<int:pk>/editar/', views.ClienteUpdateView.as_view(), name='update'),
     path('<int:pk>/eliminar/', views.ClienteDeleteView.as_view(), name='delete'),

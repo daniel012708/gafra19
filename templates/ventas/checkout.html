@@ -4,34 +4,28 @@
 {% block title %}Finalizar Compra - GAFRA Store{% endblock %}
 
 {% block content %}
-<!-- Header Section -->
-<section class="container mb-5">
-    <div class="text-center">
-        <h1 class="display-5 fw-bold text-dark mb-3">
-            <i class="bi bi-credit-card text-primary me-3"></i>Finalizar Compra
-        </h1>
-        <p class="lead text-muted">Completa tu pedido y confirma la información de envío</p>
-    </div>
+<section class="client-page-hero mb-4">
+    <span class="client-kicker"><i class="bi bi-shield-check"></i> Compra segura</span>
+    <h1 class="client-title">Finaliza el pedido con una revisión clara de cada paso.</h1>
+    <p class="client-subtitle">Confirmamos tus datos, tu dirección y el resumen de compra en una interfaz más tranquila y fácil de completar.</p>
 </section>
 
-<section class="container">
+<section>
     <div class="row g-4">
-        <!-- Order Summary -->
         <div class="col-lg-4 order-lg-2">
-            <div class="card-custom sticky-top" style="top: 120px;">
+            <div class="client-surface client-summary-card">
                 <div class="card-body">
                     <h4 class="card-title fw-bold text-dark mb-4">
                         <i class="bi bi-receipt text-primary me-2"></i>Resumen del Pedido
                     </h4>
 
-                    <!-- Order Items -->
                     <div class="mb-4">
                         {% for item in items %}
-                        <div class="d-flex align-items-center mb-3 pb-3 border-bottom">
+                        <div class="client-mini-item mb-3">
                             <div class="flex-shrink-0 me-3">
                                 {% if item.producto.imagen %}
                                     <img src="{{ item.producto.imagen.url }}" alt="{{ item.producto.nombre }}"
-                                         class="rounded" style="width: 50px; height: 50px; object-fit: cover;">
+                                         class="rounded client-thumb">
                                 {% else %}
                                     <div class="bg-light d-flex align-items-center justify-content-center rounded"
                                          style="width: 50px; height: 50px;">
@@ -51,37 +45,34 @@
                         {% endfor %}
                     </div>
 
-                    <!-- Totals -->
                     <div class="border-top pt-3">
-                        <div class="d-flex justify-content-between mb-2">
+                        <div class="client-summary-line">
                             <span class="text-muted">Subtotal:</span>
-                            <span class="fw-semibold">${{ total|floatformat:0 }}</span>
+                            <strong>${{ total|floatformat:0 }}</strong>
                         </div>
-                        <div class="d-flex justify-content-between mb-2">
+                        <div class="client-summary-line">
                             <span class="text-muted">Envío:</span>
-                            <span class="fw-semibold text-success">Gratis</span>
+                            <strong class="text-success">Gratis</strong>
                         </div>
-                        <div class="d-flex justify-content-between mb-2">
+                        <div class="client-summary-line">
                             <span class="text-muted">Impuestos:</span>
-                            <span class="fw-semibold">$0</span>
+                            <strong>$0</strong>
                         </div>
                         <hr class="my-3">
                         <div class="d-flex justify-content-between">
                             <h5 class="mb-0 fw-bold text-dark">Total:</h5>
-                            <h5 class="mb-0 fw-bold text-primary">${{ total|floatformat:0 }}</h5>
+                            <h5 class="mb-0 client-summary-total">${{ total|floatformat:0 }}</h5>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Checkout Form -->
         <div class="col-lg-8 order-lg-1">
-            <form method="post" id="checkoutForm">
+            <form method="post" id="checkoutForm" class="client-form">
                 {% csrf_token %}
 
-                <!-- Customer Information -->
-                <div class="card-custom mb-4">
+                <div class="client-surface client-form-card mb-4">
                     <div class="card-body">
                         <h4 class="card-title fw-bold text-dark mb-4">
                             <i class="bi bi-person text-primary me-2"></i>Información del Cliente
@@ -112,8 +103,7 @@
                     </div>
                 </div>
 
-                <!-- Payment Information -->
-                <div class="card-custom mb-4">
+                <div class="client-surface client-form-card mb-4">
                     <div class="card-body">
                         <h4 class="card-title fw-bold text-dark mb-4">
                             <i class="bi bi-credit-card text-primary me-2"></i>Información de Pago
@@ -143,8 +133,7 @@
                     </div>
                 </div>
 
-                <!-- Terms and Conditions -->
-                <div class="card-custom mb-4">
+                <div class="client-surface client-form-card mb-4">
                     <div class="card-body">
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" id="terminos" name="terminos" required>
@@ -155,17 +144,15 @@
                     </div>
                 </div>
 
-                <!-- Action Buttons -->
                 <div class="d-flex gap-3 mb-5">
-                    <a href="{% url 'ventas:ver_carrito' %}" class="btn btn-outline-secondary flex-fill">
+                    <a href="{% url 'ventas:ver_carrito' %}" class="client-btn-secondary flex-fill">
                         <i class="bi bi-arrow-left me-2"></i>Volver al Carrito
                     </a>
-                    <button type="submit" class="btn btn-primary-custom btn-lg flex-fill">
+                    <button type="submit" class="client-btn-primary btn-lg flex-fill">
                         <i class="bi bi-check-circle me-2"></i>Confirmar Pedido
                     </button>
                 </div>
 
-                <!-- Security Notice -->
                 <div class="text-center">
                     <small class="text-muted">
                         <i class="bi bi-shield-check me-1"></i>

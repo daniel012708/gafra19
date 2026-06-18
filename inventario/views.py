@@ -2,13 +2,16 @@ from django.http import HttpResponse
 import csv
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q
 from .forms_excel import ExcelUploadForm
 import pandas as pd
 from .models import MateriaPrima
 from proveedores.models import Proveedor
+from gafra.access import ModuleAccessMixin, module_access_required
 
 # --- Carga masiva desde Excel ---
 @login_required
+@module_access_required('admin', 'almacenista', 'logistica', module_key='inventario')
 def carga_masiva_materias(request):
     if request.method == 'POST':
         form = ExcelUploadForm(request.POST, request.FILES)
@@ -45,19 +48,32 @@ def carga_masiva_materias(request):
     return render(request, 'inventario/carga_masiva.html', {'form': form})
 
 from django.urls import reverse_lazy
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import ListView, CreateView, UpdateView, DeleteView
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView, DetailView
 from django.db import models
 
 from .models import MateriaPrima
 from .forms import MateriaPrimaForm
 
 
-class MateriaPrimaListView(LoginRequiredMixin, ListView):
+class MateriaPrimaListView(ModuleAccessMixin, ListView):
     model = MateriaPrima
     template_name = 'inventario/inventario_list.html'
     context_object_name = 'materias_primas'
     paginate_by = 20
+    module_key = 'inventario'
+    allowed_roles = ('admin', 'almacenista', 'logistica')
+
+    def get_queryset(self):
+        queryset = super().get_queryset().select_related('proveedor').order_by('nombre', 'id')
+        q = self.request.GET.get('q', '').strip()
+        if q:
+            queryset = queryset.filter(
+                Q(nombre__icontains=q)
+                | Q(codigo__icontains=q)
+                | Q(marca__icontains=q)
+                | Q(proveedor__nombre__icontains=q)
+            )
+        return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -66,26 +82,42 @@ class MateriaPrimaListView(LoginRequiredMixin, ListView):
         return context
 
 
-class MateriaPrimaCreateView(LoginRequiredMixin, CreateView):
+class MateriaPrimaDetailView(ModuleAccessMixin, DetailView):
+    model = MateriaPrima
+    template_name = 'inventario/inventario_detail.html'
+    context_object_name = 'materia'
+    module_key = 'inventario'
+    allowed_roles = ('admin', 'almacenista', 'logistica')
+
+
+class MateriaPrimaCreateView(ModuleAccessMixin, CreateView):
     model = MateriaPrima
     form_class = MateriaPrimaForm
     template_name = 'inventario/inventario_form.html'
     success_url = reverse_lazy('inventario:list')
+    module_key = 'inventario'
+    allowed_roles = ('admin', 'almacenista', 'logistica')
 
 
-class MateriaPrimaUpdateView(LoginRequiredMixin, UpdateView):
+class MateriaPrimaUpdateView(ModuleAccessMixin, UpdateView):
     model = MateriaPrima
     form_class = MateriaPrimaForm
     template_name = 'inventario/inventario_form.html'
     success_url = reverse_lazy('inventario:list')
+    module_key = 'inventario'
+    allowed_roles = ('admin', 'almacenista', 'logistica')
 
 
-class MateriaPrimaDeleteView(LoginRequiredMixin, DeleteView):
+class MateriaPrimaDeleteView(ModuleAccessMixin, DeleteView):
     model = MateriaPrima
     template_name = 'inventario/inventario_confirm_delete.html'
     success_url = reverse_lazy('inventario:list')
+    module_key = 'inventario'
+    allowed_roles = ('admin', 'almacenista', 'logistica')
 
 
+@login_required
+@module_access_required('admin', 'almacenista', 'logistica', module_key='inventario')
 def reportes(request):
     from django.utils import timezone
     from gafra.utils_pdf import render_pdf_from_template

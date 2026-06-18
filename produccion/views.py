@@ -1,7 +1,12 @@
 from django.http import HttpResponse
 import csv
+from django.contrib.auth.decorators import login_required
 from .models import OrdenProduccion
+from django.db.models import Q
+from gafra.access import ModuleAccessMixin, module_access_required
 
+@login_required
+@module_access_required('admin', 'logistica', module_key='produccion')
 def reportes(request):
     total_ordenes = OrdenProduccion.objects.count()
     if request.GET.get('export') == 'csv':
@@ -25,7 +30,6 @@ import pandas as pd
 from .models import OrdenProduccion
 from productos.models import Producto, Receta
 from django.contrib.auth.models import User
-from django.contrib.auth.decorators import login_required
 
 # --- Carga masiva desde Excel ---
 @login_required
@@ -68,7 +72,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import ListView, CreateView, UpdateView, DeleteView
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView, DetailView
 from django.utils import timezone
 from django.db import transaction
 
@@ -76,17 +80,26 @@ from .models import OrdenProduccion, ProduccionDiaria
 from .forms import OrdenProduccionForm, ProduccionDiariaForm
 
 
-class OrdenProduccionListView(LoginRequiredMixin, ListView):
+class OrdenProduccionListView(ModuleAccessMixin, ListView):
     model = OrdenProduccion
     template_name = 'produccion/produccion_list.html'
     context_object_name = 'ordenes_produccion'
     paginate_by = 20
+    module_key = 'produccion'
+    allowed_roles = ('admin', 'logistica')
 
     def get_queryset(self):
-        queryset = super().get_queryset()
+        queryset = super().get_queryset().select_related('producto', 'receta', 'responsable')
         estado = self.request.GET.get('estado')
+        q = self.request.GET.get('q', '').strip()
         if estado:
             queryset = queryset.filter(estado=estado)
+        if q:
+            queryset = queryset.filter(
+                Q(producto__nombre__icontains=q)
+                | Q(responsable__username__icontains=q)
+                | Q(notas__icontains=q)
+            )
         return queryset.order_by('-fecha_creacion')
 
     def get_context_data(self, **kwargs):
@@ -96,7 +109,16 @@ class OrdenProduccionListView(LoginRequiredMixin, ListView):
         return context
 
 
+class OrdenProduccionDetailView(ModuleAccessMixin, DetailView):
+    model = OrdenProduccion
+    template_name = 'produccion/produccion_detail.html'
+    context_object_name = 'orden'
+    module_key = 'produccion'
+    allowed_roles = ('admin', 'logistica')
+
+
 @login_required
+@module_access_required('admin', 'logistica', module_key='produccion')
 def orden_produccion_create(request):
     if request.method == 'POST':
         form = OrdenProduccionForm(request.POST)
@@ -120,6 +142,7 @@ def orden_produccion_create(request):
 
 
 @login_required
+@module_access_required('admin', 'logistica', module_key='produccion')
 def orden_produccion_iniciar(request, pk):
     orden = get_object_or_404(OrdenProduccion, pk=pk)
 
@@ -143,6 +166,7 @@ def orden_produccion_iniciar(request, pk):
 
 
 @login_required
+@module_access_required('admin', 'logistica', module_key='produccion')
 def orden_produccion_completar(request, pk):
     orden = get_object_or_404(OrdenProduccion, pk=pk)
 
@@ -191,11 +215,13 @@ def orden_produccion_completar(request, pk):
     })
 
 
-class OrdenProduccionCreateView(LoginRequiredMixin, CreateView):
+class OrdenProduccionCreateView(ModuleAccessMixin, CreateView):
     model = OrdenProduccion
     form_class = OrdenProduccionForm
     template_name = 'produccion/produccion_form.html'
     success_url = reverse_lazy('produccion:list')
+    module_key = 'produccion'
+    allowed_roles = ('admin', 'logistica')
 
     def form_valid(self, form):
         form.instance.responsable = self.request.user
@@ -205,11 +231,13 @@ class OrdenProduccionCreateView(LoginRequiredMixin, CreateView):
         return super().form_valid(form)
 
 
-class OrdenProduccionUpdateView(LoginRequiredMixin, UpdateView):
+class OrdenProduccionUpdateView(ModuleAccessMixin, UpdateView):
     model = OrdenProduccion
     form_class = OrdenProduccionForm
     template_name = 'produccion/produccion_form.html'
     success_url = reverse_lazy('produccion:list')
+    module_key = 'produccion'
+    allowed_roles = ('admin', 'logistica')
 
     def form_valid(self, form):
         # Asignar automáticamente la receta del producto
@@ -221,10 +249,12 @@ class OrdenProduccionUpdateView(LoginRequiredMixin, UpdateView):
         return super().get_queryset().filter(estado='pendiente')
 
 
-class OrdenProduccionDeleteView(LoginRequiredMixin, DeleteView):
+class OrdenProduccionDeleteView(ModuleAccessMixin, DeleteView):
     model = OrdenProduccion
     template_name = 'produccion/produccion_confirm_delete.html'
     success_url = reverse_lazy('produccion:list')
+    module_key = 'produccion'
+    allowed_roles = ('admin', 'logistica')
 
     def get_queryset(self):
         return super().get_queryset().filter(estado='pendiente')

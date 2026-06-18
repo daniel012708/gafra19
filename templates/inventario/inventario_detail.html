@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block head_title %}Detalle de materia prima{% endblock %}
+{% block header_title %}Detalle de materia prima{% endblock %}
+{% block content %}
+<div class="card">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <div>
+      <h5 class="mb-0">{{ materia.nombre }}</h5>
+      <small class="text-muted">{{ materia.codigo }}</small>
+    </div>
+    <div class="d-flex gap-2">
+      <a href="{% url 'inventario:entrada' materia.pk %}" class="btn btn-outline-success btn-sm">Registrar entrada</a>
+      <a href="{% url 'inventario:update' materia.pk %}" class="btn btn-outline-secondary btn-sm">Editar</a>
+      <a href="{% url 'inventario:list' %}" class="btn btn-primary btn-sm">Volver</a>
+    </div>
+  </div>
+  <div class="card-body">
+    <div class="row g-3">
+      <div class="col-md-4"><div class="border rounded p-3"><div class="text-muted small">Marca</div><div class="fw-semibold">{{ materia.marca|default:'-' }}</div></div></div>
+      <div class="col-md-4"><div class="border rounded p-3"><div class="text-muted small">Proveedor</div><div class="fw-semibold">{{ materia.proveedor.nombre }}</div></div></div>
+      <div class="col-md-4"><div class="border rounded p-3"><div class="text-muted small">Unidad</div><div class="fw-semibold">{{ materia.get_unidad_medida_display }}</div></div></div>
+      <div class="col-md-4"><div class="border rounded p-3"><div class="text-muted small">Stock actual</div><div class="fw-semibold">{{ materia.stock_actual }}</div></div></div>
+      <div class="col-md-4"><div class="border rounded p-3"><div class="text-muted small">Stock mínimo</div><div class="fw-semibold">{{ materia.stock_minimo }}</div></div></div>
+      <div class="col-md-4"><div class="border rounded p-3"><div class="text-muted small">Precio unitario</div><div class="fw-semibold">${{ materia.precio_unitario }}</div></div></div>
+      <div class="col-md-6"><div class="border rounded p-3"><div class="text-muted small">Ubicación</div><div class="fw-semibold">{{ materia.ubicacion|default:'-' }}</div></div></div>
+      <div class="col-md-6"><div class="border rounded p-3"><div class="text-muted small">Estado</div><div class="fw-semibold">{% if materia.activo %}Activo{% else %}Inactivo{% endif %}</div></div></div>
+      <div class="col-12"><div class="border rounded p-3"><div class="text-muted small">Descripción</div><div class="fw-semibold">{{ materia.descripcion|default:'-' }}</div></div></div>
+      <div class="col-12"><div class="border rounded p-3"><div class="text-muted small">Observaciones</div><div class="fw-semibold">{{ materia.observaciones|default:'-' }}</div></div></div>
+    </div>
+  </div>
+</div>
+{% endblock %}

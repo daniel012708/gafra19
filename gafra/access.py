@@ -1,3 +1,9 @@
+from functools import wraps
+
+from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.shortcuts import redirect
+
 SIDEBAR_ITEMS = [
     {
         'key': 'dashboard',
@@ -57,7 +63,7 @@ ROLE_MODULES = {
     'vendedor': {'clientes', 'productos', 'ventas'},
     'almacenista': {'proveedores', 'inventario', 'productos'},
     'logistica': {'inventario', 'productos', 'produccion', 'ventas'},
-    'cliente': {'clientes', 'productos', 'ventas'},
+    'cliente': {'productos', 'ventas'},
 }
 
 
@@ -133,3 +139,45 @@ def current_module_from_request(request):
     if not path:
         return 'dashboard'
     return path.split('/')[0]
+
+
+class ModuleAccessMixin(LoginRequiredMixin, UserPassesTestMixin):
+    module_key = None
+    allowed_roles = ()
+    permission_denied_message = 'No tienes permisos para acceder a esta sección.'
+
+    def test_func(self):
+        user = self.request.user
+        if not getattr(user, 'is_authenticated', False):
+            return False
+        if self.module_key and self.module_key not in allowed_modules_for_user(user):
+            return False
+        if self.allowed_roles and not user_has_role(user, *self.allowed_roles):
+            return False
+        return True
+
+    def handle_no_permission(self):
+        if self.request.user.is_authenticated:
+            messages.error(self.request, self.permission_denied_message)
+            return redirect('dashboard:index')
+        return super().handle_no_permission()
+
+
+def module_access_required(*roles, module_key=None, message='No tienes permisos para acceder a esta sección.'):
+    def decorator(view_func):
+        @wraps(view_func)
+        def _wrapped(request, *args, **kwargs):
+            user = request.user
+            if not getattr(user, 'is_authenticated', False):
+                return redirect('login')
+            if module_key and module_key not in allowed_modules_for_user(user):
+                messages.error(request, message)
+                return redirect('dashboard:index')
+            if roles and not user_has_role(user, *roles):
+                messages.error(request, message)
+                return redirect('dashboard:index')
+            return view_func(request, *args, **kwargs)
+
+        return _wrapped
+
+    return decorator

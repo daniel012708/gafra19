@@ -4,55 +4,49 @@
 {% block title %}Pedido {{ pedido.numero_venta }} - GAFRA Store{% endblock %}
 
 {% block content %}
-<!-- Header Section removed per request -->
-<section class="container detalle-pedido">
+<section class="client-page-hero mb-4">
+    <span class="client-kicker"><i class="bi bi-truck"></i> Detalle del pedido</span>
+    <h1 class="client-title">Pedido {{ pedido.numero_venta }} con información clara, útil y sin bloques apretados.</h1>
+    <p class="client-subtitle">Consulta estado, entrega, productos y resumen en una disposición mucho más cómoda para leer.</p>
+</section>
+
+<section class="detalle-pedido">
     <div class="row g-4">
-        <!-- Order Information -->
         <div class="col-lg-8">
-            <div class="left-stack">
-            <div class="card-custom mb-4">
+            <div class="client-surface mb-4">
                 <div class="card-body">
                     <h4 class="card-title fw-bold text-dark mb-4">
                         <i class="bi bi-info-circle text-primary me-2"></i>Información del Pedido
                     </h4>
 
-                    <div class="row g-4">
-                        <div class="col-md-3">
-                            <div class="glass-effect p-3 rounded">
+                    <div class="client-detail-grid">
+                            <div class="client-info-box">
                                 <h6 class="fw-bold text-dark mb-2">Número de Pedido</h6>
                                 <p class="mb-0 text-primary fs-5">{{ pedido.numero_venta }}</p>
                             </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="glass-effect p-3 rounded">
+                            <div class="client-info-box">
                                 <h6 class="fw-bold text-dark mb-2">Fecha del Pedido</h6>
                                 <p class="mb-0">{{ pedido.fecha|date:"l, d F Y" }}</p>
                                 <small class="text-muted">{{ pedido.fecha|date:"H:i" }} horas</small>
                             </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="glass-effect p-3 rounded">
+                            <div class="client-info-box">
                                 <h6 class="fw-bold text-dark mb-2">Estado del Pedido</h6>
                                 {% if pedido.estado == 'completada' %}
-                                    <span class="badge bg-success fs-6 px-3 py-2">Completado</span>
+                                    <span class="client-status-pill done">Completado</span>
                                 {% elif pedido.estado == 'en_progreso' %}
-                                    <span class="badge bg-info text-dark fs-6 px-3 py-2">En proceso</span>
+                                    <span class="client-status-pill progress">En proceso</span>
                                 {% elif pedido.estado == 'pendiente' %}
-                                    <span class="badge bg-warning text-dark fs-6 px-3 py-2">Pendiente</span>
+                                    <span class="client-status-pill pending">Pendiente</span>
                                 {% else %}
-                                    <span class="badge bg-danger fs-6 px-3 py-2">Cancelado</span>
+                                    <span class="client-status-pill cancelled">Cancelado</span>
                                 {% endif %}
                             </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="glass-effect p-3 rounded">
+                            <div class="client-info-box">
                                 <h6 class="fw-bold text-dark mb-2">Total del Pedido</h6>
-                                <p class="mb-0 price-tag">${{ pedido.total|floatformat:0 }}</p>
+                                <p class="mb-0 client-price-tag">${{ pedido.total|floatformat:0 }}</p>
                             </div>
-                        </div>
                     </div>
 
-                    <!-- Shipping Information -->
                     {% if pedido.telefono or pedido.direccion %}
                     <div class="mt-4 pt-4 border-top">
                         <h5 class="fw-bold text-dark mb-3">
@@ -87,22 +81,20 @@
                 </div>
             </div>
 
-            <!-- Order Items -->
-            <div class="card-custom">
+            <div class="client-surface">
                 <div class="card-body">
                     <h4 class="card-title fw-bold text-dark mb-4">
                         <i class="bi bi-basket text-primary me-2"></i>Productos del Pedido
                     </h4>
 
-                    <div class="row g-4">
+                    <div class="row g-3">
                         {% for detalle in detalles %}
                         <div class="col-12">
-                            <div class="d-flex align-items-center p-3 border rounded">
-                                <!-- Product Image -->
-                                <div class="flex-shrink-0 me-3">
+                            <div class="client-order-item-row">
+                                <div class="flex-shrink-0">
                                     {% if detalle.producto.imagen %}
                                         <img src="{{ detalle.producto.imagen.url }}" alt="{{ detalle.producto.nombre }}"
-                                             class="rounded" style="width: 80px; height: 80px; object-fit: cover;">
+                                             class="rounded">
                                     {% else %}
                                         <div class="bg-light d-flex align-items-center justify-content-center rounded"
                                              style="width: 80px; height: 80px;">
@@ -111,7 +103,6 @@
                                     {% endif %}
                                 </div>
 
-                                <!-- Product Details -->
                                 <div class="flex-grow-1">
                                     <h5 class="fw-bold text-dark mb-1">{{ detalle.producto.nombre }}</h5>
                                     <p class="text-muted small mb-2">{{ detalle.producto.descripcion|truncatechars:100 }}</p>
@@ -139,52 +130,47 @@
                         {% endfor %}
                     </div>
                 </div>
-            </div>
-            </div>
         </div>
 
-        <!-- Order Summary -->
         <div class="col-lg-4">
-            <div class="right-stack">
-            <div class="card-custom">
+            <div class="client-surface client-summary-card mb-3">
                 <div class="card-body">
                     <h4 class="card-title fw-bold text-dark mb-4">
                         <i class="bi bi-calculator text-primary me-2"></i>Resumen
                     </h4>
 
-                    <div class="d-flex justify-content-between mb-3">
+                    <div class="client-summary-line">
                         <span class="text-muted">Subtotal ({{ detalles|length }} productos):</span>
-                        <span class="fw-semibold">${{ pedido.total|floatformat:0 }}</span>
+                        <strong>${{ pedido.total|floatformat:0 }}</strong>
                     </div>
 
-                    <div class="d-flex justify-content-between mb-3">
+                    <div class="client-summary-line">
                         <span class="text-muted">Descuento:</span>
-                        <span class="fw-semibold text-success">-${{ pedido.descuento|floatformat:0 }}</span>
+                        <strong class="text-success">-${{ pedido.descuento|floatformat:0 }}</strong>
                     </div>
 
-                    <div class="d-flex justify-content-between mb-3">
+                    <div class="client-summary-line">
                         <span class="text-muted">Impuestos:</span>
-                        <span class="fw-semibold">${{ pedido.impuesto|floatformat:0 }}</span>
+                        <strong>${{ pedido.impuesto|floatformat:0 }}</strong>
                     </div>
 
-                    <div class="d-flex justify-content-between mb-3">
+                    <div class="client-summary-line">
                         <span class="text-muted">Envío:</span>
-                        <span class="fw-semibold text-success">Gratis</span>
+                        <strong class="text-success">Gratis</strong>
                     </div>
 
                     <hr class="my-4">
 
                     <div class="d-flex justify-content-between mb-4">
                         <h5 class="mb-0 fw-bold text-dark">Total Pagado:</h5>
-                        <h5 class="mb-0 fw-bold text-primary">${{ pedido.total|floatformat:0 }}</h5>
+                        <h5 class="mb-0 client-summary-total">${{ pedido.total|floatformat:0 }}</h5>
                     </div>
 
-                    <!-- Action Buttons -->
                     <div class="d-grid gap-2">
                         <a href="{% url 'ventas:historial_pedidos' %}" class="btn btn-outline-secondary">
                             <i class="bi bi-arrow-left me-2"></i>Volver a Pedidos
                         </a>
-                        <a href="{% url 'ventas:catalogo_cliente' %}" class="btn btn-primary-custom">
+                        <a href="{% url 'ventas:catalogo_cliente' %}" class="client-btn-primary">
                             <i class="bi bi-shop me-2"></i>Comprar Más
                         </a>
                         {% if pedido.estado == 'completada' %}
@@ -196,8 +182,7 @@
                 </div>
             </div>
 
-            <!-- Help Section -->
-            <div class="card-custom mt-3 help-card">
+            <div class="client-surface help-card">
                 <div class="card-body text-center">
                     <i class="bi bi-headset text-primary fs-1 mb-3"></i>
                     <h6 class="fw-bold text-dark mb-2">¿Necesitas Ayuda?</h6>
@@ -211,7 +196,6 @@
                         </a>
                     </div>
                 </div>
-            </div>
         </div>
     </div>
 </section>

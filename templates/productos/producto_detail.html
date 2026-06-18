@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block head_title %}Detalle de producto{% endblock %}
+{% block header_title %}Detalle de producto{% endblock %}
+{% block content %}
+<div class="card">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <div>
+      <h5 class="mb-0">{{ producto.nombre }}</h5>
+      <small class="text-muted">{{ producto.codigo }}</small>
+    </div>
+    <div class="d-flex gap-2">
+      <a href="{% url 'productos:update' producto.pk %}" class="btn btn-outline-secondary btn-sm">Editar</a>
+      <a href="{% url 'productos:historial' producto.pk %}" class="btn btn-outline-info btn-sm">Historial</a>
+      <a href="{% url 'productos:list' %}" class="btn btn-primary btn-sm">Volver</a>
+    </div>
+  </div>
+  <div class="card-body">
+    <div class="row g-3">
+      <div class="col-md-4"><div class="border rounded p-3"><div class="text-muted small">Categoría</div><div class="fw-semibold">{{ producto.categoria|default:'-' }}</div></div></div>
+      <div class="col-md-4"><div class="border rounded p-3"><div class="text-muted small">Precio de venta</div><div class="fw-semibold">${{ producto.precio_venta }}</div></div></div>
+      <div class="col-md-4"><div class="border rounded p-3"><div class="text-muted small">Stock actual</div><div class="fw-semibold">{{ producto.stock_actual }}</div></div></div>
+      <div class="col-12"><div class="border rounded p-3"><div class="text-muted small">Descripción</div><div class="fw-semibold">{{ producto.descripcion }}</div></div></div>
+      <div class="col-12">
+        <div class="border rounded p-3">
+          <div class="text-muted small mb-2">Ingredientes de receta</div>
+          {% if producto.receta and producto.receta.ingredientes.all %}
+            <ul class="mb-0">
+              {% for ingrediente in producto.receta.ingredientes.all %}
+                <li>{{ ingrediente.materia_prima.nombre }}: {{ ingrediente.cantidad_requerida }} {{ ingrediente.materia_prima.unidad_medida }}</li>
+              {% empty %}
+                <li>Sin ingredientes registrados.</li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <div class="fw-semibold">Sin receta configurada.</div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

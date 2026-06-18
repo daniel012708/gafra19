@@ -237,12 +237,16 @@ def carga_masiva_ventas(request):
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
 from django.core.paginator import Paginator
+from django.views.decorators.cache import never_cache
+from django.views.decorators.csrf import ensure_csrf_cookie
 import logging
 
 logger = logging.getLogger(__name__)
 
 
 # Catálogo para clientes: lista productos activos con filtros simples
+@never_cache
+@ensure_csrf_cookie
 def catalogo_cliente(request):
     from productos.models import Producto, Categoria
     from .models import Favorito, Carrito
@@ -293,6 +297,8 @@ def catalogo_cliente(request):
     return render(request, 'ventas/catalogo_cliente.html', context)
 
 
+@never_cache
+@ensure_csrf_cookie
 def catalogo_publico(request):
     """Versión pública del catálogo que permite explorar y agregar al carrito (usa sesión para usuarios anónimos)."""
     from productos.models import Producto, Categoria

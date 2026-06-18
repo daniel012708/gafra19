@@ -4,36 +4,34 @@
 {% block title %}Mi Carrito - GAFRA Store{% endblock %}
 
 {% block content %}
-<!-- Header Section -->
-<style>
-/* Ocultar título y caja de acciones solicitadas */
-.ver-carrito .text-center { display: none !important; }
-.ver-carrito .small-actions-card { display: none !important; }
-</style>
-<section class="container ver-carrito mb-5">
-    <div class="text-center">
-        <h3 class="h3 fw-bold text-dark mb-2">
-            <i class="bi bi-cart3 text-primary me-2"></i>Mi Carrito
-        </h3>
-        <p class="small text-muted mb-0">Revisa y modifica los productos en tu carrito</p>
+<section class="client-page-hero mb-4">
+    <span class="client-kicker"><i class="bi bi-bag-check"></i> Tu selección</span>
+    <h1 class="client-title">Un carrito más claro para decidir sin enredos.</h1>
+    <p class="client-subtitle">Ajusta cantidades, revisa subtotales y confirma tu compra con una vista limpia de todo lo que elegiste.</p>
+    <div class="client-hero-stats">
+        <div class="client-stat-chip"><strong>{{ items|length }}</strong><span>productos</span></div>
+        <div class="client-stat-chip"><strong>${{ total|floatformat:0 }}</strong><span>total actual</span></div>
     </div>
 </section>
 
 {% if items %}
-<section class="container">
+<section>
     <div class="row g-4">
-        <!-- Cart Items -->
         <div class="col-lg-8">
-            <div class="card-custom">
-                <div class="card-body p-0">
+            <div class="client-surface client-list-card">
+                <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+                    <div>
+                        <h2 class="client-section-title mb-1">Productos en carrito</h2>
+                        <p class="client-section-copy">Cada cambio se guarda al instante para que no pierdas el ritmo.</p>
+                    </div>
+                </div>
                     {% for item in items %}
-                    <div class="p-3 border-bottom cart-item-row">
+                    <div class="client-cart-card cart-item-row">
                         <div class="row align-items-center">
-                            <!-- Product Image -->
                             <div class="col-md-2">
                                 {% if item.producto.imagen %}
                                     <img src="{{ item.producto.imagen.url }}" alt="{{ item.producto.nombre }}"
-                                         class="img-fluid rounded cart-item-img" style="max-height: 64px; object-fit: cover; width:64px;">
+                                         class="img-fluid rounded cart-item-img client-thumb" style="object-fit: cover; width:64px; height:64px;">
                                 {% else %}
                                     <div class="bg-light d-flex align-items-center justify-content-center rounded"
                                          style="width: 64px; height: 64px;">
@@ -42,20 +40,17 @@
                                 {% endif %}
                             </div>
 
-                            <!-- Product Info -->
                             <div class="col-md-4">
                                 <h5 class="fw-bold text-dark mb-1">{{ item.producto.nombre }}</h5>
                                 <p class="text-muted small mb-0">{{ item.producto.descripcion|truncatechars:60 }}</p>
                                 <small class="text-muted">Código: {{ item.producto.codigo }}</small>
                             </div>
 
-                            <!-- Price -->
                             <div class="col-md-2">
-                                <span class="fw-semibold text-primary">${{ item.producto.precio_venta|floatformat:0 }}</span>
+                                <span class="client-price-tag">${{ item.producto.precio_venta|floatformat:0 }}</span>
                             </div>
 
-                            <!-- Quantity -->
-                                <div class="col-md-2">
+                            <div class="col-md-2">
                                 <form method="post" action="{% url 'ventas:actualizar_carrito' item.id %}" class="d-flex align-items-center">
                                     {% csrf_token %}
                                     <button type="button" class="btn btn-outline-secondary btn-sm me-2"
@@ -68,7 +63,6 @@
                                 </form>
                             </div>
 
-                            <!-- Subtotal & Actions -->
                             <div class="col-md-2 text-end">
                                 <div class="mb-2">
                                     <strong class="text-dark">${{ item.subtotal|floatformat:0 }}</strong>
@@ -84,48 +78,43 @@
                         </div>
                     </div>
                     {% endfor %}
-                </div>
             </div>
 
-            <!-- Continue Shopping -->
             <div class="text-center mt-4">
-                <a href="{% url 'ventas:catalogo_cliente' %}" class="btn btn-outline-primary">
+                <a href="{% url 'ventas:catalogo_cliente' %}" class="client-btn-secondary">
                     <i class="bi bi-arrow-left me-2"></i>Continuar Comprando
                 </a>
             </div>
         </div>
 
-        <!-- Order Summary -->
         <div class="col-lg-4">
-            <div class="card-custom sticky-top" style="top: 120px;">
+            <div class="client-surface client-summary-card">
                 <div class="card-body">
-                    <h4 class="card-title fw-bold text-dark mb-4">
-                        <i class="bi bi-receipt text-primary me-2"></i>Resumen del Pedido
-                    </h4>
+                    <h4 class="card-title fw-bold text-dark mb-4"><i class="bi bi-receipt text-primary me-2"></i>Resumen del pedido</h4>
 
-                    <div class="d-flex justify-content-between mb-3">
+                    <div class="client-summary-line">
                         <span class="text-muted">Subtotal ({{ items|length }} productos):</span>
-                        <span class="fw-semibold">${{ total|floatformat:0 }}</span>
+                        <strong>${{ total|floatformat:0 }}</strong>
                     </div>
 
-                    <div class="d-flex justify-content-between mb-3">
+                    <div class="client-summary-line">
                         <span class="text-muted">Envío:</span>
-                        <span class="fw-semibold text-success">Gratis</span>
+                        <strong class="text-success">Gratis</strong>
                     </div>
 
-                    <div class="d-flex justify-content-between mb-3">
+                    <div class="client-summary-line">
                         <span class="text-muted">Impuestos:</span>
-                        <span class="fw-semibold">$0</span>
+                        <strong>$0</strong>
                     </div>
 
                     <hr class="my-4">
 
                     <div class="d-flex justify-content-between mb-4">
                         <h5 class="mb-0 fw-bold text-dark">Total:</h5>
-                        <h5 class="mb-0 fw-bold text-primary">${{ total|floatformat:0 }}</h5>
+                        <h5 class="mb-0 client-summary-total">${{ total|floatformat:0 }}</h5>
                     </div>
 
-                    <a href="{% url 'ventas:checkout' %}" class="btn btn-primary-custom btn-lg w-100 mb-3">
+                    <a href="{% url 'ventas:checkout' %}" class="client-btn-primary btn-lg w-100 mb-3">
                         <i class="bi bi-credit-card me-2"></i>Proceder al Pago
                     </a>
 
@@ -138,10 +127,9 @@
                 </div>
             </div>
 
-            <!-- Quick Actions -->
-            <div class="card-custom mt-3 small-actions-card">
+            <div class="client-surface mt-3">
                 <div class="card-body">
-                    <h6 class="card-title fw-bold mb-3">Acciones Rápidas</h6>
+                    <h6 class="card-title fw-bold mb-3">Atajos útiles</h6>
                     <div class="d-grid gap-2">
                         <a href="{% url 'ventas:ver_favoritos' %}" class="btn btn-outline-danger">
                             <i class="bi bi-heart me-2"></i>Ver Favoritos
@@ -158,17 +146,15 @@
 
 {% else %}
 <!-- Empty Cart -->
-<section class="container">
-    <div class="text-center py-5">
-        <div class="mb-4">
-            <i class="bi bi-cart-x text-muted" style="font-size: 5rem;"></i>
+<section class="client-surface client-empty-state">
+        <div class="client-empty-icon">
+            <i class="bi bi-cart-x"></i>
         </div>
-        <h2 class="text-muted mb-3">Tu carrito está vacío</h2>
-        <p class="text-muted mb-4">¡Es hora de llenarlo con productos increíbles!</p>
-        <a href="{% url 'ventas:catalogo_cliente' %}" class="btn btn-primary-custom btn-lg">
+        <h2 class="mb-3">Tu carrito está vacío</h2>
+        <p>Haz una primera selección y vuelve aquí para revisar cantidades, precios y el total antes de pagar.</p>
+        <a href="{% url 'ventas:catalogo_cliente' %}" class="client-btn-primary btn-lg">
             <i class="bi bi-shop me-2"></i>Ir al Catálogo
         </a>
-    </div>
 </section>
 {% endif %}
 

@@ -5,7 +5,10 @@ from .models import MateriaPrima
 class MateriaPrimaForm(forms.ModelForm):
     def clean_nombre(self):
         nombre = self.cleaned_data['nombre'].strip()
-        if MateriaPrima.objects.filter(nombre__iexact=nombre).exists():
+        qs = MateriaPrima.objects.filter(nombre__iexact=nombre)
+        if self.instance and self.instance.pk:
+            qs = qs.exclude(pk=self.instance.pk)
+        if qs.exists():
             raise forms.ValidationError('Ya existe una materia prima con ese nombre.')
         return nombre
 

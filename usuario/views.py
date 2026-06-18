@@ -1,7 +1,12 @@
 from django.http import HttpResponse
 import csv
+from django.contrib.auth.decorators import login_required
 from .models import Usuario
+from django.db.models import Q
+from gafra.access import ModuleAccessMixin, module_access_required
 
+@login_required
+@module_access_required('admin', module_key='usuario')
 def reportes(request):
     from django.utils import timezone
     from gafra.utils_pdf import render_pdf_from_template
@@ -61,10 +66,10 @@ from .forms_excel import ExcelUploadForm
 import pandas as pd
 from .models import Usuario
 from django.contrib.auth.models import User
-from django.contrib.auth.decorators import login_required
 
 # --- Carga masiva desde Excel ---
 @login_required
+@module_access_required('admin', module_key='usuario')
 def carga_masiva_usuarios(request):
     if request.method == 'POST':
         form = ExcelUploadForm(request.POST, request.FILES)
@@ -96,38 +101,65 @@ def carga_masiva_usuarios(request):
         form = ExcelUploadForm()
     return render(request, 'usuario/carga_masiva.html', {'form': form})
 from django.urls import reverse_lazy
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import ListView, CreateView, UpdateView, DeleteView
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView, DetailView
 
 from .models import Usuario
 from .forms import UsuarioForm
 
 
-class UsuarioListView(LoginRequiredMixin, ListView):
+class UsuarioListView(ModuleAccessMixin, ListView):
     model = Usuario
     template_name = 'usuario/usuario_list.html'
     context_object_name = 'usuarios'
     paginate_by = 20
+    module_key = 'usuario'
+    allowed_roles = ('admin',)
+
+    def get_queryset(self):
+        queryset = super().get_queryset().select_related('user').order_by('-fecha_creacion', '-id')
+        q = self.request.GET.get('q', '').strip()
+        if q:
+            queryset = queryset.filter(
+                Q(user__username__icontains=q)
+                | Q(user__first_name__icontains=q)
+                | Q(user__last_name__icontains=q)
+                | Q(user__email__icontains=q)
+            )
+        return queryset
 
 
-class UsuarioCreateView(LoginRequiredMixin, CreateView):
+class UsuarioDetailView(ModuleAccessMixin, DetailView):
+    model = Usuario
+    template_name = 'usuario/usuario_detail.html'
+    context_object_name = 'usuario_obj'
+    module_key = 'usuario'
+    allowed_roles = ('admin',)
+
+
+class UsuarioCreateView(ModuleAccessMixin, CreateView):
     model = Usuario
     form_class = UsuarioForm
     template_name = 'usuario/usuario_form.html'
     success_url = reverse_lazy('usuario:list')
+    module_key = 'usuario'
+    allowed_roles = ('admin',)
 
 
-class UsuarioUpdateView(LoginRequiredMixin, UpdateView):
+class UsuarioUpdateView(ModuleAccessMixin, UpdateView):
     model = Usuario
     form_class = UsuarioForm
     template_name = 'usuario/usuario_form.html'
     success_url = reverse_lazy('usuario:list')
+    module_key = 'usuario'
+    allowed_roles = ('admin',)
 
 
-class UsuarioDeleteView(LoginRequiredMixin, DeleteView):
+class UsuarioDeleteView(ModuleAccessMixin, DeleteView):
     model = Usuario
     template_name = 'usuario/usuario_confirm_delete.html'
     success_url = reverse_lazy('usuario:list')
+    module_key = 'usuario'
+    allowed_roles = ('admin',)
 
 
 # Vistas de autenticación

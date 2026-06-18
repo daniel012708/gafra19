@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from proveedores.models import Proveedor
 from productos.models import Producto
 from inventario.models import MateriaPrima
@@ -8,6 +8,7 @@ from ventas.models import Venta
 from ventas.models import DetalleVenta
 from django.db.models import Sum, F
 from datetime import datetime
+from gafra.access import get_user_role
 
 
 def _last_n_months(n=6):
@@ -21,6 +22,11 @@ def _last_n_months(n=6):
 
 
 def index(request):
+    role = get_user_role(request.user)
+    if role == 'cliente':
+        return redirect('ventas:catalogo_cliente')
+    if role == 'logistica':
+        return redirect('ventas:pedidos_logistica')
 
     # Métricas generales
     total_proveedores = Proveedor.objects.count()

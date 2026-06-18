@@ -1,7 +1,14 @@
 # Reportes de productos
 from django.http import HttpResponse
 import csv
+from django.contrib.auth.decorators import login_required
+from django.db.models import Q
 
+from gafra.access import ModuleAccessMixin, module_access_required
+
+
+@login_required
+@module_access_required('admin', 'almacenista', 'logistica', 'vendedor', module_key='productos')
 def reportes(request):
     from django.utils import timezone
     from gafra.utils_pdf import render_pdf_from_template
@@ -81,28 +88,48 @@ def reportes(request):
     })
 from django.urls import reverse_lazy
 from django.contrib import messages
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import ListView, CreateView, UpdateView, DeleteView
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView, DetailView
 
 from .models import Producto
 from .forms import ProductoForm, IngredienteRecetaFormSet
 
 
-class ProductoListView(LoginRequiredMixin, ListView):
+class ProductoListView(ModuleAccessMixin, ListView):
     model = Producto
     template_name = 'productos/producto_list.html'
     context_object_name = 'productos'
     paginate_by = 20
+    module_key = 'productos'
+    allowed_roles = ('admin', 'almacenista', 'logistica', 'vendedor')
+
+    def get_queryset(self):
+        queryset = super().get_queryset().select_related('categoria').order_by('nombre', 'id')
+        q = self.request.GET.get('q', '').strip()
+        if q:
+            queryset = queryset.filter(
+                Q(nombre__icontains=q) | Q(codigo__icontains=q) | Q(categoria__nombre__icontains=q)
+            )
+        return queryset
 
 
 
 from .models import Receta
 
-class ProductoCreateView(LoginRequiredMixin, CreateView):
+
+class ProductoDetailView(ModuleAccessMixin, DetailView):
+    model = Producto
+    template_name = 'productos/producto_detail.html'
+    context_object_name = 'producto'
+    module_key = 'productos'
+    allowed_roles = ('admin', 'almacenista', 'logistica', 'vendedor')
+
+class ProductoCreateView(ModuleAccessMixin, CreateView):
     model = Producto
     form_class = ProductoForm
     template_name = 'productos/producto_form.html'
     success_url = reverse_lazy('productos:list')
+    module_key = 'productos'
+    allowed_roles = ('admin', 'almacenista', 'logistica', 'vendedor')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -128,11 +155,13 @@ class ProductoCreateView(LoginRequiredMixin, CreateView):
 
 
 
-class ProductoUpdateView(LoginRequiredMixin, UpdateView):
+class ProductoUpdateView(ModuleAccessMixin, UpdateView):
     model = Producto
     form_class = ProductoForm
     template_name = 'productos/producto_form.html'
     success_url = reverse_lazy('productos:list')
+    module_key = 'productos'
+    allowed_roles = ('admin', 'almacenista', 'logistica', 'vendedor')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -157,10 +186,12 @@ class ProductoUpdateView(LoginRequiredMixin, UpdateView):
             return self.form_invalid(form)
 
 
-class ProductoDeleteView(LoginRequiredMixin, DeleteView):
+class ProductoDeleteView(ModuleAccessMixin, DeleteView):
     model = Producto
     template_name = 'productos/producto_confirm_delete.html'
     success_url = reverse_lazy('productos:list')
+    module_key = 'productos'
+    allowed_roles = ('admin', 'almacenista', 'logistica', 'vendedor')
     
     def delete(self, request, *args, **kwargs):
         obj = self.get_object()
@@ -170,12 +201,12 @@ class ProductoDeleteView(LoginRequiredMixin, DeleteView):
 
 # --- Carga masiva desde Excel ---
 from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required
 from .forms_excel import ExcelUploadForm
 import pandas as pd
 from .models import Producto, Categoria
 
 @login_required
+@module_access_required('admin', 'almacenista', 'logistica', 'vendedor', module_key='productos')
 def carga_masiva_productos(request):
     if request.method == 'POST':
         form = ExcelUploadForm(request.POST, request.FILES)

@@ -2,12 +2,14 @@ from django.test import TestCase, Client
 from django.urls import reverse
 from django.contrib.auth.models import User
 from .models import Proveedor
+from usuario.models import Usuario
 
 
 class ProveedorViewsTest(TestCase):
     def setUp(self):
         self.client = Client()
         self.user = User.objects.create_user(username='tester', password='pass')
+        Usuario.objects.create(user=self.user, rol='almacenista', telefono='3001234567', activo=True)
         self.proveedor = Proveedor.objects.create(
             nombre='Prov T', contacto='C', telefono='123', email='a@b.com',
             direccion='Dir', ciudad='Ciudad', pais='Pais', activo=True
@@ -26,8 +28,15 @@ class ProveedorViewsTest(TestCase):
     def test_create(self):
         self.client.login(username='tester', password='pass')
         data = {
-            'nombre': 'Prov2', 'contacto':'X','telefono':'000','email':'x@x.com',
-            'direccion':'D','ciudad':'C','pais':'P','activo': True
+            'nombre': 'Prov2',
+            'contacto': 'Xyz',
+            'telefono': '3000000',
+            'email': 'x@x.com',
+            'direccion': 'D',
+            'ciudad': 'C',
+            'pais': 'P',
+            'tipo': 'Nacional',
+            'activo': 'on',
         }
         response = self.client.post(reverse('proveedores:create'), data)
         self.assertEqual(response.status_code, 302)

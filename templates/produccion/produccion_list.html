@@ -45,13 +45,18 @@
     {% endif %}
 
     <div class="card">
-    <div class="card-header d-flex justify-content-between align-items-center">
-        <h5 class="mb-0">Órdenes de Producción</h5>
-        <div class="d-flex gap-2">
+    <div class="card-header d-flex justify-content-between align-items-center list-card-header">
+        <div>
+            <h5 class="mb-0">Órdenes de Producción</h5>
+            <small class="text-muted">Vista compacta de seguimiento productivo</small>
+        </div>
+        <div class="list-card-actions">
+            <form method="get" class="list-search-form">
+                <input type="search" name="q" value="{{ request.GET.q|default:'' }}" class="form-control form-control-sm" placeholder="Buscar orden">
+                <button type="submit" class="btn btn-outline-primary btn-sm">Buscar</button>
+            </form>
             <a href="{% url 'produccion:carga_masiva' %}" class="btn btn-outline-success btn-sm">Carga masiva</a>
             <a href="{% url 'produccion:reportes' %}" class="btn btn-outline-secondary btn-sm">Reportes</a>
-        </div>
-        <div class="d-flex gap-2">
             <!-- Filtros por estado -->
             <div class="dropdown">
                 <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
@@ -71,79 +76,74 @@
     </div>
     <div class="card-body p-0">
         <div class="table-responsive">
-            <table class="table table-striped table-hover mb-0 align-middle">
+            <table class="table table-striped table-hover table-compact mb-0 align-middle">
                 <thead class="table-light">
                     <tr>
                         <th>ID</th>
                         <th>Producto</th>
-                        <th>Receta</th>
                         <th>Cantidad</th>
                         <th>Responsable</th>
                         <th>Estado</th>
-                        <th>Fecha Creación</th>
-                        <th>Fecha Inicio</th>
-                        <th>Fecha Fin</th>
+                        <th>Fechas</th>
                         <th>Notas</th>
-                        <th>Acciones</th>
+                        <th class="text-end">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
                 {% for orden in ordenes_produccion %}
                     <tr class="{% if orden.estado == 'pendiente' %}orden-pendiente{% elif orden.estado == 'en_progreso' %}orden-en-progreso{% else %}orden-completada{% endif %}">
                         <td><span class="badge bg-secondary">OP-{{ orden.id }}</span></td>
-                        <td><strong>{{ orden.producto.nombre }}</strong></td>
                         <td>
-                            {% if orden.receta %}
-                                {% if orden.receta.descripcion %}
-                                    <span title="{{ orden.receta.descripcion }}">Receta de {{ orden.producto.nombre }}</span>
-                                {% else %}
-                                    Receta de {{ orden.producto.nombre }}
-                                {% endif %}
-                            {% else %}
-                                <span class="text-muted">-</span>
-                            {% endif %}
+                            <div class="cell-stack">
+                                <span class="cell-title">{{ orden.producto.nombre }}</span>
+                                <span class="cell-muted">{{ orden.receta.descripcion|default:'Sin receta descriptiva'|truncatechars:36 }}</span>
+                            </div>
                         </td>
                         <td><span class="badge bg-light text-dark">{{ orden.cantidad_a_producir }}</span></td>
-                        <td>{% if orden.responsable %}<span class="badge bg-info text-dark">{{ orden.responsable.get_full_name|default:orden.responsable.username }}</span>{% else %}<span class="text-muted">-</span>{% endif %}</td>
+                        <td>{% if orden.responsable %}{{ orden.responsable.get_full_name|default:orden.responsable.username }}{% else %}<span class="text-muted">-</span>{% endif %}</td>
                         <td>
                             <span class="badge {% if orden.estado == 'pendiente' %}bg-warning{% elif orden.estado == 'en_progreso' %}bg-info{% else %}bg-success{% endif %}">
                                 {{ orden.get_estado_display }}
                             </span>
                         </td>
-                        <td>{{ orden.fecha_creacion|date:"d/m/Y H:i" }}</td>
-                        <td>{% if orden.fecha_inicio %}{{ orden.fecha_inicio|date:"d/m/Y H:i" }}{% else %}-{% endif %}</td>
-                        <td>{% if orden.fecha_fin %}{{ orden.fecha_fin|date:"d/m/Y H:i" }}{% else %}-{% endif %}</td>
+                        <td>
+                            <div class="cell-stack">
+                                <span class="cell-muted">Creada: {{ orden.fecha_creacion|date:"d/m/Y" }}</span>
+                                <span class="cell-muted">Inicio: {% if orden.fecha_inicio %}{{ orden.fecha_inicio|date:"d/m/Y" }}{% else %}-{% endif %}</span>
+                                <span class="cell-muted">Fin: {% if orden.fecha_fin %}{{ orden.fecha_fin|date:"d/m/Y" }}{% else %}-{% endif %}</span>
+                            </div>
+                        </td>
                         <td>{% if orden.notas %}<span title="{{ orden.notas }}">{{ orden.notas|truncatechars:30 }}</span>{% else %}<span class="text-muted">-</span>{% endif %}</td>
-                        <td class="table-actions">
-                            <div class="btn-group btn-group-sm" role="group">
+                        <td class="table-actions text-end">
+                            <div class="table-action-group" role="group">
+                                <a href="{% url 'produccion:detail' orden.pk %}" class="btn btn-outline-primary btn-sm" title="Ver detalle">
+                                    Ver
+                                </a>
                                 {% if orden.estado == 'pendiente' %}
                                     <a href="{% url 'produccion:iniciar' orden.pk %}" class="btn btn-success btn-sm"
                                        onclick="return confirm('¿Iniciar producción? Se consumirán las materias primas necesarias.')"
                                        title="Iniciar producción">
-                                        <i class="bi bi-play-fill"></i> Iniciar
+                                        Iniciar
                                     </a>
                                 {% elif orden.estado == 'en_progreso' %}
                                     <a href="{% url 'produccion:completar' orden.pk %}" class="btn btn-primary btn-sm"
                                        title="Completar producción">
-                                        <i class="bi bi-check-circle-fill"></i> Completar
+                                        Completar
                                     </a>
                                 {% endif %}
                                 {% if orden.estado == 'pendiente' %}
                                     <a href="{% url 'produccion:update' orden.pk %}" class="btn btn-outline-secondary btn-sm"
-                                       title="Editar orden">
-                                        <i class="bi bi-pencil"></i>
+                                       title="Editar orden">Editar
                                     </a>
                                     <a href="{% url 'produccion:delete' orden.pk %}" class="btn btn-outline-danger btn-sm"
                                        onclick="return confirm('¿Eliminar esta orden de producción?')"
-                                       title="Eliminar orden">
-                                        <i class="bi bi-trash"></i>
-                                    </a>
+                                       title="Eliminar orden">Eliminar</a>
                                 {% endif %}
                             </div>
                         </td>
                     </tr>
                 {% empty %}
-                    <tr><td colspan="7" class="text-center py-3">No hay órdenes de producción.</td></tr>
+                    <tr><td colspan="8" class="text-center py-3">No hay órdenes de producción.</td></tr>
                 {% endfor %}
                 </tbody>
             </table>

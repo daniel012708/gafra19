@@ -1,17 +1,41 @@
-from django.test import TestCase, Client
-from django.urls import reverse
 from django.contrib.auth.models import User
-from productos.models import Categoria, Producto
-from .models import Inventario
+from django.test import Client, TestCase
+from django.urls import reverse
+
+from proveedores.models import Proveedor
+from usuario.models import Usuario
+
+from .models import MateriaPrima
 
 
 class InventarioViewsTest(TestCase):
     def setUp(self):
         self.client = Client()
         self.user = User.objects.create_user(username='tester', password='pass')
-        cat = Categoria.objects.create(nombre='CatTest')
-        prod = Producto.objects.create(codigo='X1', nombre='ProdX', descripcion='', categoria=cat, precio_costo=1, precio_venta=2, activo=True)
-        self.inv = Inventario.objects.create(producto=prod, cantidad_actual=10, cantidad_minima=1, cantidad_maxima=20, ubicacion='A1')
+        Usuario.objects.create(user=self.user, rol='almacenista', telefono='3001234567', activo=True)
+        self.proveedor = Proveedor.objects.create(
+            nombre='Proveedor Base',
+            contacto='Ana Ruiz',
+            telefono='3001234567',
+            email='proveedor.base@example.com',
+            direccion='Calle 1',
+            ciudad='Bogota',
+            pais='Colombia',
+            tipo='Nacional',
+            activo=True,
+        )
+        self.materia_prima = MateriaPrima.objects.create(
+            nombre='Tela premium',
+            descripcion='Tela de prueba',
+            marca='Marca X',
+            proveedor=self.proveedor,
+            precio_unitario=10,
+            unidad_medida='kg',
+            stock_actual=10,
+            stock_minimo=2,
+            ubicacion='A1',
+            activo=True,
+        )
 
     def test_list_requires_login(self):
         response = self.client.get(reverse('inventario:list'))
@@ -20,17 +44,24 @@ class InventarioViewsTest(TestCase):
     def test_list_shows_items(self):
         self.client.login(username='tester', password='pass')
         response = self.client.get(reverse('inventario:list'))
-        self.assertContains(response, 'ProdX')
+        self.assertContains(response, 'Tela premium')
         self.assertEqual(response.status_code, 200)
 
     def test_create(self):
         self.client.login(username='tester', password='pass')
-        # create a different product to avoid one-to-one conflict
-        new_cat = Categoria.objects.create(nombre='Another')
-        prod2 = Producto.objects.create(
-            codigo='Y2', nombre='ProdY', descripcion='', categoria=new_cat, precio_costo=1, precio_venta=2, activo=True
-        )
-        data = {'producto': prod2.id, 'cantidad_actual':5, 'cantidad_minima':0, 'cantidad_maxima':10, 'ubicacion':'B2'}
+        data = {
+            'nombre': 'Espuma HR',
+            'descripcion': 'Espuma de alta densidad',
+            'marca': 'Marca Y',
+            'proveedor': self.proveedor.id,
+            'precio_unitario': '25.50',
+            'unidad_medida': 'kg',
+            'stock_actual': '15',
+            'stock_minimo': '3',
+            'ubicacion': 'B2',
+            'observaciones': 'Ingreso inicial',
+            'activo': 'on',
+        }
         response = self.client.post(reverse('inventario:create'), data)
         self.assertEqual(response.status_code, 302)
-        self.assertTrue(Inventario.objects.filter(ubicacion='B2').exists())
+        self.assertTrue(MateriaPrima.objects.filter(nombre='Espuma HR').exists())

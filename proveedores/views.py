@@ -2,12 +2,15 @@ from django.http import HttpResponse
 import csv
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q
 from .forms_excel import ExcelUploadForm
 import pandas as pd
 from .models import Proveedor
+from gafra.access import ModuleAccessMixin, module_access_required
 
 # --- Carga masiva desde Excel ---
 @login_required
+@module_access_required('admin', 'almacenista', 'logistica', module_key='proveedores')
 def carga_masiva_proveedores(request):
     if request.method == 'POST':
         form = ExcelUploadForm(request.POST, request.FILES)
@@ -45,27 +48,50 @@ def carga_masiva_proveedores(request):
         form = ExcelUploadForm()
     return render(request, 'proveedores/carga_masiva.html', {'form': form})
 from django.urls import reverse_lazy
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import ListView, CreateView, UpdateView, DeleteView
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView, DetailView
 
 from .models import Proveedor
 from .forms import ProveedorForm
 from .movimientos import ProveedorMovimiento
 
 
-class ProveedorListView(LoginRequiredMixin, ListView):
+class ProveedorListView(ModuleAccessMixin, ListView):
     model = Proveedor
     template_name = 'proveedores/proveedor_list.html'
     context_object_name = 'proveedores'
     paginate_by = 20
+    module_key = 'proveedores'
+    allowed_roles = ('admin', 'almacenista', 'logistica')
+
+    def get_queryset(self):
+        queryset = super().get_queryset().order_by('nombre', 'id')
+        q = self.request.GET.get('q', '').strip()
+        if q:
+            queryset = queryset.filter(
+                Q(nombre__icontains=q)
+                | Q(contacto__icontains=q)
+                | Q(email__icontains=q)
+                | Q(ciudad__icontains=q)
+            )
+        return queryset
+
+
+class ProveedorDetailView(ModuleAccessMixin, DetailView):
+    model = Proveedor
+    template_name = 'proveedores/proveedor_detail.html'
+    context_object_name = 'proveedor'
+    module_key = 'proveedores'
+    allowed_roles = ('admin', 'almacenista', 'logistica')
 
 
 
-class ProveedorCreateView(LoginRequiredMixin, CreateView):
+class ProveedorCreateView(ModuleAccessMixin, CreateView):
     model = Proveedor
     form_class = ProveedorForm
     template_name = 'proveedores/proveedor_form.html'
     success_url = reverse_lazy('proveedores:list')
+    module_key = 'proveedores'
+    allowed_roles = ('admin', 'almacenista', 'logistica')
 
     def form_valid(self, form):
         response = super().form_valid(form)
@@ -79,11 +105,13 @@ class ProveedorCreateView(LoginRequiredMixin, CreateView):
 
 
 
-class ProveedorUpdateView(LoginRequiredMixin, UpdateView):
+class ProveedorUpdateView(ModuleAccessMixin, UpdateView):
     model = Proveedor
     form_class = ProveedorForm
     template_name = 'proveedores/proveedor_form.html'
     success_url = reverse_lazy('proveedores:list')
+    module_key = 'proveedores'
+    allowed_roles = ('admin', 'almacenista', 'logistica')
 
     def form_valid(self, form):
         response = super().form_valid(form)
@@ -97,10 +125,12 @@ class ProveedorUpdateView(LoginRequiredMixin, UpdateView):
 
 
 
-class ProveedorDeleteView(LoginRequiredMixin, DeleteView):
+class ProveedorDeleteView(ModuleAccessMixin, DeleteView):
     model = Proveedor
     template_name = 'proveedores/proveedor_confirm_delete.html'
     success_url = reverse_lazy('proveedores:list')
+    module_key = 'proveedores'
+    allowed_roles = ('admin', 'almacenista', 'logistica')
 
     def delete(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -113,6 +143,8 @@ class ProveedorDeleteView(LoginRequiredMixin, DeleteView):
         return super().delete(request, *args, **kwargs)
 
 
+@login_required
+@module_access_required('admin', 'almacenista', 'logistica', module_key='proveedores')
 def reportes(request):
     from django.utils import timezone
     from gafra.utils_pdf import render_pdf_from_template

@@ -13,9 +13,16 @@
 </div>
 {% endif %}
 <div class="card">
-    <div class="card-header d-flex justify-content-between align-items-center">
-        <h5 class="mb-0">Materias Primas</h5>
-        <div class="d-flex gap-2">
+    <div class="card-header d-flex justify-content-between align-items-center list-card-header">
+        <div>
+            <h5 class="mb-0">Materias Primas</h5>
+            <small class="text-muted">Vista resumida de inventario base</small>
+        </div>
+        <div class="list-card-actions">
+            <form method="get" class="list-search-form">
+                <input type="search" name="q" value="{{ request.GET.q|default:'' }}" class="form-control form-control-sm" placeholder="Buscar materia prima">
+                <button type="submit" class="btn btn-outline-primary btn-sm">Buscar</button>
+            </form>
             <a href="{% url 'inventario:create' %}" class="btn btn-primary btn-sm">Nueva Materia Prima</a>
             <a href="{% url 'inventario:carga_masiva' %}" class="btn btn-outline-success btn-sm">Carga masiva</a>
             <a href="{% url 'inventario:reportes' %}" class="btn btn-outline-secondary btn-sm">Reportes</a>
@@ -24,42 +31,36 @@
     </div>
     <div class="card-body p-0">
         <div class="table-responsive">
-            <table class="table table-striped table-hover mb-0 align-middle">
+            <table class="table table-striped table-hover table-compact mb-0 align-middle">
                 <thead class="table-primary">
                     <tr>
                         <th>Código</th>
-                        <th>Nombre</th>
-                        <th>Marca</th>
-                        <th>Stock Actual</th>
-                        <th>Stock Mínimo</th>
-                        <th>Unidad</th>
-                        <th>Precio Unitario</th>
+                        <th>Materia prima</th>
+                        <th>Stock</th>
                         <th>Proveedor</th>
                         <th>Ubicación</th>
-                        <th>Fecha creación</th>
-                        <th>Observaciones</th>
                         <th>Estado</th>
-                        <th>Acciones</th>
+                        <th class="text-end">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
                 {% for materia in materias_primas %}
                     <tr>
                         <td><span class="text-monospace small">{{ materia.codigo }}</span></td>
-                        <td>{{ materia.nombre }}</td>
-                        <td>{{ materia.marca }}</td>
                         <td>
-                            <span class="{% if materia.stock_actual <= materia.stock_minimo %}text-danger fw-bold{% elif materia.stock_actual <= materia.stock_minimo|add:10 %}text-warning{% else %}text-success{% endif %}">
-                                {{ materia.stock_actual }}
-                            </span>
+                            <div class="cell-stack">
+                                <span class="cell-title">{{ materia.nombre }}</span>
+                                <span class="cell-muted">{{ materia.marca|default:'Sin marca' }}</span>
+                            </div>
                         </td>
-                        <td>{{ materia.stock_minimo }}</td>
-                        <td>{{ materia.get_unidad_medida_display }}</td>
-                        <td>${{ materia.precio_unitario }}</td>
+                        <td>
+                            <div class="cell-stack">
+                                <span class="{% if materia.stock_actual <= materia.stock_minimo %}text-danger fw-bold{% elif materia.stock_actual <= materia.stock_minimo|add:10 %}text-warning{% else %}text-success{% endif %}">{{ materia.stock_actual }}</span>
+                                <span class="cell-muted">Min: {{ materia.stock_minimo }}</span>
+                            </div>
+                        </td>
                         <td>{{ materia.proveedor.nombre }}</td>
                         <td>{{ materia.ubicacion }}</td>
-                        <td><span class="small">{{ materia.fecha_creacion|date:"Y-m-d H:i" }}</span></td>
-                        <td><span class="text-muted small">{{ materia.observaciones|default:"-" }}</span></td>
                         <td>
                             {% if materia.activo %}
                                 <span class="badge bg-success">Sí</span>
@@ -67,17 +68,16 @@
                                 <span class="badge bg-danger">No</span>
                             {% endif %}
                         </td>
-                        <td class="table-actions">
-                            <div class="action-btn-group d-flex gap-1">
+                        <td class="table-actions text-end">
+                            <div class="table-action-group">
+                                <a href="{% url 'inventario:detail' materia.pk %}" class="btn btn-sm btn-outline-primary">Ver</a>
                                 <a href="{% url 'inventario:update' materia.pk %}" class="btn btn-sm btn-outline-secondary">Editar</a>
                                 <a href="{% url 'inventario:delete' materia.pk %}" class="btn btn-sm btn-outline-danger">Eliminar</a>
-                                <a href="{% url 'inventario:entrada' materia.pk %}" class="btn btn-sm btn-outline-success">Entrada</a>
-                                <a href="{% url 'inventario:historial' materia.pk %}" class="btn btn-sm btn-outline-info">Historial</a>
                             </div>
                         </td>
                     </tr>
                 {% empty %}
-                    <tr><td colspan="13" class="text-center py-3">No hay materias primas registradas.</td></tr>
+                    <tr><td colspan="7" class="text-center py-3">No hay materias primas registradas.</td></tr>
                 {% endfor %}
                 </tbody>
             </table>

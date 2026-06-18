@@ -28,7 +28,10 @@ from inventario.models import MateriaPrima
 class ProductoForm(forms.ModelForm):
     def clean_nombre(self):
         nombre = self.cleaned_data['nombre'].strip()
-        if Producto.objects.filter(nombre__iexact=nombre).exists():
+        qs = Producto.objects.filter(nombre__iexact=nombre)
+        if self.instance and self.instance.pk:
+            qs = qs.exclude(pk=self.instance.pk)
+        if qs.exists():
             raise forms.ValidationError('Ya existe un producto con ese nombre.')
         return nombre
 

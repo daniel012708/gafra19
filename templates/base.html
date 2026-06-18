@@ -15,62 +15,263 @@
     <link rel="stylesheet" href="{% static 'css/saas.css' %}?v={{ STATIC_VERSION }}">
         <style>
         .app-sidebar {
-            width: 256px;
-            min-width: 256px;
-            max-width: 256px;
+            width: 288px;
+            min-width: 288px;
+            max-width: 288px;
             height: 100vh;
-            background: linear-gradient(180deg, #101828 0%, #172033 100%);
-            box-shadow: var(--shadow, 0 0 24px rgba(102,126,234,0.08));
+            background:
+                radial-gradient(circle at top left, rgba(96, 165, 250, .18), transparent 28%),
+                linear-gradient(180deg, #0b1220 0%, #101828 56%, #162033 100%);
+            box-shadow: 18px 0 42px rgba(2, 6, 23, .16);
             flex-shrink: 0;
             position: fixed;
             left: 0;
             top: 0;
             z-index: 1030;
-            overflow-y: auto;
-            border-right: 1px solid rgba(255,255,255,.06);
+            overflow: hidden;
+            border-right: 1px solid rgba(148, 163, 184, .14);
         }
         .app-main {
-            margin-left: 256px;
+            margin-left: 288px;
             flex-grow: 1;
             min-width: 0;
             z-index: 1;
             padding-left: 0;
             overflow-x: hidden;
         }
+        .app-sidebar.expanded ~ .app-main {
+            margin-left: 288px;
+        }
+        .app-sidebar.expanded .sidebar-inner,
         .sidebar-inner {
             min-height: 100vh;
-            padding: 1rem .9rem;
+            width: 100%;
+            max-width: 100%;
+            margin: 0;
+            padding: 1.5rem 1rem 1.2rem;
+            border-right: 0;
             align-items: stretch !important;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(96, 165, 250, .45) transparent;
+        }
+        .sidebar-inner::-webkit-scrollbar {
+            width: 8px;
+        }
+        .sidebar-inner::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .sidebar-inner::-webkit-scrollbar-thumb {
+            background: rgba(96, 165, 250, .32);
+            border-radius: 999px;
+        }
+        .sidebar-brand {
+            width: 100%;
+            gap: .9rem;
+            padding: .85rem 1rem;
+            border-radius: 20px;
+            background: linear-gradient(135deg, rgba(59, 130, 246, .16), rgba(125, 211, 252, .08));
+            border: 1px solid rgba(148, 163, 184, .16);
+            text-decoration: none;
+        }
+        .brand-logo {
+            width: 46px;
+            height: 46px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, rgba(96, 165, 250, .32), rgba(14, 165, 233, .16));
+            padding: .35rem;
+        }
+        .brand-copy {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+        .brand-title {
+            color: #f8fafc;
+            font-size: .98rem;
+            font-weight: 800;
+            letter-spacing: .08em;
+        }
+        .brand-subtitle {
+            color: rgba(226, 232, 240, .72);
+            font-size: .72rem;
+            letter-spacing: .04em;
+            text-transform: uppercase;
+        }
+        .window-controls {
+            display: none !important;
+        }
+        .sidebar-search {
+            padding: 0 !important;
+            margin: 1rem 0 1.2rem !important;
+        }
+        .sidebar-search .input-group {
+            padding: 0;
+        }
+        .sidebar-search .form-control {
+            min-height: 46px;
+            padding: .75rem 1rem;
+            border-radius: 16px !important;
+            border: 1px solid rgba(148, 163, 184, .16);
+            background: rgba(15, 23, 42, .38);
+            color: #f8fafc;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, .02);
+        }
+        .sidebar-search .form-control::placeholder {
+            color: rgba(226, 232, 240, .58);
+        }
+        .sidebar-search .form-control:focus {
+            border-color: rgba(96, 165, 250, .5);
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, .16);
+            background: rgba(15, 23, 42, .52);
+        }
+        .sidebar-nav {
+            gap: .35rem;
+        }
+        .sidebar-section-label {
+            display: inline-flex;
+            align-items: center;
+            padding: 0 .35rem;
+            margin: 0 0 .65rem;
+            color: rgba(148, 163, 184, .72);
+            font-size: .72rem;
+            font-weight: 700;
+            letter-spacing: .08em;
+            text-transform: uppercase;
         }
         .sidebar-nav .nav-link {
             display: flex;
             align-items: center;
-            gap: .75rem;
-            padding: .8rem .95rem;
-            border-radius: 14px;
-            color: rgba(255,255,255,.84);
+            gap: .85rem;
+            width: 100%;
+            padding: .9rem 1rem;
+            border-radius: 16px;
+            color: rgba(241, 245, 249, .88);
             font-weight: 600;
+            background: transparent;
+            border: 1px solid transparent;
+            transition: transform .18s ease, background .18s ease, border-color .18s ease, box-shadow .18s ease, color .18s ease;
         }
         .sidebar-nav .nav-link i {
-            font-size: 1.1rem;
-            width: 1.25rem;
+            font-size: 1.05rem;
+            width: 2.25rem;
+            height: 2.25rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
             text-align: center;
+            border-radius: 12px;
+            color: #93c5fd;
+            background: rgba(148, 163, 184, .10);
+            flex-shrink: 0;
+        }
+        .sidebar-nav .nav-text {
+            display: flex;
+            flex: 1 1 auto;
+            align-items: center;
+            min-width: 0;
+            font-size: .96rem;
         }
         .sidebar-nav .nav-link:hover,
         .sidebar-nav .nav-link.active {
-            background: rgba(255,255,255,.09);
+            background: linear-gradient(135deg, rgba(30, 41, 59, .96), rgba(15, 23, 42, .92));
             color: #fff;
+            border-color: rgba(96, 165, 250, .24);
+            box-shadow: 0 14px 24px rgba(2, 6, 23, .22);
+            transform: translateX(2px);
+        }
+        .sidebar-nav .nav-link:hover i,
+        .sidebar-nav .nav-link.active i {
+            background: linear-gradient(135deg, #60a5fa, #38bdf8);
+            color: #eff6ff;
+            box-shadow: 0 10px 20px rgba(56, 189, 248, .24);
+        }
+        .sidebar-footer {
+            margin-top: 1.25rem !important;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(148, 163, 184, .12);
+        }
+        .app-sidebar.expanded .sidebar-footer {
+            justify-content: stretch;
+            padding-left: 0;
+        }
+        .sidebar-user {
+            width: 100%;
+            padding: .95rem 1rem;
+            border-radius: 20px;
+            text-align: left;
+            background: linear-gradient(180deg, rgba(15, 23, 42, .72), rgba(15, 23, 42, .4));
+            border: 1px solid rgba(148, 163, 184, .12);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, .03);
+        }
+        .sidebar-user > a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: .8rem;
+        }
+        .sidebar-user .avatar-sm {
+            width: 48px;
+            height: 48px;
+            padding: .2rem;
+            border: 1px solid rgba(148, 163, 184, .24);
+            background: rgba(15, 23, 42, .72);
         }
         .sidebar-user-name,
         .sidebar-user-role {
             color: rgba(255,255,255,.88);
         }
+        .sidebar-user-name {
+            font-weight: 700;
+            line-height: 1.2;
+        }
         .sidebar-user-role {
-            font-size: .82rem;
-            opacity: .72;
+            font-size: .8rem;
+            opacity: .68;
+            margin-top: .2rem;
+            text-transform: uppercase;
+            letter-spacing: .05em;
+        }
+        .sidebar-logout {
+            display: inline-flex;
+            justify-content: center;
+            width: 100%;
+            margin-top: .9rem !important;
+            border-radius: 999px;
+            border-color: rgba(96, 165, 250, .28);
+            color: #dbeafe;
+            background: linear-gradient(135deg, rgba(30, 41, 59, .92), rgba(15, 23, 42, .9));
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, .04);
+        }
+        .sidebar-logout:hover {
+            border-color: rgba(125, 211, 252, .5);
+            background: linear-gradient(135deg, rgba(59, 130, 246, .28), rgba(15, 23, 42, .95));
+            color: #fff;
+        }
+        .app-topbar {
+            padding: 1rem 1.5rem;
+            margin: 1.1rem 1.25rem 0;
+            border-radius: 0 0 20px 20px;
+            background: linear-gradient(180deg, rgba(255, 255, 255, .88), rgba(255, 255, 255, .74));
+            backdrop-filter: blur(18px);
+            border: 1px solid rgba(148, 163, 184, .16);
+            box-shadow: 0 18px 32px rgba(15, 23, 42, .08);
+        }
+        .topbar-search .form-control {
+            min-height: 44px;
+            border-radius: 999px !important;
+            border-color: rgba(148, 163, 184, .24);
+            background: rgba(248, 250, 252, .94);
+        }
+        .topbar-search .btn {
+            min-width: 110px;
+            border-radius: 999px;
+        }
+        .app-content {
+            padding: 1.5rem 1.25rem 2rem !important;
         }
         .app-content .table {
-            table-layout: fixed;
+            table-layout: auto;
             width: 100%;
         }
         .app-content .table th,
@@ -81,13 +282,86 @@
         .table-actions {
             white-space: nowrap;
         }
+        .list-card-header {
+            gap: .75rem;
+            flex-wrap: wrap;
+        }
+        .list-card-actions {
+            display: flex;
+            gap: .5rem;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: flex-end;
+        }
+        .list-search-form {
+            display: flex;
+            gap: .5rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .list-search-form .form-control {
+            min-width: 180px;
+        }
+        .table-compact th,
+        .table-compact td {
+            padding: .75rem .85rem;
+        }
+        .cell-muted {
+            color: #64748b;
+            font-size: .85rem;
+        }
+        .cell-title {
+            font-weight: 700;
+            color: #0f172a;
+        }
+        .cell-stack {
+            display: flex;
+            flex-direction: column;
+            gap: .15rem;
+            min-width: 0;
+        }
+        .table-action-group {
+            display: flex;
+            gap: .35rem;
+            flex-wrap: nowrap;
+            justify-content: flex-end;
+        }
+        .table-action-group .btn {
+            white-space: nowrap;
+        }
+        .table-responsive {
+            overflow-x: auto;
+            overflow-y: visible;
+            -webkit-overflow-scrolling: touch;
+        }
         @media (max-width: 900px) {
             .app-sidebar {
-                width: 220px;
-                min-width: 220px;
-                max-width: 220px;
+                width: 248px;
+                min-width: 248px;
+                max-width: 248px;
             }
-            .app-main { margin-left: 220px; }
+            .app-main { margin-left: 248px; }
+            .app-sidebar.expanded ~ .app-main { margin-left: 248px; }
+        }
+        @media (max-width: 768px) {
+            .app-topbar {
+                margin: .75rem .75rem 0;
+                padding: .9rem 1rem;
+            }
+            .list-card-actions,
+            .list-search-form {
+                width: 100%;
+                justify-content: flex-start;
+            }
+            .list-search-form .form-control {
+                min-width: 0;
+                width: 100%;
+            }
+            .table-compact th,
+            .table-compact td {
+                padding: .65rem .7rem;
+                font-size: .92rem;
+            }
         }
         @media (max-width: 640px) {
             .app-sidebar {
@@ -96,18 +370,31 @@
                 max-width: 100%;
                 height: auto;
                 position: static;
+                border-right: 0;
+                box-shadow: none;
             }
             .app-main { margin-left: 0; }
+            .sidebar-inner {
+                min-height: auto;
+                padding: 1rem .85rem;
+            }
+            .sidebar-brand {
+                padding: .8rem .9rem;
+            }
         }
         </style>
     </head>
     <body>
         <div class="app-wrapper d-flex">
-            <aside class="app-sidebar" id="appSidebar" aria-label="Sidebar">
+            <aside class="app-sidebar expanded" id="appSidebar" aria-label="Sidebar">
                 <div class="sidebar-inner d-flex flex-column">
                     <div class="d-flex w-100 justify-content-center mb-2 position-relative">
                         <a href="/" class="sidebar-brand d-flex align-items-center" title="GAFRA">
                             <img src="{% static 'img/logo.svg' %}" alt="Gafra" class="brand-logo" onerror="this.style.display='none'">
+                            <span class="brand-copy">
+                                <span class="brand-title">GAFRA</span>
+                                <span class="brand-subtitle">Panel operativo</span>
+                            </span>
                         </a>
                         <div class="window-controls d-none d-md-flex">
                             <span class="dot dot-red"></span>
@@ -125,6 +412,7 @@
                     </div>
 
                     <nav class="nav flex-column sidebar-nav mt-2" role="navigation">
+                        <span class="sidebar-section-label">Navegación</span>
                         {% for link in sidebar_navigation %}
                         <a class="nav-link {% if current_module == link.key %}active{% endif %}" href="{% url link.url_name %}">
                             <i class="bi {{ link.icon }}"></i><span class="nav-text">{{ link.label }}</span>
@@ -140,7 +428,7 @@
                             <div class="mt-2">
                                 <div class="sidebar-user-name">{{ user.get_full_name|default:user.username }}</div>
                                 <div class="sidebar-user-role">{{ current_user_role_label }}</div>
-                                <a href="{% url 'logout' %}" class="d-inline-block mt-2 btn btn-sm btn-outline-secondary">Cerrar sesión</a>
+                                <a href="{% url 'logout' %}" class="sidebar-logout d-inline-block mt-2 btn btn-sm btn-outline-secondary">Cerrar sesión</a>
                             </div>
                         </div>
                     </div>
@@ -313,16 +601,10 @@
             });
         </script>
         <script>
-            // Ensure sidebar is expanded on desktop and match main card heights
+            // Keep sidebar expanded on desktop and match main card heights
             document.addEventListener('DOMContentLoaded', function(){
                 try{
                     if(window.innerWidth >= 768){
-                        const sidebar = document.getElementById('appSidebar');
-                        if(sidebar) {
-                            // start collapsed by default on desktop; hovering will expand temporarily
-                            sidebar.classList.add('collapsed');
-                        }
-
                         // Make cards in the main container match the height of the welcome card
                         const welcome = document.querySelector('.welcome-card');
                         const cards = Array.from(document.querySelectorAll('.app-content .container-lg .card'));
@@ -335,15 +617,6 @@
                         }
                     }
                 }catch(e){ console && console.debug && console.debug(e); }
-            
-                // Hover-expand behavior: expand the sidebar while hovering (no pin)
-                (function(){
-                    const sidebar = document.getElementById('appSidebar');
-                    if(!sidebar) return;
-                    let hoverEnabled = true;
-                    sidebar.addEventListener('mouseenter', function(){ if(hoverEnabled) { sidebar.classList.add('expanded'); sidebar.classList.remove('collapsed'); } });
-                    sidebar.addEventListener('mouseleave', function(){ if(hoverEnabled) { sidebar.classList.remove('expanded'); sidebar.classList.add('collapsed'); } });
-                })();
             });
         </script>
         <script>

@@ -8,6 +8,7 @@ urlpatterns = [
     path('reportes/', views.reportes, name='reportes'),
     path('carga-masiva/', views.carga_masiva_usuarios, name='carga_masiva'),
     path('', views.UsuarioListView.as_view(), name='list'),
+    path('<int:pk>/', views.UsuarioDetailView.as_view(), name='detail'),
     path('nuevo/', views.UsuarioCreateView.as_view(), name='create'),
     path('<int:pk>/editar/', views.UsuarioUpdateView.as_view(), name='update'),
     path('<int:pk>/eliminar/', views.UsuarioDeleteView.as_view(), name='delete'),

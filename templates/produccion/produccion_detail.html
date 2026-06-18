@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block head_title %}Detalle de orden{% endblock %}
+{% block header_title %}Detalle de orden{% endblock %}
+{% block content %}
+<div class="card">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <div>
+      <h5 class="mb-0">OP-{{ orden.id }}</h5>
+      <small class="text-muted">Detalle completo de la orden de producción</small>
+    </div>
+    <div class="d-flex gap-2">
+      {% if orden.estado == 'pendiente' %}
+      <a href="{% url 'produccion:update' orden.pk %}" class="btn btn-outline-secondary btn-sm">Editar</a>
+      {% endif %}
+      <a href="{% url 'produccion:list' %}" class="btn btn-primary btn-sm">Volver</a>
+    </div>
+  </div>
+  <div class="card-body">
+    <div class="row g-3">
+      <div class="col-md-4"><div class="border rounded p-3"><div class="text-muted small">Producto</div><div class="fw-semibold">{{ orden.producto.nombre }}</div></div></div>
+      <div class="col-md-4"><div class="border rounded p-3"><div class="text-muted small">Cantidad</div><div class="fw-semibold">{{ orden.cantidad_a_producir }}</div></div></div>
+      <div class="col-md-4"><div class="border rounded p-3"><div class="text-muted small">Estado</div><div class="fw-semibold">{{ orden.get_estado_display }}</div></div></div>
+      <div class="col-md-6"><div class="border rounded p-3"><div class="text-muted small">Responsable</div><div class="fw-semibold">{{ orden.responsable.get_full_name|default:orden.responsable.username|default:'-' }}</div></div></div>
+      <div class="col-md-6"><div class="border rounded p-3"><div class="text-muted small">Receta</div><div class="fw-semibold">{{ orden.receta }}</div></div></div>
+      <div class="col-md-4"><div class="border rounded p-3"><div class="text-muted small">Creación</div><div class="fw-semibold">{{ orden.fecha_creacion|date:'d/m/Y H:i' }}</div></div></div>
+      <div class="col-md-4"><div class="border rounded p-3"><div class="text-muted small">Inicio</div><div class="fw-semibold">{{ orden.fecha_inicio|date:'d/m/Y H:i'|default:'-' }}</div></div></div>
+      <div class="col-md-4"><div class="border rounded p-3"><div class="text-muted small">Fin</div><div class="fw-semibold">{{ orden.fecha_fin|date:'d/m/Y H:i'|default:'-' }}</div></div></div>
+      <div class="col-12"><div class="border rounded p-3"><div class="text-muted small">Notas</div><div class="fw-semibold">{{ orden.notas|default:'-' }}</div></div></div>
+      <div class="col-12">
+        <div class="border rounded p-3">
+          <div class="text-muted small mb-2">Ingredientes requeridos</div>
+          <ul class="mb-0">
+            {% for ingrediente in orden.receta.ingredientes.all %}
+              <li>{{ ingrediente.materia_prima.nombre }}: {{ ingrediente.cantidad_requerida }} por unidad</li>
+            {% empty %}
+              <li>Sin ingredientes registrados.</li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

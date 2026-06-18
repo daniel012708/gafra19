@@ -4,13 +4,13 @@
 {% block content %}
 <div class="card">
   <div class="card-header">
-    <div class="d-flex justify-content-between align-items-center">
+    <div class="d-flex justify-content-between align-items-center list-card-header">
       <div>
         <h5 class="mb-0">Productos</h5>
         <small class="text-muted">Listado de productos registrados</small>
       </div>
-      <div class="d-flex align-items-center gap-2">
-        <form method="get" class="d-flex align-items-center" role="search">
+      <div class="list-card-actions">
+        <form method="get" class="list-search-form" role="search">
           <div class="input-group input-group-sm">
             <input name="q" value="{{ request.GET.q|default:'' }}" type="search" class="form-control form-control-sm rounded-pill" placeholder="Buscar producto por nombre o código"> 
             <button class="btn btn-sm btn-primary rounded-pill ms-1" type="submit"><i class="bi bi-search"></i></button>
@@ -24,11 +24,11 @@
   </div>
   <div class="card-body p-0">
     <div class="table-responsive">
-      <table class="table table-striped table-hover mb-0 align-middle">
+      <table class="table table-striped table-hover table-compact mb-0 align-middle">
         <thead class="table-primary">
           <tr>
             <th style="width:72px"></th>
-            <th>Nombre</th>
+            <th>Producto</th>
             <th>Categoría</th>
             <th class="text-end">Stock</th>
             <th class="text-end">Precio</th>
@@ -49,8 +49,10 @@
               </div>
             </td>
             <td>
-              <div class="fw-bold text-primary">{{ producto.nombre }}</div>
-              <div class="text-muted small">Código: {{ producto.codigo }}</div>
+              <div class="cell-stack">
+                <div class="fw-bold text-primary">{{ producto.nombre }}</div>
+                <div class="text-muted small">Código: {{ producto.codigo }}</div>
+              </div>
             </td>
             <td>{{ producto.categoria }}</td>
             <td class="text-end">
@@ -69,9 +71,9 @@
               {% endif %}
             </td>
             <td class="text-end table-actions">
-              <div class="action-btn-group d-flex gap-1">
+              <div class="table-action-group">
+                <a href="{% url 'productos:detail' producto.pk %}" class="btn btn-sm btn-outline-primary">Ver</a>
                 <a href="{% url 'productos:update' producto.pk %}" class="btn btn-sm btn-outline-secondary">Editar</a>
-                <a href="{% url 'productos:historial' producto.pk %}" class="btn btn-sm btn-outline-info">Historial</a>
                 <a href="{% url 'productos:delete' producto.pk %}" class="btn btn-sm btn-outline-danger">Eliminar</a>
               </div>
             </td>

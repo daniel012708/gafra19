@@ -3,9 +3,14 @@ from django.contrib.auth.decorators import login_required
 from .forms_excel import ExcelUploadForm
 import pandas as pd
 from .models import Cliente
+from django.db.models import Q
 
 # --- Carga masiva desde Excel ---
+from gafra.access import ModuleAccessMixin, module_access_required
+
+
 @login_required
+@module_access_required('admin', 'vendedor', module_key='clientes')
 def carga_masiva_clientes(request):
     if request.method == 'POST':
         form = ExcelUploadForm(request.POST, request.FILES)
@@ -34,40 +39,69 @@ def carga_masiva_clientes(request):
         form = ExcelUploadForm()
     return render(request, 'clientes/carga_masiva.html', {'form': form})
 from django.urls import reverse_lazy
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import ListView, CreateView, UpdateView, DeleteView
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView, DetailView
 
 from .models import Cliente
 from .forms import ClienteForm
 
 
-class ClienteListView(LoginRequiredMixin, ListView):
+class ClienteListView(ModuleAccessMixin, ListView):
     model = Cliente
     template_name = 'clientes/cliente_list.html'
     context_object_name = 'clientes'
     paginate_by = 20
+    module_key = 'clientes'
+    allowed_roles = ('admin', 'vendedor')
+
+    def get_queryset(self):
+        queryset = super().get_queryset().order_by('-fecha_registro', '-id')
+        q = self.request.GET.get('q', '').strip()
+        if q:
+            queryset = queryset.filter(
+                Q(nombre__icontains=q)
+                | Q(documento__icontains=q)
+                | Q(email__icontains=q)
+                | Q(telefono__icontains=q)
+            )
+        return queryset
 
 
-class ClienteCreateView(LoginRequiredMixin, CreateView):
+class ClienteDetailView(ModuleAccessMixin, DetailView):
+    model = Cliente
+    template_name = 'clientes/cliente_detail.html'
+    context_object_name = 'cliente'
+    module_key = 'clientes'
+    allowed_roles = ('admin', 'vendedor')
+
+
+class ClienteCreateView(ModuleAccessMixin, CreateView):
     model = Cliente
     form_class = ClienteForm
     template_name = 'clientes/cliente_form.html'
     success_url = reverse_lazy('clientes:list')
+    module_key = 'clientes'
+    allowed_roles = ('admin', 'vendedor')
 
 
-class ClienteUpdateView(LoginRequiredMixin, UpdateView):
+class ClienteUpdateView(ModuleAccessMixin, UpdateView):
     model = Cliente
     form_class = ClienteForm
     template_name = 'clientes/cliente_form.html'
     success_url = reverse_lazy('clientes:list')
+    module_key = 'clientes'
+    allowed_roles = ('admin', 'vendedor')
 
 
-class ClienteDeleteView(LoginRequiredMixin, DeleteView):
+class ClienteDeleteView(ModuleAccessMixin, DeleteView):
     model = Cliente
     template_name = 'clientes/cliente_confirm_delete.html'
     success_url = reverse_lazy('clientes:list')
+    module_key = 'clientes'
+    allowed_roles = ('admin', 'vendedor')
 
 
+@login_required
+@module_access_required('admin', 'vendedor', module_key='clientes')
 def reportes(request):
     """Reportes simples para clientes."""
     from django.http import HttpResponse

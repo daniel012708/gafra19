@@ -2,88 +2,123 @@
 {% load static %}
 
 {% block content %}
-
-<!-- HERO removed per request: search moved up -->
-
-<!-- SEARCH -->
-<section class="container mb-5">
-    <div class="search-bar">
-        <form method="get" class="row g-3">
-            <div class="col-md-5">
-                <input type="text" name="q" class="form-control" placeholder="Buscar productos...">
-            </div>
-            <div class="col-md-3">
-                <select name="categoria" class="form-select">
-                    <option value="">Categorías</option>
-                    {% for cat in categorias %}
-                        <option value="{{ cat.id }}">{{ cat.nombre }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="col-md-2">
-                <input type="number" name="precio_max" class="form-control" placeholder="Precio max">
-            </div>
-            <div class="col-md-2">
-                <button class="btn btn-primary-custom w-100">Buscar</button>
-            </div>
-        </form>
+<section class="client-page-hero mb-4">
+    <span class="client-kicker"><i class="bi bi-stars"></i> Colección destacada</span>
+    <h1 class="client-title">Todo para acompañar los primeros años con estilo y calma.</h1>
+    <p class="client-subtitle">Explora coches, cunas, colchonetas y accesorios elegidos para familias que quieren comprar rápido, entender bien el producto y tener una experiencia más bonita.</p>
+    <div class="client-hero-stats">
+        <div class="client-stat-chip">
+            <strong>{{ productos|length }}</strong>
+            <span>productos visibles</span>
+        </div>
+        <div class="client-stat-chip">
+            <strong>{{ categorias|length }}</strong>
+            <span>categorías disponibles</span>
+        </div>
+        <div class="client-stat-chip">
+            <strong>{% if total_items %}{{ total_items }}{% else %}0{% endif %}</strong>
+            <span>artículos en carrito</span>
+        </div>
     </div>
 </section>
 
-<!-- PRODUCTOS -->
-<section class="container">
-    <div class="row g-4 products-grid">
+<section class="client-surface client-filter-panel mb-4">
+    <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-end gap-3 mb-3">
+        <div>
+            <h2 class="client-section-title">Busca por lo que necesitas hoy</h2>
+            <p class="client-section-copy">Filtra por nombre, categoría o tope de precio sin perder el contexto del catálogo.</p>
+        </div>
+    </div>
+    <form method="get" class="row g-3">
+        <div class="col-lg-5">
+            <input type="text" name="q" class="form-control" placeholder="Buscar productos..." value="{{ busqueda|default:'' }}">
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <select name="categoria" class="form-select">
+                <option value="">Categorías</option>
+                {% for cat in categorias %}
+                    <option value="{{ cat.id }}" {% if categoria_seleccionada == cat.id|stringformat:'s' %}selected{% endif %}>{{ cat.nombre }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-lg-2 col-md-6">
+            <input type="number" name="precio_max" class="form-control" placeholder="Precio máximo" value="{{ precio_max|default:'' }}">
+        </div>
+        <div class="col-lg-2">
+            <button class="client-btn-primary w-100" type="submit"><i class="bi bi-search"></i>Filtrar</button>
+        </div>
+    </form>
+</section>
+
+<section>
+    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+        <div>
+            <h2 class="client-section-title mb-1">{% if publico %}Catálogo público{% else %}Catálogo cliente{% endif %}</h2>
+            <p class="client-section-copy">Productos listos para agregar al carrito o guardar para después.</p>
+        </div>
+    </div>
+    <div class="products-grid">
         {% for producto in productos %}
         <div class="product-col">
-            <div class="card-custom">
+            <article class="client-product-card">
+                <div class="client-product-media">
+                    {% if producto.imagen %}
+                    <img src="{{ producto.imagen.url }}" class="product-image" alt="{{ producto.nombre }}" loading="lazy" decoding="async">
+                    {% else %}
+                    <img src="{% static 'img/logo.svg' %}" class="product-image" alt="{{ producto.nombre }}" loading="lazy" decoding="async">
+                    {% endif %}
 
-                <!-- IMG -->
-                <div class="position-relative">
-                    <img src="{{ producto.imagen.url }}" class="w-100 product-image" alt="{{ producto.nombre }}" loading="lazy" decoding="async">
-
-                    <!-- FAVORITO -->
+                    {% if user.is_authenticated %}
                     <form method="post" action="{% url 'ventas:agregar_favorito' producto.id %}" class="position-absolute favorite-btn">
                         {% csrf_token %}
-                        <button class="btn text-danger">
-                            ❤️
+                        <button class="btn text-danger" type="submit" title="Guardar en favoritos">
+                            <i class="bi bi-heart-fill"></i>
                         </button>
                     </form>
-
-                    <!-- STOCK -->
-                    {% if producto.stock_actual > 0 %}
-                        <span class="badge-custom position-absolute top-0 start-0 m-2">Disponible</span>
-                    {% else %}
-                        <span class="badge bg-danger position-absolute top-0 start-0 m-2">Agotado</span>
                     {% endif %}
+
+                    <div class="position-absolute top-0 start-0 m-3">
+                    {% if producto.stock_actual > 0 %}
+                        <span class="client-stock-badge"><i class="bi bi-check-circle-fill"></i>Disponible</span>
+                    {% else %}
+                        <span class="client-stock-badge is-empty"><i class="bi bi-x-circle-fill"></i>Agotado</span>
+                    {% endif %}
+                    </div>
                 </div>
 
-                <!-- BODY -->
-                <div class="p-3 d-flex flex-column">
-                    <h5>{{ producto.nombre }}</h5>
-                    <p class="text-muted small">{{ producto.descripcion|truncatechars:60 }}</p>
+                <div class="client-product-body">
+                    <div>
+                        <h3 class="client-product-title">{{ producto.nombre }}</h3>
+                        <p class="client-product-desc">{{ producto.descripcion|truncatechars:90 }}</p>
+                    </div>
 
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <span class="price-badge">${{ producto.precio_venta|floatformat:0 }}</span>
-                        <small>Stock: {{ producto.stock_actual }}</small>
+                    <div class="client-meta-row">
+                        <span class="client-price-tag">${{ producto.precio_venta|floatformat:0 }}</span>
+                        <span class="client-stock-note">Stock: {{ producto.stock_actual }}</span>
                     </div>
 
                     {% if producto.stock_actual > 0 %}
                     <form method="post" action="{% url 'ventas:agregar_carrito' producto.id %}">
                         {% csrf_token %}
-                        <div class="d-flex gap-2">
-                            <input type="number" name="cantidad" value="1" min="1" class="form-control" style="width:78px;">
-                            <button class="btn btn-primary-custom">🛒</button>
+                        <div class="client-buy-row">
+                            <input type="number" name="cantidad" value="1" min="1" class="form-control client-quantity-input">
+                            <button class="client-btn-primary flex-grow-1" type="submit"><i class="bi bi-bag-plus"></i>Agregar</button>
                         </div>
                     </form>
                     {% else %}
-                        <button class="btn btn-secondary w-100">Agotado</button>
+                        <button class="client-btn-secondary w-100" disabled><i class="bi bi-moon-stars"></i>Avísame luego</button>
                     {% endif %}
                 </div>
-
-            </div>
+            </article>
+        </div>
+        {% empty %}
+        <div class="client-surface client-empty-state" style="grid-column: 1 / -1;">
+            <div class="client-empty-icon"><i class="bi bi-search-heart"></i></div>
+            <h2>No encontramos productos con esos filtros</h2>
+            <p>Prueba otra búsqueda o limpia los filtros para volver a ver toda la colección disponible.</p>
+            <a href="{% if publico %}{% url 'ventas:catalogo_publico' %}{% else %}{% url 'ventas:catalogo_cliente' %}{% endif %}" class="client-btn-primary"><i class="bi bi-arrow-counterclockwise"></i>Ver catálogo completo</a>
         </div>
         {% endfor %}
     </div>
 </section>
-
 {% endblock %}

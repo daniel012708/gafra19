@@ -9,6 +9,7 @@ app_name = 'inventario'
 urlpatterns = [
     path('historial/', HistorialGeneralMateriaPrimaView.as_view(), name='historial_general'),
     path('', views.MateriaPrimaListView.as_view(), name='list'),
+    path('<int:pk>/', views.MateriaPrimaDetailView.as_view(), name='detail'),
     path('nuevo/', views.MateriaPrimaCreateView.as_view(), name='create'),
     path('<int:pk>/editar/', views.MateriaPrimaUpdateView.as_view(), name='update'),
     path('<int:pk>/eliminar/', views.MateriaPrimaDeleteView.as_view(), name='delete'),

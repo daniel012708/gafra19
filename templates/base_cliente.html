@@ -11,62 +11,100 @@
     <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&display=swap" rel="stylesheet">
     <!-- Custom CSS -->
     <link rel="stylesheet" href="{% static 'css/custom.css' %}">
     <!-- Modern ventas styles (navbar + cards) -->
     <link rel="stylesheet" href="{% static 'css/ventas_moderno.css' %}">
+    <link rel="stylesheet" href="{% static 'css/cliente_portal.css' %}">
 
    
 
     {% block extra_head %}{% endblock %}
 </head>
-<body>
-    <!-- Modern Navbar (gradient background with centered pill menu) -->
-    <header class="top-hero-nav bg-gradient">
-        <div class="container d-flex justify-content-center py-4">
-            <nav class="nav-pill d-flex align-items-center">
-                <a href="{% url 'ventas:catalogo_cliente' %}" class="pill-item {% if request.resolver_match.url_name == 'catalogo_cliente' %}active{% endif %}">
-                    <i class="bi bi-grid-3x3-gap"></i>
-                    <span>Productos</span>
-                </a>
-
-                <a href="{% url 'ventas:ver_favoritos' %}" class="pill-item {% if request.resolver_match.url_name == 'ver_favoritos' %}active{% endif %}">
-                    <i class="bi bi-heart"></i>
-                    <span>Favoritos</span>
-                </a>
-
-                <a href="{% url 'ventas:historial_pedidos' %}" class="pill-item {% if request.resolver_match.url_name == 'historial_pedidos' %}active{% endif %}">
-                    <i class="bi bi-receipt"></i>
-                    <span>Mis Pedidos</span>
-                </a>
-
-                <a href="{% url 'ventas:ver_carrito' %}" class="pill-item ms-2">
-                    <i class="bi bi-cart3"></i>
-                    <span>Carrito</span>
-                    {% if total_items %}
-                        <span class="cart-badge ms-2">{{ total_items }}</span>
-                    {% endif %}
-                </a>
-
-                <div class="pill-item dropdown ms-2">
-                    <a class="dropdown-toggle d-inline-flex align-items-center" href="#" role="button" id="userMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="bi bi-person-circle"></i>
-                        <span class="ms-2">{% if user.is_authenticated %}{{ user.get_full_name|default:user.username }}{% else %}Cuenta{% endif %}</span>
+<body class="client-portal-body">
+    <div class="client-shell">
+    <header class="client-topbar">
+        <div class="container-xxl">
+            <div class="client-header-card">
+                <div class="d-flex flex-column flex-lg-row gap-3 justify-content-between align-items-lg-center">
+                    <a href="{% url 'ventas:catalogo_cliente' %}" class="client-brand">
+                        <span class="client-brand-mark">
+                            <img src="{% static 'img/logo.svg' %}" alt="Gafra" onerror="this.style.display='none'">
+                        </span>
+                        <span class="client-brand-copy">
+                            <strong class="client-brand-title">GAFRA STORE</strong>
+                            <small>Productos para tu mundo bebé</small>
+                        </span>
                     </a>
-                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenuLink">
+
+                    <div class="d-flex flex-wrap gap-2 align-items-center justify-content-lg-end">
                         {% if user.is_authenticated %}
-                            <li><a class="dropdown-item" href="{% url 'usuario:profile' %}"><i class="bi bi-person me-2"></i>Mi Perfil</a></li>
-                            <li><a class="dropdown-item" href="{% url 'ventas:historial_pedidos' %}"><i class="bi bi-clock-history me-2"></i>Pedidos</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="{% url 'logout' %}"><i class="bi bi-box-arrow-right me-2"></i>Cerrar sesión</a></li>
+                        <a href="{% url 'usuario:profile' %}" class="client-account-chip">
+                            <i class="bi bi-person-heart"></i>
+                            <span>
+                                <strong>{{ user.get_full_name|default:user.username }}</strong>
+                                <span>Cuenta activa</span>
+                            </span>
+                        </a>
                         {% else %}
-                            <li><a class="dropdown-item" href="{% url 'login' %}"><i class="bi bi-box-arrow-in-right me-2"></i>Iniciar sesión</a></li>
-                            <li><a class="dropdown-item" href="{% url 'usuario:registro_cliente' %}"><i class="bi bi-person-plus me-2"></i>Regístrate</a></li>
+                        <a href="{% url 'login' %}" class="client-account-chip">
+                            <i class="bi bi-box-arrow-in-right"></i>
+                            <span>
+                                <strong>Mi cuenta</strong>
+                                <span>Inicia sesión</span>
+                            </span>
+                        </a>
                         {% endif %}
-                    </ul>
+                    </div>
                 </div>
-            </nav>
+
+                <div class="client-nav-wrap">
+                    <nav class="client-nav align-items-center">
+                        <a href="{% url 'ventas:catalogo_cliente' %}" class="client-nav-link {% if request.resolver_match.url_name == 'catalogo_cliente' %}active{% endif %}">
+                            <i class="bi bi-grid-3x3-gap"></i>
+                            <span>Catálogo</span>
+                        </a>
+
+                        <a href="{% url 'ventas:ver_favoritos' %}" class="client-nav-link {% if request.resolver_match.url_name == 'ver_favoritos' %}active{% endif %}">
+                            <i class="bi bi-heart"></i>
+                            <span>Favoritos</span>
+                        </a>
+
+                        <a href="{% url 'ventas:historial_pedidos' %}" class="client-nav-link {% if request.resolver_match.url_name == 'historial_pedidos' %}active{% endif %}">
+                            <i class="bi bi-receipt-cutoff"></i>
+                            <span>Mis pedidos</span>
+                        </a>
+
+                        <a href="{% url 'ventas:ver_carrito' %}" class="client-nav-link {% if request.resolver_match.url_name == 'ver_carrito' or request.resolver_match.url_name == 'checkout' %}active{% endif %}">
+                            <i class="bi bi-bag"></i>
+                            <span>Carrito</span>
+                            {% if total_items %}
+                                <span class="client-cart-badge">{{ total_items }}</span>
+                            {% endif %}
+                        </a>
+
+                        <div class="dropdown client-user-menu ms-lg-auto">
+                            <a class="dropdown-toggle" href="#" role="button" id="userMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-stars"></i>
+                                <span>{% if user.is_authenticated %}Atajos{% else %}Cuenta{% endif %}</span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenuLink">
+                                {% if user.is_authenticated %}
+                                    <li><a class="dropdown-item" href="{% url 'usuario:profile' %}"><i class="bi bi-person me-2"></i>Mi perfil</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'ventas:historial_pedidos' %}"><i class="bi bi-clock-history me-2"></i>Historial</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'ventas:ver_carrito' %}"><i class="bi bi-bag me-2"></i>Ir al carrito</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="{% url 'logout' %}"><i class="bi bi-box-arrow-right me-2"></i>Cerrar sesión</a></li>
+                                {% else %}
+                                    <li><a class="dropdown-item" href="{% url 'login' %}"><i class="bi bi-box-arrow-in-right me-2"></i>Iniciar sesión</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'usuario:registro_cliente' %}"><i class="bi bi-person-plus me-2"></i>Crear cuenta</a></li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                    </nav>
+                </div>
+            </div>
         </div>
     </header>
 
@@ -78,10 +116,11 @@
     </div>
 
     <!-- Main Content -->
-    <main class="container-fluid" style="padding-top: 48px;">
+    <main class="client-main">
+        <div class="container-xxl">
         {% if messages %}
         <div class="row justify-content-center mb-4">
-            <div class="col-md-8">
+            <div class="col-md-9 col-xl-8">
                 {% for message in messages %}
                 <div class="alert alert-{{ message.tags }} alert-dismissible fade show animate-fade-in" role="alert">
                     <i class="bi bi-info-circle me-2"></i>{{ message }}
@@ -93,33 +132,35 @@
         {% endif %}
 
         {% block content %}{% endblock %}
+        </div>
     </main>
 
     <!-- Footer -->
-    <footer class="footer-custom mt-5">
-        <div class="container">
+    <footer class="client-footer">
+        <div class="container-xxl">
+            <div class="client-footer-card">
             <div class="row">
                 <div class="col-md-4">
                     <h5 class="mb-3">GAFRA Store</h5>
-                    <p>Tu tienda online de confianza para muebles y accesorios para bebés.</p>
-                    <div class="d-flex">
-                        <a href="#" class="text-white me-3"><i class="bi bi-facebook fs-4"></i></a>
-                        <a href="#" class="text-white me-3"><i class="bi bi-instagram fs-4"></i></a>
-                        <a href="#" class="text-white me-3"><i class="bi bi-twitter fs-4"></i></a>
-                        <a href="#" class="text-white"><i class="bi bi-whatsapp fs-4"></i></a>
+                    <p>Diseñado para comprar cunas, coches, colchonetas y accesorios con una experiencia más clara, cálida y rápida.</p>
+                    <div class="client-socials">
+                        <a href="#"><i class="bi bi-facebook"></i></a>
+                        <a href="#"><i class="bi bi-instagram"></i></a>
+                        <a href="#"><i class="bi bi-twitter-x"></i></a>
+                        <a href="#"><i class="bi bi-whatsapp"></i></a>
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <h5 class="mb-3">Enlaces Rápidos</h5>
+                    <h5 class="mb-3">Compra fácil</h5>
                     <ul class="list-unstyled">
-                        <li><a href="{% url 'ventas:catalogo_cliente' %}" class="text-white text-decoration-none">Productos</a></li>
-                        <li><a href="{% url 'ventas:ver_favoritos' %}" class="text-white text-decoration-none">Favoritos</a></li>
-                        <li><a href="{% url 'ventas:historial_pedidos' %}" class="text-white text-decoration-none">Mis Pedidos</a></li>
-                        <li><a href="{% url 'ventas:ver_carrito' %}" class="text-white text-decoration-none">Carrito</a></li>
+                        <li><a href="{% url 'ventas:catalogo_cliente' %}">Explorar productos</a></li>
+                        <li><a href="{% url 'ventas:ver_favoritos' %}">Guardar favoritos</a></li>
+                        <li><a href="{% url 'ventas:historial_pedidos' %}">Seguir pedidos</a></li>
+                        <li><a href="{% url 'ventas:ver_carrito' %}">Revisar carrito</a></li>
                     </ul>
                 </div>
                 <div class="col-md-4">
-                    <h5 class="mb-3">Contacto</h5>
+                    <h5 class="mb-3">Acompañamiento real</h5>
                     <p><i class="bi bi-telephone me-2"></i>+34 123 456 789</p>
                     <p><i class="bi bi-envelope me-2"></i>info@gafra.com</p>
                     <p><i class="bi bi-geo-alt me-2"></i>Calle Principal 123, Ciudad</p>
@@ -129,14 +170,54 @@
             <div class="text-center">
                 <p class="mb-0">&copy; 2026 GAFRA Store. Todos los derechos reservados.</p>
             </div>
+            </div>
         </div>
     </footer>
+    </div>
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <!-- Custom JS -->
     <script>
+        function getCookie(name) {
+            const cookieValue = document.cookie
+                .split('; ')
+                .find(row => row.startsWith(name + '='));
+            return cookieValue ? decodeURIComponent(cookieValue.split('=')[1]) : '';
+        }
+
+        function syncCsrfToken(form) {
+            if (!form || (form.method || '').toUpperCase() !== 'POST') {
+                return;
+            }
+
+            const csrfToken = getCookie('csrftoken');
+            if (!csrfToken) {
+                return;
+            }
+
+            let csrfInput = form.querySelector('input[name="csrfmiddlewaretoken"]');
+            if (!csrfInput) {
+                csrfInput = document.createElement('input');
+                csrfInput.type = 'hidden';
+                csrfInput.name = 'csrfmiddlewaretoken';
+                form.prepend(csrfInput);
+            }
+            csrfInput.value = csrfToken;
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('form[method="post"]').forEach(syncCsrfToken);
+
+            document.addEventListener('submit', function (event) {
+                const form = event.target;
+                if (form && form.tagName === 'FORM') {
+                    syncCsrfToken(form);
+                }
+            }, true);
+        });
+
         // Loading spinner functions (safe if element hidden/absent)
         function showSpinner() {
             const el = document.getElementById('loadingSpinner');
