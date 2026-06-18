@@ -4,8 +4,10 @@ services:
     runtime: python
     plan: free
     buildCommand: python -m pip install -r requirements.txt && python manage.py collectstatic --noinput && python manage.py migrate
-    startCommand: gunicorn gafra.wsgi:application
+    startCommand: gunicorn gafra.wsgi:application --bind 0.0.0.0:$PORT --workers 1 --threads 2 --timeout 120
     envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.8
       - key: DJANGO_DEBUG
         value: false
       - key: DJANGO_SECRET_KEY
