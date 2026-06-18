@@ -4,6 +4,7 @@ services:
     runtime: python
     plan: free
     buildCommand: python -m pip install -r requirements.txt && python manage.py collectstatic --noinput
+    preDeployCommand: python manage.py migrate --noinput
     startCommand: python manage.py migrate --noinput && gunicorn gafra.wsgi:application --bind 0.0.0.0:$PORT --workers 1 --threads 2 --timeout 120
     envVars:
       - key: PYTHON_VERSION
