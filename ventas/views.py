@@ -11,11 +11,6 @@ from gafra.utils_pdf import render_pdf_from_template
 from gafra.access import user_has_role
 from .models import Venta
 
-import matplotlib
-matplotlib.use('Agg')
-import matplotlib.pyplot as plt
-import io
-import base64
 from datetime import datetime, timedelta
 from django.contrib.auth.models import User
 
@@ -65,8 +60,19 @@ def reportes(request):
                 v.fecha_completado.strftime('%Y-%m-%d %H:%M') if v.fecha_completado else '',
             ])
         return resp
-    # Generate small chart (sales per day) to embed in UI and PDF
+    # Generate small chart (sales per day) to embed in UI and PDF.
+    # If matplotlib is unavailable in an environment (e.g. lightweight deploy),
+    # return None so the app keeps working and only the chart is skipped.
     def make_sales_chart(qs):
+        try:
+            import io
+            import base64
+            import matplotlib
+            matplotlib.use('Agg')
+            import matplotlib.pyplot as plt
+        except Exception:
+            return None
+
         # aggregate by date
         from django.db.models.functions import TruncDate
         daily = qs.annotate(day=TruncDate('fecha')).values('day').annotate(total=Sum('total')).order_by('day')
