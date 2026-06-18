@@ -1,0 +1,148 @@
+{% extends 'base.html' %}
+{% block extra_head %}
+  <link rel="stylesheet" href="/static/css/ventas_moderno.css">
+{% endblock %}
+{% block head_title %}{% if form %}Editar venta{% else %}Nueva venta{% endif %}{% endblock %}
+{% block header_title %}{% if form %}Editar venta{% else %}Nueva venta{% endif %}{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-10">
+      <div class="venta-card card">
+        <div class="card-header"><h5 class="mb-0">{% if form %}Editar venta{% else %}Nueva venta{% endif %}</h5></div>
+        <div class="card-body">
+          <form method="post" id="venta-form">
+            {% csrf_token %}
+
+            {# Si la vista pasa un `form` (UpdateView) mostramos el formulario y el formset `detalles` #}
+            {% if form %}
+              {{ form.non_field_errors }}
+              <div class="mb-3">
+                {{ form.cliente.label_tag }}
+                {{ form.cliente }}
+                {% if form.cliente.errors %}
+                  <div class="alert alert-danger py-1 px-2 mt-1">{{ form.cliente.errors.0 }}</div>
+                {% endif %}
+              </div>
+              <div class="mb-3">
+                {{ form.estado.label_tag }}
+                {{ form.estado }}
+                {% if form.estado.errors %}
+                  <div class="alert alert-danger py-1 px-2 mt-1">{{ form.estado.errors.0 }}</div>
+                {% endif %}
+              </div>
+              <div class="mb-3">
+                {{ form.observaciones.label_tag }}
+                {{ form.observaciones }}
+                {% if form.observaciones.errors %}
+                  <div class="alert alert-danger py-1 px-2 mt-1">{{ form.observaciones.errors.0 }}</div>
+                {% endif %}
+              </div>
+
+              {# Renderizar el inline formset de detalles si existe #}
++              {% if detalles %}
+                <h6 class="mt-4">Detalles</h6>
+                <div class="table-responsive">
+                  <table class="venta-table table align-middle">
+                    <thead>
+                      <tr>
+                        <th>PRODUCTO</th>
+                        <th>CANTIDAD</th>
+                        <th>PRECIO</th>
+                        <th>SUBTOTAL</th>
+                        <th>Eliminar</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {{ detalles.management_form }}
+                      {% for subform in detalles.forms %}
+                        <tr>
+                          <td>{{ subform.producto }}</td>
+                          <td>{{ subform.cantidad }}</td>
+                          <td>{{ subform.precio_unitario }}</td>
+                          <td>{{ subform.subtotal }}</td>
+                          <td>{% if subform.DELETE %}{{ subform.DELETE }}{% endif %}</td>
+                        </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+              {% endif %}
+
+              <div class="d-flex gap-2 mt-3">
+                <button type="submit" class="venta-btn-main">Guardar</button>
+                <a href="{% url 'ventas:lista' %}" class="venta-btn-secondary">Cancelar</a>
+              </div>
+
+            {% else %}
+              {# Flujo original para crear nueva venta (selección de cliente + cantidades) #}
+              <div class="mb-3">
+                <label for="id_cliente" class="venta-label">Cliente</label>
+                <select name="cliente" id="id_cliente" class="venta-select" required>
+                  <option value="">---------</option>
+                  {% for c in clientes %}
+                    <option value="{{ c.pk }}" {% if cliente_id|default:'' == c.pk|stringformat:'s' %}selected{% endif %}>{{ c }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <h6 class="mt-4">Productos</h6>
+              <div class="table-responsive">
+                <table class="venta-table table align-middle" id="tabla-productos">
+                  <thead>
+                    <tr>
+                      <th>PRODUCTO</th>
+                      <th>PRECIO</th>
+                      <th>STOCK</th>
+                      <th style="width:120px">CANTIDAD</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for p in productos %}
+                    <tr>
+                      <td>{{ p }}</td>
+                      <td>${{ p.precio_venta }}</td>
+                      <td>{{ p.stock_actual }}</td>
+                      <td>
+                        <input type="number" name="cantidad_{{ p.pk }}" class="venta-input cantidad-input" min="0" value="0" data-precio="{{ p.precio_venta }}" data-stock="{{ p.stock_actual }}">
+                      </td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
++              <div class="mt-3 text-end">
+                <span class="venta-subtotal">Subtotal: $<span id="subtotal-venta">0.00</span></span><br>
+                <span class="venta-total">Total: $<span id="total-venta">0.00</span></span>
+              </div>
+              <div class="d-flex gap-2 mt-3">
+                <button type="submit" class="venta-btn-main">Continuar</button>
+                <a href="{% url 'ventas:lista' %}" class="venta-btn-secondary">Cancelar</a>
+              </div>
+            {% endif %}
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{# Script para el flujo de nueva venta (sólo cuando no estamos editando) #}
+{% if not form %}
+<script>
+function updateTotals() {
+  let subtotal = 0;
+  document.querySelectorAll('.cantidad-input').forEach(input => {
+    const cantidad = parseInt(input.value) || 0;
+    const precio = parseFloat(input.getAttribute('data-precio')) || 0;
+    subtotal += cantidad * precio;
+  });
+  document.getElementById('subtotal-venta').textContent = subtotal.toFixed(2);
+  document.getElementById('total-venta').textContent = subtotal.toFixed(2);
+}
+document.querySelectorAll('.cantidad-input').forEach(input => {
+  input.addEventListener('input', updateTotals);
+});
+updateTotals();
+</script>
+{% endif %}
+{% endblock %}

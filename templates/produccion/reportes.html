@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container py-4">
+	<div class="card shadow-sm">
+		<div class="card-body p-4 p-lg-5">
+			<h3 class="mb-1">Reporte de Producción</h3>
+			<p class="text-muted mb-4">{{ total_ordenes }} orden{{ total_ordenes|pluralize }} y {{ en_progreso }} en proceso.</p>
+			<form method="get" class="row g-3 mb-4">
+				<div class="col-md-4">
+					<label class="form-label">Búsqueda rápida</label>
+					<input type="search" name="q" value="{{ q }}" class="form-control" placeholder="Producto o receta">
+				</div>
+				<div class="col-md-2">
+					<label class="form-label">Estado</label>
+					<select name="estado" class="form-select">
+						<option value="">Todos</option>
+						<option value="pendiente" {% if estado == 'pendiente' %}selected{% endif %}>Pendiente</option>
+						<option value="en_progreso" {% if estado == 'en_progreso' %}selected{% endif %}>En proceso</option>
+						<option value="completada" {% if estado == 'completada' %}selected{% endif %}>Completada</option>
+						<option value="cancelada" {% if estado == 'cancelada' %}selected{% endif %}>Cancelada</option>
+					</select>
+				</div>
+				<div class="col-md-3">
+					<label class="form-label">Responsable</label>
+					<input type="text" name="responsable" value="{{ responsable }}" class="form-control" placeholder="Usuario responsable">
+				</div>
+				<div class="col-md-1">
+					<label class="form-label">Desde</label>
+					<input type="date" name="desde" value="{{ desde }}" class="form-control">
+				</div>
+				<div class="col-md-2">
+					<label class="form-label">Hasta</label>
+					<input type="date" name="hasta" value="{{ hasta }}" class="form-control">
+				</div>
+				<div class="col-12 d-flex flex-wrap gap-2 justify-content-end">
+					<button type="submit" class="btn btn-outline-primary">Aplicar filtros</button>
+					<button type="submit" name="export" value="pdf" class="btn btn-login">Descargar PDF filtrado</button>
+					<button type="submit" name="export" value="csv" class="btn btn-outline-secondary">Descargar CSV filtrado</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+{% endblock %}

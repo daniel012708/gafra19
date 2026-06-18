@@ -1,0 +1,45 @@
+{% block extra_head %}
+  <link rel="stylesheet" href="/static/css/ventas_moderno.css">
+{% endblock %}
+{% block head_title %}Detalle de Venta{% endblock %}
+{% block header_title %}Detalle de Venta{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="venta-card card">
+        <div class="card-header"><h5 class="mb-0">Venta #{{ venta.numero_venta }}</h5></div>
+        <div class="card-body">
+          <div class="mb-2"><strong>Cliente:</strong> {{ venta.cliente }}</div>
+          <div class="mb-2"><strong>Vendedor:</strong> {{ venta.vendedor }}</div>
+          <div class="mb-2"><strong>Fecha:</strong> {{ venta.fecha }}</div>
+          <div class="mb-2"><strong>Estado:</strong> {{ venta.estado }}</div>
+          <div class="mb-2"><strong>Observaciones:</strong> {{ venta.observaciones|default:'-' }}</div>
+          <h6>Productos vendidos:</h6>
+          <div class="table-responsive">
+            <table class="venta-table table align-middle">
+              <thead><tr><th>PRODUCTO</th><th>CANTIDAD</th><th>PRECIO</th><th>SUBTOTAL</th></tr></thead>
+              <tbody>
+              {% for d in venta.detalles.all %}
+                <tr>
+                  <td>{{ d.producto }}</td>
+                  <td>{{ d.cantidad }}</td>
+                  <td>${{ d.precio_unitario }}</td>
+                  <td>${{ d.subtotal }}</td>
+                </tr>
+              {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          <div class="text-end venta-total">
+            Total: ${{ venta.total }}
+          </div>
+          <div class="mt-3">
+            <a href="{% url 'ventas:lista' %}" class="venta-btn-secondary">Volver a ventas</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

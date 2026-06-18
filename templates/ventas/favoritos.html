@@ -1,0 +1,138 @@
+{% extends 'base_cliente.html' %}
+{% load static %}
+
+{% block title %}Mis Favoritos - GAFRA Store{% endblock %}
+
+{% block content %}
+<!-- Header Section removed per request -->
+<!-- Favorites Grid -->
+<section class="container">
+    {% if productos %}
+        <div class="row g-4">
+            {% for producto in productos %}
+            <div class="col-xl-3 col-lg-4 col-md-6">
+                <div class="card-custom h-100">
+                    <!-- Product Image -->
+                    <div class="position-relative overflow-hidden">
+                        {% if producto.imagen %}
+                            <img src="{{ producto.imagen.url }}" class="card-img-top product-image"
+                                 alt="{{ producto.nombre }}">
+                        {% else %}
+                            <div class="bg-light d-flex align-items-center justify-content-center product-image">
+                                <i class="bi bi-image text-muted" style="font-size: 4rem;"></i>
+                            </div>
+                        {% endif %}
+
+                        <!-- Remove from Favorites Button -->
+                        <form method="post" action="{% url 'ventas:agregar_favorito' producto.id %}"
+                              class="position-absolute favorite-btn" id="fav-form-{{ producto.id }}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn text-danger border-0 bg-white bg-opacity-75"
+                                    title="Remover de favoritos">
+                                <i class="bi bi-heart-fill fs-5"></i>
+                            </button>
+                        </form>
+
+                        <!-- Stock Badge -->
+                        {% if producto.stock_actual > 0 %}
+                            <div class="position-absolute top-0 start-0 m-3">
+                                <span class="badge-custom text-white">En Stock</span>
+                            </div>
+                        {% else %}
+                            <div class="position-absolute top-0 start-0 m-3">
+                                <span class="badge bg-danger text-white">Agotado</span>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Product Info -->
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title fw-bold text-dark mb-2">{{ producto.nombre }}</h5>
+                        <p class="card-text text-muted small mb-3 flex-grow-1">{{ producto.descripcion|truncatechars:80 }}</p>
+
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <span class="price-tag">${{ producto.precio_venta|floatformat:0 }}</span>
+                            <small class="text-muted">Stock: {{ producto.stock_actual }}</small>
+                        </div>
+
+                        <!-- Add to Cart Form -->
+                        {% if producto.stock_actual > 0 %}
+                        <form method="post" action="{% url 'ventas:agregar_carrito' producto.id %}">
+                            {% csrf_token %}
+                            <div class="d-flex gap-2">
+                                <input type="number" name="cantidad" value="1" min="1"
+                                       max="{{ producto.stock_actual }}" class="form-control form-control-sm"
+                                       style="width: 80px;">
+                                <button class="btn btn-primary-custom flex-grow-1 btn-sm" type="submit">
+                                    <i class="bi bi-cart-plus me-1"></i>Agregar
+                                </button>
+                            </div>
+                        </form>
+                        {% else %}
+                        <button class="btn btn-secondary w-100" disabled>
+                            <i class="bi bi-cart-x me-1"></i>Agotado
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="text-center mt-5">
+            <a href="{% url 'ventas:catalogo_cliente' %}" class="btn btn-primary-custom btn-lg">
+                <i class="bi bi-shop me-2"></i>Continuar Comprando
+            </a>
+        </div>
+
+    {% else %}
+        <!-- Empty Favorites -->
+        <div class="text-center py-5">
+            <div class="mb-4">
+                <i class="bi bi-heart text-muted" style="font-size: 5rem;"></i>
+            </div>
+            <h2 class="text-muted mb-3">Tu lista de favoritos está vacía</h2>
+            <p class="text-muted mb-4">
+                ¡Guarda tus productos favoritos para encontrarlos fácilmente la próxima vez!
+            </p>
+            <a href="{% url 'ventas:catalogo_cliente' %}" class="btn btn-primary-custom btn-lg">
+                <i class="bi bi-shop me-2"></i>Explorar Productos
+            </a>
+        </div>
+    {% endif %}
+</section>
+
+<!-- Tips Section -->
+{% if productos %}
+<section class="container my-5">
+    <div class="card-custom">
+        <div class="card-body text-center">
+            <h5 class="fw-bold text-dark mb-3">
+                <i class="bi bi-lightbulb text-warning me-2"></i>Consejos para tus Favoritos
+            </h5>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="text-center">
+                        <i class="bi bi-bell text-primary" style="font-size: 2rem;"></i>
+                        <p class="mt-2 small text-muted">Recibe notificaciones cuando tus productos favoritos estén en oferta</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="text-center">
+                        <i class="bi bi-share text-success" style="font-size: 2rem;"></i>
+                        <p class="mt-2 small text-muted">Comparte tus productos favoritos con amigos y familiares</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="text-center">
+                        <i class="bi bi-clock-history text-info" style="font-size: 2rem;"></i>
+                        <p class="mt-2 small text-muted">Tus favoritos se guardan permanentemente en tu cuenta</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endif %}
+{% endblock %}

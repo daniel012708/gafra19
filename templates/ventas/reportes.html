@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container py-4">
+  <div class="card shadow-sm">
+    <div class="card-body p-4 p-lg-5">
+      <h3 class="mb-1">Reporte de Ventas</h3>
+      <p class="text-muted mb-4">{{ total_ventas }} venta{{ total_ventas|pluralize }} y {{ total_ingresos|floatformat:2 }} en ingresos después del filtro aplicado.</p>
+
+      <form method="get" class="row g-3 mb-4">
+        <div class="col-md-3">
+          <label class="form-label">Búsqueda rápida</label>
+          <input type="search" name="q" value="{{ q }}" class="form-control" placeholder="Venta, cliente o vendedor">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Fecha inicial</label>
+          <input type="date" name="desde" value="{{ desde }}" class="form-control">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Fecha final</label>
+          <input type="date" name="hasta" value="{{ hasta }}" class="form-control">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Estado</label>
+          <select name="estado" class="form-select">
+            <option value="">Todos</option>
+            <option value="pendiente" {% if estado_filter == 'pendiente' %}selected{% endif %}>Pendiente</option>
+            <option value="en_progreso" {% if estado_filter == 'en_progreso' %}selected{% endif %}>En proceso</option>
+            <option value="completada" {% if estado_filter == 'completada' %}selected{% endif %}>Completada</option>
+            <option value="cancelada" {% if estado_filter == 'cancelada' %}selected{% endif %}>Cancelada</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Usuario responsable</label>
+          <select name="usuario" class="form-select">
+            <option value="">Todos</option>
+            {% for u in usuarios %}
+              <option value="{{ u.username }}" {% if usuario_filter == u.username %}selected{% endif %}>{{ u.get_full_name|default:u.username }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-12 d-flex flex-wrap gap-2 justify-content-end">
+          <button type="submit" class="btn btn-outline-primary">Aplicar filtros</button>
+          <button type="submit" name="export" value="pdf" class="btn btn-login">Descargar PDF filtrado</button>
+          <button type="submit" name="export" value="csv" class="btn btn-outline-secondary">Descargar CSV filtrado</button>
+        </div>
+      </form>
+
+      <div class="alert alert-info mb-0">
+        El PDF incluye gráficas y el resumen de ventas filtradas.
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

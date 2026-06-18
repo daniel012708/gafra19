@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block head_title %}Agregar movimiento de producto{% endblock %}
+{% block header_title %}Agregar movimiento de producto{% endblock %}
+{% block content %}
+<h2>Agregar movimiento de producto</h2>
+<a href="{% url 'productos:historial_general' %}" class="btn btn-secondary mb-3">&larr; Volver al historial</a>
+<form method="post">
+    {% csrf_token %}
+    {% for field in form %}
+        <div class="mb-3">
+            {{ field.label_tag }}
+            {{ field }}
+            {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
+            {% for error in field.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+        </div>
+    {% endfor %}
+    <button type="submit" class="btn btn-success">Guardar movimiento</button>
+</form>
+{% endblock %}

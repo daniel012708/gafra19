@@ -1,0 +1,586 @@
+/* SaaS-style theme for GAFRA admin - modern, minimal, clean */
+:root{
+  /* Palette */
+  --color-primary: #3B82F6; /* nicer blue */
+  --color-secondary: #60A5FA; /* soft sky */
+  --color-accent: #10B981; /* green accent */
+  --bg-page: #FBF4E7; /* warm vanilla page background */
+  --bg-card: #FFFFFF;
+  --text-primary: #0F172A;
+  --text-secondary: #64748B;
+  --success: #10B981;
+  --danger: #EF4444;
+  --warning: #F59E0B;
+  --table-border: rgba(15,23,42,0.06);
+  --color-dark-blue: #0b3d91;
+
+  /* Spacing scale */
+  --space-1: 8px;
+  --space-2: 16px;
+  --space-3: 24px;
+  --space-4: 32px;
+
+  --ease: cubic-bezier(.2,.9,.3,1);
+  --bg-vanilla: 251,244,231; /* RGB for vanilla base (use with rgba) */
+  --bg-vanilla-alpha: 0.72;
+  --sidebar-duration: .42s;
+  --nav-duration: .32s;
+}
+
+/* Typography */
+h1,h2,h3,h4,h5{font-weight:700; color:var(--text-primary);}
+html,body{font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; color:var(--text-primary); background: linear-gradient(180deg, rgba(var(--bg-vanilla),0.18), var(--bg-page));}
+h1{font-size:1.75rem}
+h2{font-size:1.375rem}
+h3{font-size:1.125rem}
+small, .text-muted{color:var(--text-secondary) !important}
+
+/* Layout */
+.app-main { padding: var(--space-3); }
+.app-sidebar{ background: transparent; padding:0; }
+.sidebar-inner{ width:72px; background: linear-gradient(180deg,#0f172a,#111827); border-radius:18px; margin:18px; padding:14px 8px; display:flex; flex-direction:column; align-items:center; min-height:calc(100vh - 36px); box-shadow: 0 20px 50px rgba(2,6,23,0.08); }
+.sidebar-brand{ padding:8px; border-radius:12px; display:flex; gap:8px; align-items:center; }
+.brand-logo{ width:36px; height:36px; display:block; }
+.avatar-sm{ width:40px; height:40px; border-radius:10px; }
+.sidebar-nav .nav-link{ color:rgba(255,255,255,0.85); width:56px; height:56px; display:flex; align-items:center; justify-content:center; border-radius:12px; transition: all var(--nav-duration) var(--ease); margin:8px auto; background: transparent; }
+.sidebar-nav .nav-link i{ font-size:1.25rem; color: inherit; display:block; }
+.sidebar-nav .nav-link .nav-text{ display:none; }
+.sidebar-nav .nav-link:hover{ background: rgba(255,255,255,0.04); transform: translateY(-4px); color:#fff; }
+.sidebar-nav .nav-link.active, .sidebar-nav .nav-link[aria-current="page"]{
+  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+  color: white;
+  box-shadow: 0 14px 40px rgba(2,6,23,0.14);
+}
+
+/* stronger hover/active feedback for nav items */
+.sidebar-nav .nav-link:hover{ background: linear-gradient(180deg, rgba(96,165,250,0.12), rgba(147,197,253,0.06)); transform: translateY(-6px) scale(1.02); color: #fff; }
+.sidebar-nav .nav-link:focus, .sidebar-nav .nav-link:active{ box-shadow: 0 18px 44px rgba(96,165,250,0.12); transform: translateY(-4px); }
+
+/* Expanded state: show labels and widen rail */
+.app-sidebar.expanded .sidebar-inner{ width:220px; }
+.app-sidebar.expanded .sidebar-nav .nav-link{ width:100%; height:auto; padding:10px 14px; justify-content:flex-start; }
+.app-sidebar.expanded .sidebar-nav .nav-link .nav-text{ display:inline-block; margin-left:12px; font-weight:700; }
+.app-sidebar.expanded .sidebar-brand{ justify-content:flex-start; }
+.app-sidebar.expanded .sidebar-footer{ justify-content:flex-start; padding-left:14px; }
+
+/* Disable internal scrollbar for the rail (no scrolling) */
+.sidebar-inner{ overflow-y: visible; }
+.sidebar-inner::-webkit-scrollbar{ width:0; height:0; }
+.sidebar-inner{ -ms-overflow-style: none; scrollbar-width: none; }
+
+/* Transition for expansion */
+.sidebar-inner{ transition: width var(--sidebar-duration) var(--ease), margin var(--sidebar-duration) var(--ease); }
+
+/* Shift main content when sidebar is pinned expanded */
+.app-sidebar.expanded .sidebar-inner{ width:220px; /* leave a small white gap on the right when expanded */
+  border-right: 16px solid rgba(255,255,255,0.95);
+}
+.app-sidebar.expanded ~ .app-main{ margin-left: 260px; transition: margin-left var(--sidebar-duration) var(--ease); }
+/* Collapsed state tweaks: only show icons and remove extra spacing */
+.app-sidebar.collapsed{ width: auto; }
+.app-sidebar.collapsed .sidebar-inner{ width:72px; margin:18px 8px; }
+.app-sidebar.collapsed .sidebar-brand{ justify-content:center; }
+.app-sidebar.collapsed .sidebar-search{ display:none; }
+.app-sidebar.collapsed .sidebar-nav .nav-link{ width:56px; height:56px; padding:0; margin:8px auto; justify-content:center; }
+.app-sidebar.collapsed .sidebar-nav .nav-link .nav-text{ display:none; }
+.app-sidebar.collapsed .sidebar-footer{ justify-content:center; padding:8px 0; }
+
+/* Keep small white gap when collapsed, matching expanded visual separation */
+.app-sidebar.collapsed .sidebar-inner{ border-right: 16px solid rgba(255,255,255,0.95); }
+
+/* Ensure main content hugs the rail when collapsed (default) */
+.app-main{ margin-left:92px; transition: margin-left var(--sidebar-duration) var(--ease); }
+.app-sidebar.expanded ~ .app-main{ margin-left:260px; }
+.sidebar-footer{ padding:8px 0; width:100%; display:flex; align-items:center; justify-content:center; }
+
+.sidebar-search .form-control{ background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.04); color: rgba(255,255,255,0.9); }
+.sidebar-search .form-control::placeholder{ color: rgba(255,255,255,0.5); }
+.sidebar-search .input-group{ padding:4px; }
+
+/* Make the sidebar float with rounded ends on tall viewports */
+@media (min-width: 900px){
+  .app-sidebar{ position:fixed; left:0; top:0; bottom:0; display:flex; align-items:flex-start; }
+  .sidebar-inner{ margin:28px; min-height:calc(100vh - 56px); }
+}
+
+/* Cards */
+.card{ background:var(--bg-card); border:0; border-radius:16px; box-shadow: 0 10px 25px rgba(2,6,23,0.05); transition: transform .22s var(--ease), box-shadow .22s var(--ease); }
+.card:hover{ transform: translateY(-4px); box-shadow: 0 18px 40px rgba(2,6,23,0.06); }
+.card .card-header{ background:transparent; border-bottom:0; padding:12px 16px; font-weight:600; color:var(--text-primary); font-size:0.95rem; }
+.card .card-body{ padding:20px; }
+
+/* KPI / stat cards */
+.stat-card{ padding:14px; border-radius:12px; background:linear-gradient(180deg, rgba(255,255,255,0.9), rgba(255,255,255,0.95)); display:flex; flex-direction:row; align-items:center; gap:12px; }
+.stat-icon{ width:56px; height:56px; display:flex; align-items:center; justify-content:center; border-radius:10px; font-size:20px; color:white; flex:0 0 auto; }
+
+/* Stat card typography - horizontal layout */
+.stat-card h6{ margin:0; margin-left:8px; font-size:0.875rem; color:var(--text-secondary); font-weight:600; }
+.stat-card .stat-value{ font-size:1.4rem; font-weight:700; color:var(--text-primary); margin:0 0 0 8px; }
+.stat-card small{ display:block; color:var(--text-secondary); margin-left:8px; }
+
+/* Buttons */
+.btn{
+  border-radius:10px; font-weight:600; transition: transform .22s var(--ease), box-shadow .22s var(--ease), background .18s var(--ease), color .18s var(--ease); }
+.btn-primary{
+  background: transparent; color: var(--color-primary); border:1px solid rgba(59,130,246,0.10); box-shadow:none;
+}
+.btn-primary:hover{
+  background: linear-gradient(135deg,#7C3AED,#4F46E5); color:#fff; transform: translateY(-2px); box-shadow: 0 12px 30px rgba(99,102,241,0.14);
+}
+.app-sidebar{ background: linear-gradient(180deg, #FFFFFF, #F7FAFF); padding:var(--space-3) 8px; border-right:1px solid rgba(15,23,42,0.04); }
+.btn-sm{ padding:.45rem .7rem; }
+.action-btn { display:inline-flex; align-items:center; gap:8px; }
+.sidebar-nav .nav-link i{ color:var(--color-secondary); }
+/* Inputs & search */
+.sidebar-nav .nav-link.active, .sidebar-nav .nav-link[aria-current="page"]{ background: linear-gradient(135deg,var(--color-primary), var(--color-secondary)); color:white; box-shadow: 0 6px 18px rgba(79,70,229,0.08); }
+.form-control:focus{ box-shadow: 0 0 0 4px rgba(99,102,241,0.08); border-color:var(--color-primary); }
+.welcome-card{ background: linear-gradient(135deg, #0b3d91 0%, #1e40af 100%); color:var(--text-primary); padding:12px; border-radius:12px; }
+
+.chart-container{ height:140px; }
+
+/* Compact chart cards used on dashboard */
+.compact-chart-card{ padding:8px !important; }
+.compact-chart-card .card-body{ padding:8px !important; }
+.compact-chart-card h6{ font-size:0.9rem; margin-bottom:6px; }
+.compact-chart-card .chart-container{ height:110px !important; }
+
+/* Ensure compact chart wrapper doesn't keep large min-height from global rules */
+.compact-chart-card{ min-height:0 !important; }
+
+/* Module title icon sizing */
+.module-title i{ vertical-align: middle; font-size:0.95em; color:var(--color-secondary); }
+.badge{ padding:6px 12px; border-radius:999px; font-size:12px; font-weight:600; }
+.badge-success{ background:#D1FAE5; color:#065F46; }
+.badge-danger{ background:#FEE2E2; color:#7F1D1D; }
+.badge-warning{ background:#FEF3C7; color:#92400E; }
+.badge-info{ background:#E6F8F9; color:#064E57; }
+
+/* Tables - card-like rows (consolidated) */
+.table{ display:table; table-layout: auto; width:100%; border-collapse: separate !important; border-spacing: 0 6px; overflow-x:auto; -webkit-overflow-scrolling: touch; }
+.table thead{ display:table-header-group; position: sticky; top: 0; z-index: 10; }
+.table thead th{ padding:8px 12px; text-align:left; font-weight:700; color:#000; background: #ffffff; box-sizing: border-box; }
+
+/* Allow the browser to size columns naturally (table-layout:auto) to avoid over-truncation. */
+/* Allow wrapping for longer textual columns (client/vendor) while keeping others single-line */
+.table td:nth-child(2), .table td:nth-child(3){ white-space: normal; word-break: break-word; }
+
+.table tbody{ display:table-row-group; }
+.table tbody tr{ display:table-row; background:var(--bg-card); border-radius:10px; box-shadow: 0 6px 16px rgba(2,6,23,0.03); transition: transform .18s var(--ease), box-shadow .18s var(--ease); border:1px solid var(--table-border); }
+.table td{ display:table-cell; vertical-align:middle; padding:8px 12px; border:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.table .row-actions{ display:flex; gap:6px; justify-content:flex-end; flex-wrap:nowrap; }
+
+/* Visual scrollbar styling (subtle) */
+.table::-webkit-scrollbar{ height:8px; }
+.table::-webkit-scrollbar-track{ background:transparent; }
+.table::-webkit-scrollbar-thumb{ background:linear-gradient(180deg, rgba(0,0,0,0.12), rgba(0,0,0,0.08)); border-radius:10px; }
+
+/* Helper bottom scrollbar inserted by JS when tables overflow horizontally */
+.table-scrollbar{ display:block; height:12px; overflow-x:auto; overflow-y:hidden; -webkit-overflow-scrolling: touch; }
+.table-scrollbar .scroll-inner{ height:1px; }
+.table-scrollbar::-webkit-scrollbar{ height:10px; }
+.table-scrollbar::-webkit-scrollbar-thumb{ background: linear-gradient(180deg, rgba(0,0,0,0.12), rgba(0,0,0,0.08)); border-radius:10px; }
+.table-scrollbar{ margin-bottom: 8px; }
+
+/* Activity list */
+.activity-item{ padding:8px 0; border-bottom:1px dashed rgba(15,23,42,0.04); }
+.activity-icon{ width:44px; height:44px; display:flex; align-items:center; justify-content:center; border-radius:10px; }
+
+/* Shadows and helpers */
+.shadow-soft{ box-shadow: 0 10px 25px rgba(2,6,23,0.05); }
+.rounded-16{ border-radius:16px; }
+.p-24{ padding:24px !important; }
+.gap-16{ gap:16px; }
+
+/* Responsive */
+@media (max-width: 768px){
+  .app-sidebar{ display:none; }
+  .app-main{ margin-left:0; padding:16px; }
+  .table tbody tr{ display:block; }
+  .stat-icon{ width:56px; height:56px; font-size:18px; }
+}
+
+/* Small utility tweaks to integrate with existing templates */
+.welcome-card{ background: linear-gradient(135deg, #DBEAFE 0%, #E0F2FE 100%); color:var(--text-primary); padding:12px; border-radius:12px; }
+.welcome-card .card-body{ padding:12px; }
+.welcome-small .welcome-icon{ width:56px; height:56px; border-radius:10px; background: rgba(255,255,255,0.7); color:var(--color-primary); display:flex; align-items:center; justify-content:center; font-size:20px; }
+
+/* Mini charts in KPI cards */
+.mini-chart-wrap{ display:none; }
+.stat-mini-chart{ display:none; }
+
+/* Topbar subtle search and profile */
+.topbar-search .form-control{ background: rgba(15,23,42,0.03); border: 1px solid rgba(15,23,42,0.04); padding:6px 10px; height:36px; }
+.topbar-search .btn{ height:36px; padding:6px 10px; border-radius:8px; }
+.topbar-search .bi-search, .topbar-search svg { opacity:0.6; }
+.topbar-profile{ display:flex; align-items:center; gap:8px; }
+.topbar-profile img{ width:34px; height:34px; border-radius:8px; }
+.topbar-admin-icon{ display:inline-flex; align-items:center; justify-content:center; width:36px; height:36px; border-radius:8px; background: transparent; border:1px solid rgba(15,23,42,0.04); color:var(--text-secondary); }
+
+/* Anchor the profile dropdown to the top-right corner of the header */
+.topbar-right{ position:relative; }
+.topbar-profile{ position:relative; }
+.topbar-profile .dropdown-menu{ position:absolute; top:calc(100% + 8px); right:0; left:auto; }
+
+/* Shrink welcome-card when using .welcome-small */
+.welcome-small{ min-height:72px !important; }
+.welcome-small h3{ font-size:1rem; margin:0; }
+.welcome-small p{ margin:0; font-size:0.825rem; }
+
+/* Modules horizontal nav (subtle) */
+.modules-nav{ display:flex; gap:8px; align-items:stretch; }
+.module-item{ flex:1 1 auto; text-align:center; padding:8px; background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(255,255,255,0.99)); border-radius:12px; box-shadow: 0 6px 18px rgba(2,6,23,0.03); }
+.module-item{ display:flex; flex-direction:column; align-items:center; justify-content:center; position:relative; overflow:visible; }
+.module-item .module-icon{ font-size:20px; width:54px; height:54px; display:inline-flex; align-items:center; justify-content:center; border-radius:12px; margin-bottom:6px; box-shadow: 0 8px 24px rgba(2,6,23,0.07); transition: transform .14s var(--ease), box-shadow .14s var(--ease); }
+.module-item .module-title{ font-weight:700; margin-bottom:6px; }
+.module-item .module-sub{ font-size:0.82rem; color:var(--text-secondary); }
+.module-item:hover .module-icon{ transform: translateY(-6px) scale(1.03); box-shadow: 0 18px 44px rgba(2,6,23,0.09); }
+
+/* Ensure lucide svgs inside icons are white for contrast */
+.module-item .module-icon svg{ color: #fff; stroke: #fff; }
+
+/* Prominent gradient download button used on report pages */
+.btn-login{
+  background: linear-gradient(135deg, var(--color-secondary), #7C3AED);
+  border: none;
+  color: #fff;
+  font-weight: 700;
+  font-size: 15px;
+  padding: 12px 18px;
+  border-radius: 12px;
+  width: 100%;
+  display:inline-block;
+  text-align:center;
+  transition: transform .12s ease, box-shadow .12s ease;
+  box-shadow: 0 10px 30px rgba(96,165,250,0.16);
+}
+.btn-login:hover{ transform: translateY(-2px); box-shadow: 0 14px 40px rgba(96,165,250,0.18); }
+
+/* Specific gradients are set inline in template; add a subtle border overlay */
+.module-item .module-icon:after{ content:''; position:absolute; width:56px; height:56px; border-radius:12px; left:0; top:0; box-shadow: inset 0 1px 0 rgba(255,255,255,0.12); pointer-events:none; }
+
+/* Background decorative icon */
+.module-bg-icon{ position:absolute; right:8px; top:6px; z-index:0; pointer-events:none; opacity:0.14; transform: rotate(8deg) scale(1.02); }
+.module-bg-icon svg{ width:92px; height:92px; color: rgba(15,23,42,0.08); stroke: rgba(15,23,42,0.08); fill: none; stroke-width:1.6; filter: drop-shadow(0 6px 18px rgba(2,6,23,0.03)); }
+
+/* Keep content above the background icon */
+.module-item > .module-icon, .module-item > .module-title, .module-item > .module-sub { position:relative; z-index:2; }
+
+/* Slightly reduce background icon opacity on hover for contrast */
+.module-item:hover .module-bg-icon{ opacity:0.06; transform: translateY(-6px) rotate(6deg); }
+.module-item .module-title{ font-weight:700; font-size:0.9rem; margin-bottom:4px; }
+.module-item .module-sub{ font-size:0.8rem; color:var(--text-secondary); }
+
+/* Subtle motion for links */
+a{ transition: color .18s var(--ease), opacity .18s var(--ease); }
+
+/* Ensure modals align with new theme */
+.modal-content{ border-radius:12px; }
+
+/* Fallbacks */
+:focus{ outline: none; }
+
+/* Icon SVG tweaks for Lucide/Heroicons */
+svg.lucide, svg.heroicon {
+  width: 1.125em;
+  height: 1.125em;
+  vertical-align: -0.125em;
+  stroke-width: 1.6;
+  stroke: currentColor;
+}
+
+/* Welcome subicon styling */
+.welcome-subicon i{
+  width:28px;
+  height:28px;
+  display:inline-block;
+  color: var(--warning);
+}
+.welcome-subicon{ display:block; }
+
+/* Topbar input-group layout fix: keep search input and button on one line */
+.topbar-search .input-group{ display:flex; gap:8px; align-items:center; flex-wrap:nowrap; }
+.topbar-search .form-control{ flex:1 1 auto; min-width:180px; }
+.topbar-search .btn{ white-space:nowrap; }
+
+/* Make search input and button taller and visually aligned on md+ */
+@media (min-width: 768px){
+  .topbar-search .form-control{ height:40px; padding:8px 14px; }
+  .topbar-search .btn{ height:40px; padding:8px 14px; border-radius:12px; }
+  /* ensure the input and button align with rounded ends */
+  .topbar-search .form-control{ border-top-right-radius:999px; border-bottom-right-radius:999px; }
+  .topbar-search .btn{ border-top-left-radius:12px; border-bottom-left-radius:12px; }
+}
+
+/* Profile dropdown styling */
+.topbar-profile .dropdown-menu{ min-width:220px; border-radius:12px; padding:6px 0; box-shadow: 0 12px 36px rgba(2,6,23,0.08); right:0; left:auto; z-index:2050; }
+.topbar-profile .dropdown-header{ padding:10px 14px; font-weight:700; }
+.topbar-profile .dropdown-item{ padding:10px 14px; color:var(--text-primary); }
+.topbar-profile .dropdown-item i{ margin-right:10px; color:var(--color-secondary); }
+.topbar-profile .dropdown-divider{ margin:6px 0; }
+.topbar-profile .dropdown-menu a.text-danger{ color:var(--danger); }
+
+/* Ensure avatar is visible and compact */
+.topbar-profile a img{ width:36px; height:36px; border-radius:8px; object-fit:cover; }
+
+/* Header & dropdown polish: keep header above content and avoid overlap */
+.app-topbar{
+  position:sticky;
+  top:0;
+  z-index:2060;
+  background: rgba(var(--bg-vanilla), 0.10); /* slightly warm transparent header to blend */
+  backdrop-filter: blur(6px);
+  padding:10px 18px;
+  border-bottom: 1px solid rgba(15,23,42,0.04);
+}
+
+.topbar-right, .topbar-left{ z-index:2065; }
+.topbar-profile .dropdown-menu{ transform-origin: top right; animation: gafraDropdown .12s ease both; }
+
+@keyframes gafraDropdown{
+  from{ opacity:0; transform: translateY(-6px) scale(0.995); }
+  to{ opacity:1; transform: translateY(0) scale(1); }
+}
+
+/* Make welcome-card visually distinct and reduce default min-height when appropriate */
+.welcome-card{ border:1px solid rgba(15,23,42,0.04); box-shadow: 0 8px 24px rgba(2,6,23,0.04); padding:14px; }
+.app-content .container-lg .card.welcome-card{ min-height: auto !important; }
+
+.welcome-placeholder{ border:1px dashed rgba(15,23,42,0.03); border-radius:10px; padding:10px; background: linear-gradient(180deg, rgba(255,255,255,0.6), rgba(255,255,255,0.4)); }
+
+/* Vanilla translucent form/card style - applied to cards and forms inside the app content */
+.app-content .card,
+.app-content form,
+.app-content form .card,
+.app-content .form-card,
+form.card{
+  background: linear-gradient(180deg, rgba(var(--bg-vanilla), var(--bg-vanilla-alpha)), rgba(255,255,255,0.55));
+  border: 1px solid rgba(255,255,255,0.7);
+  box-shadow: 0 18px 40px rgba(15,23,42,0.04);
+  backdrop-filter: blur(6px);
+  border-radius: 14px;
+}
+
+/* Make main container area use vanilla background so the page looks unified */
+.app-content{ background: transparent; padding: 12px 0; }
+.container-lg{ background: transparent; }
+
+/* Table alignment handled in consolidated table block above */
+
+/* Improve action buttons appearance */
+.row-actions a, .row-actions .btn, .action-btn{ display:inline-flex; align-items:center; gap:6px; border-radius:999px; padding:6px 8px; font-weight:700; }
+.row-actions .btn-outline-secondary{ background: var(--color-dark-blue); color: #ffffff; border:1px solid rgba(11,61,145,0.16); }
+.row-actions .btn-outline-secondary::before{ content: "✎"; margin-right:6px; opacity:0.95; color: #ffffff; }
+.row-actions .btn-outline-danger{ background: rgba(255,255,255,0.9); color: var(--danger); border:1px solid rgba(255,0,0,0.06); }
+.row-actions .btn-outline-danger::before{ content: "🗑"; margin-right:6px; }
+.row-actions a.text-info, .row-actions .btn-info{ color: var(--color-dark-blue); }
+
+/* Slight visual separation for each table row's actions */
+.table .row-actions{ justify-content:flex-end; }
+
+/* Make buttons slightly elevated */
+.row-actions .btn{ box-shadow: 0 6px 20px rgba(2,6,23,0.04); }
+
+/* Make the top search control visually match the forms so they appear unified */
+.topbar-search .form-control{
+  background: linear-gradient(180deg, rgba(var(--bg-vanilla), var(--bg-vanilla-alpha)), rgba(255,255,255,0.6));
+  border: 1px solid rgba(255,255,255,0.7);
+  box-shadow: 0 10px 30px rgba(15,23,42,0.03);
+}
+.topbar-search .btn{
+  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+  border: none;
+}
+
+/* Reduce card header contrast so the appearance is softer */
+.app-content .card .card-header{ background: transparent; color: rgba(15,23,42,0.78); }
+
+/* Slight breathing room below the header so dropdowns don't visually stick to content */
+.app-main{ padding-top: 12px; }
+
+/* Tweak module item focus state to match header */
+.module-item{ transition: transform .18s var(--ease), box-shadow .18s var(--ease); }
+.module-item:hover{ transform: translateY(-4px); box-shadow: 0 14px 36px rgba(2,6,23,0.05); }
+
+/* Force any 'info' links/buttons to use dark-blue for contrast */
+a.text-info, .text-info, .btn-info, .btn-outline-info{
+  color: var(--color-dark-blue) !important;
+  background: transparent !important;
+  border-color: rgba(11,61,145,0.08) !important;
+}
+
+/* Specific overrides for action buttons inside table rows */
+.table .row-actions a.text-info,
+.table .row-actions .btn-info,
+.table .row-actions .btn-outline-info{ 
+  background: var(--color-dark-blue) !important;
+  color: #fff !important;
+  border: 1px solid rgba(11,61,145,0.16) !important;
+  box-shadow: 0 6px 20px rgba(11,61,145,0.06) !important;
+}
+
+/* Make small topbar links (Reportes, Carga masiva) readable */
+.topbar-search a, .topbar-right a, .topbar-left a{ color: var(--color-dark-blue) !important; }
+.topbar-search a:hover, .topbar-right a:hover, .topbar-left a:hover{ color: #7C3AED !important; }
+
+/* Ensure editable inputs and content inside tables are dark for legibility */
+.table, .table td, .table th{ color: var(--text-primary); }
+.table input, .table textarea, .table select, .table .form-control, .table td [contenteditable="true"]{
+  color: var(--text-primary) !important;
+  background: #ffffff !important;
+  caret-color: var(--text-primary) !important;
+}
+.table input::placeholder, .table textarea::placeholder{ color: rgba(15,23,42,0.45) !important; }
+.table input:focus, .table textarea:focus, .table select:focus, .table .form-control:focus{
+  color: var(--text-primary) !important;
+  box-shadow: 0 6px 18px rgba(2,6,23,0.06) !important;
+  outline: none !important;
+}
+
+/* If table rows use contenteditable cells, ensure selection contrast */
+.table td[contenteditable="true"]:focus{ background: #fff !important; color: var(--text-primary) !important; }
+
+/* Strong overrides: ensure editable text is dark across all edit modules (forms, modals, tables) */
+form input, form textarea, form select, .form-control, .modal input, .modal textarea, .modal select,
+.app-content input, .app-content textarea, .app-content select, .app-content .form-control,
+.container-lg input, .container-lg textarea, .container-lg select,
+.table input, .table textarea, .table select, .table [contenteditable="true"]{
+  color: var(--text-primary) !important;
+  -webkit-text-fill-color: var(--text-primary) !important;
+  background: #ffffff !important;
+  caret-color: var(--text-primary) !important;
+}
+.form-control::placeholder, form .form-control::placeholder, .app-content .form-control::placeholder{ color: rgba(15,23,42,0.45) !important; }
+.form-control:focus, .form-control:active, .modal .form-control:focus{ color: var(--text-primary) !important; background: #fff !important; }
+
+/* Contenteditable explicit color */
+[contenteditable="true"]{ color: var(--text-primary) !important; }
+
+/* If some components apply a translucent blue color via utility classes, override them inside edit areas */
+.app-content .text-info, .app-content .text-primary, .app-content .muted, .app-content .text-muted{ color: var(--text-primary) !important; }
+
+/* Force labels to use dark text in edit modules (override theme utilities) */
+form label, label.form-label, .app-content label, .container-lg label, .modal label, .card label{
+  color: var(--text-primary) !important;
+}
+
+/* Stronger specificity for Bootstrap-like classes */
+.form-group > label, .mb-3 > label, .row > label { color: var(--text-primary) !important; }
+
+/* Remove any lingering very-light cyan backgrounds on small buttons */
+.table .row-actions .btn, .table .row-actions a{ background: transparent !important; }
+
+/* Make the welcome title pastel blue for better contrast while keeping card dark */
+.welcome-card h1, .welcome-card h2, .welcome-card h3, .welcome-card .welcome-title {
+  color: var(--text-primary) !important;
+  font-weight:700;
+}
+
+/* Final overrides to ensure dark-blue buttons and dark welcome-card are applied */
+.row-actions .btn-outline-secondary{
+  background: var(--color-dark-blue) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(11,61,145,0.18) !important;
+  box-shadow: 0 4px 14px rgba(11,61,145,0.06) !important;
+}
+.row-actions .btn-outline-secondary::before{ color:#ffffff !important; }
+.row-actions .btn-outline-secondary:hover{
+  background: linear-gradient(135deg,#5B21B6,#7C3AED) !important;
+  color:#ffffff !important;
+  transform: translateY(-2px) !important;
+}
+
+.btn-primary{ background: transparent !important; color: var(--color-primary) !important; border: 1px solid rgba(59,130,246,0.10) !important; box-shadow:none !important; }
+.btn-primary:hover{ background: linear-gradient(135deg,#7C3AED,#4F46E5) !important; color:#fff !important; }
+
+.welcome-card{ background: linear-gradient(135deg, #DBEAFE 0%, #E0F2FE 100%) !important; color: var(--text-primary) !important; border: 1px solid rgba(15,23,42,0.04) !important; }
+.welcome-card .card-body{ color: var(--text-primary) !important; }
+
+/* Emphasize row border on hover with green accent */
+.table tbody tr:hover{ border-color: rgba(16,185,129,0.14) !important; }
+
+/* Horizontal bottom scrollbar helper for wide tables */
+.table-scrollbar{
+  display:block !important; /* show external helper scrollbar so users see a clear scrollbar under the table */
+  height:12px;
+  overflow-x:auto;
+  overflow-y:hidden;
+  margin-top:6px;
+  -webkit-overflow-scrolling: touch;
+}
+.table-scrollbar .scroll-inner{ height:1px; }
+.table-scrollbar::-webkit-scrollbar{ height:8px; }
+.table-scrollbar::-webkit-scrollbar-track{ background:transparent; }
+.table-scrollbar::-webkit-scrollbar-thumb{ background: linear-gradient(180deg, rgba(0,0,0,0.12), rgba(0,0,0,0.08)); border-radius:10px; }
+.table-scrollbar{ -webkit-overflow-scrolling: touch; }
+
+/* Make sure table horizontal overflow remains visible when using the external scrollbar
+  (we prefer the external `.table-scrollbar` helper; avoid internal table overflow to prevent duplicate scrollbars) */
+.table{ overflow-x: auto !important; overflow-y: visible !important; }
+
+/* Keep cells truncated on overflow (prevent stacking), use single horizontal scrollbar on .table */
+.table td, .table th{
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  word-break: normal !important;
+}
+
+/* Make action buttons smaller so they don't push table layout on narrow views */
+.table .row-actions .btn, .table .row-actions a{
+  padding:4px 6px !important;
+  font-size:0.825rem !important;
+  line-height:1 !important;
+  border-radius:8px !important;
+}
+.table .row-actions .btn i{ font-size:0.85rem !important; }
+
+/* Visual-only: collapse textual button labels inside table rows and show only icons
+   - keep text available to screen readers by not using display:none (templates could be improved with aria-labels) */
+.table .row-actions a, .table .row-actions .btn{
+  font-size: 0 !important;
+  padding-left: 8px !important;
+  padding-right: 8px !important;
+}
+.table .row-actions a::before, .table .row-actions .btn::before{
+  font-size: 0.95rem !important;
+  margin-right: 0 !important;
+  display: inline-block !important;
+  vertical-align: middle;
+}
+.table .row-actions a i, .table .row-actions .btn i{
+  font-size: 0.95rem !important;
+  line-height: 1 !important;
+  vertical-align: middle;
+}
+
+/* Ensure action column is wide enough and buttons flow inside */
+.table .row-actions{ min-width:160px; gap:8px; }
+.table .row-actions a, .table .row-actions .btn{ white-space:nowrap; }
+
+/* Slightly reduce border-spacing to compact rows while allowing wrap */
+.table{ border-spacing: 0 6px !important; }
+
+/* Topbar / general outline-secondary buttons (e.g. Reportes) - transparent by default,
+   purple gradient on hover with white text. More specific table/action buttons keep their styling. */
+.btn.btn-outline-secondary,
+.btn-outline-secondary{
+  background: transparent !important;
+  color: var(--color-dark-blue) !important;
+  border-color: rgba(11,61,145,0.08) !important;
+}
+.btn.btn-outline-secondary.btn-sm,
+.btn-outline-secondary.btn-sm{
+  padding: .35rem .65rem !important;
+}
+.btn.btn-outline-secondary:hover,
+.btn-outline-secondary:hover{
+  background: linear-gradient(135deg,#7C3AED,#4F46E5) !important;
+  color: #ffffff !important;
+  border-color: transparent !important;
+  transform: translateY(-2px);
+}
+
+/* Ensure tiny topbar anchors that reuse btn classes also follow the same contrast rules */
+.topbar-right .btn.btn-outline-secondary,
+.topbar-left .btn.btn-outline-secondary,
+.topbar-search .btn.btn-outline-secondary{ background: transparent !important; color: var(--color-dark-blue) !important; }

@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% block head_title %}Materias Primas{% endblock %}
+{% block header_title %}Materias Primas{% endblock %}
+{% block content %}
+{% if alerta_bajo_stock and alerta_bajo_stock.count > 0 %}
+<div class="alert alert-danger mb-3">
+    <strong>¡Atención!</strong> Hay materias primas con stock por debajo del mínimo:
+    <ul class="mb-0">
+        {% for mat in alerta_bajo_stock %}
+            <li><strong>{{ mat.nombre }}</strong> (Stock actual: {{ mat.stock_actual }}, Mínimo: {{ mat.stock_minimo }})</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Materias Primas</h5>
+        <div class="d-flex gap-2">
+            <a href="{% url 'inventario:create' %}" class="btn btn-primary btn-sm">Nueva Materia Prima</a>
+            <a href="{% url 'inventario:carga_masiva' %}" class="btn btn-outline-success btn-sm">Carga masiva</a>
+            <a href="{% url 'inventario:reportes' %}" class="btn btn-outline-secondary btn-sm">Reportes</a>
+            <a href="{% url 'inventario:historial_general' %}" class="btn btn-outline-info btn-sm">Ver historial general de movimientos</a>
+        </div>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-striped table-hover mb-0 align-middle">
+                <thead class="table-primary">
+                    <tr>
+                        <th>Código</th>
+                        <th>Nombre</th>
+                        <th>Marca</th>
+                        <th>Stock Actual</th>
+                        <th>Stock Mínimo</th>
+                        <th>Unidad</th>
+                        <th>Precio Unitario</th>
+                        <th>Proveedor</th>
+                        <th>Ubicación</th>
+                        <th>Fecha creación</th>
+                        <th>Observaciones</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for materia in materias_primas %}
+                    <tr>
+                        <td><span class="text-monospace small">{{ materia.codigo }}</span></td>
+                        <td>{{ materia.nombre }}</td>
+                        <td>{{ materia.marca }}</td>
+                        <td>
+                            <span class="{% if materia.stock_actual <= materia.stock_minimo %}text-danger fw-bold{% elif materia.stock_actual <= materia.stock_minimo|add:10 %}text-warning{% else %}text-success{% endif %}">
+                                {{ materia.stock_actual }}
+                            </span>
+                        </td>
+                        <td>{{ materia.stock_minimo }}</td>
+                        <td>{{ materia.get_unidad_medida_display }}</td>
+                        <td>${{ materia.precio_unitario }}</td>
+                        <td>{{ materia.proveedor.nombre }}</td>
+                        <td>{{ materia.ubicacion }}</td>
+                        <td><span class="small">{{ materia.fecha_creacion|date:"Y-m-d H:i" }}</span></td>
+                        <td><span class="text-muted small">{{ materia.observaciones|default:"-" }}</span></td>
+                        <td>
+                            {% if materia.activo %}
+                                <span class="badge bg-success">Sí</span>
+                            {% else %}
+                                <span class="badge bg-danger">No</span>
+                            {% endif %}
+                        </td>
+                        <td class="table-actions">
+                            <div class="action-btn-group d-flex gap-1">
+                                <a href="{% url 'inventario:update' materia.pk %}" class="btn btn-sm btn-outline-secondary">Editar</a>
+                                <a href="{% url 'inventario:delete' materia.pk %}" class="btn btn-sm btn-outline-danger">Eliminar</a>
+                                <a href="{% url 'inventario:entrada' materia.pk %}" class="btn btn-sm btn-outline-success">Entrada</a>
+                                <a href="{% url 'inventario:historial' materia.pk %}" class="btn btn-sm btn-outline-info">Historial</a>
+                            </div>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="13" class="text-center py-3">No hay materias primas registradas.</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block head_title %}Perfil de Usuario{% endblock %}
+{% block header_title %}Mi Perfil{% endblock %}
+{% block content %}
+<div class="card">
+  <div class="card-header">
+    <h5 class="mb-0">Información del Perfil</h5>
+  </div>
+  <div class="card-body">
+    <div class="row">
+      <div class="col-md-6">
+        <h6>Información de Usuario</h6>
+        <p><strong>Nombre de usuario:</strong> {{ user.username }}</p>
+        <p><strong>Nombre completo:</strong> {{ user.get_full_name|default:"No especificado" }}</p>
+        <p><strong>Email:</strong> {{ user.email|default:"No especificado" }}</p>
+        <p><strong>Último login:</strong> {{ user.last_login|date:"d/m/Y H:i" }}</p>
+        <p><strong>Fecha de registro:</strong> {{ user.date_joined|date:"d/m/Y" }}</p>
+      </div>
+      {% if user.usuario %}
+      <div class="col-md-6">
+        <h6>Información Adicional</h6>
+        <p><strong>Rol:</strong> {{ user.usuario.get_rol_display }}</p>
+        <p><strong>Teléfono:</strong> {{ user.usuario.telefono|default:"No especificado" }}</p>
+        <p><strong>Estado:</strong>
+          {% if user.usuario.activo %}
+            <span class="badge bg-success">Activo</span>
+          {% else %}
+            <span class="badge bg-danger">Inactivo</span>
+          {% endif %}
+        </p>
+        <div class="mt-2">
+          <a href="{% url 'logout' %}" class="btn btn-danger btn-sm rounded-pill">Cerrar sesión</a>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,2 @@
+producto,receta,cantidad_a_producir,estado,responsable,notas
+Producto demo,Receta demo,100,pendiente,admin,Notas de ejemplo

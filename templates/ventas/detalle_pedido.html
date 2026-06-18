@@ -1,0 +1,226 @@
+{% extends 'base_cliente.html' %}
+{% load static %}
+
+{% block title %}Pedido {{ pedido.numero_venta }} - GAFRA Store{% endblock %}
+
+{% block content %}
+<!-- Header Section removed per request -->
+<section class="container detalle-pedido">
+    <div class="row g-4">
+        <!-- Order Information -->
+        <div class="col-lg-8">
+            <div class="left-stack">
+            <div class="card-custom mb-4">
+                <div class="card-body">
+                    <h4 class="card-title fw-bold text-dark mb-4">
+                        <i class="bi bi-info-circle text-primary me-2"></i>Información del Pedido
+                    </h4>
+
+                    <div class="row g-4">
+                        <div class="col-md-3">
+                            <div class="glass-effect p-3 rounded">
+                                <h6 class="fw-bold text-dark mb-2">Número de Pedido</h6>
+                                <p class="mb-0 text-primary fs-5">{{ pedido.numero_venta }}</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="glass-effect p-3 rounded">
+                                <h6 class="fw-bold text-dark mb-2">Fecha del Pedido</h6>
+                                <p class="mb-0">{{ pedido.fecha|date:"l, d F Y" }}</p>
+                                <small class="text-muted">{{ pedido.fecha|date:"H:i" }} horas</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="glass-effect p-3 rounded">
+                                <h6 class="fw-bold text-dark mb-2">Estado del Pedido</h6>
+                                {% if pedido.estado == 'completada' %}
+                                    <span class="badge bg-success fs-6 px-3 py-2">Completado</span>
+                                {% elif pedido.estado == 'en_progreso' %}
+                                    <span class="badge bg-info text-dark fs-6 px-3 py-2">En proceso</span>
+                                {% elif pedido.estado == 'pendiente' %}
+                                    <span class="badge bg-warning text-dark fs-6 px-3 py-2">Pendiente</span>
+                                {% else %}
+                                    <span class="badge bg-danger fs-6 px-3 py-2">Cancelado</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="glass-effect p-3 rounded">
+                                <h6 class="fw-bold text-dark mb-2">Total del Pedido</h6>
+                                <p class="mb-0 price-tag">${{ pedido.total|floatformat:0 }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Shipping Information -->
+                    {% if pedido.telefono or pedido.direccion %}
+                    <div class="mt-4 pt-4 border-top">
+                        <h5 class="fw-bold text-dark mb-3">
+                            <i class="bi bi-truck text-primary me-2"></i>Información de Envío
+                        </h5>
+                        <div class="row g-3">
+                            {% if pedido.telefono %}
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-telephone text-primary me-3 fs-4"></i>
+                                    <div>
+                                        <h6 class="mb-0 fw-semibold">Teléfono</h6>
+                                        <p class="mb-0 text-muted">{{ pedido.telefono }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                            {% if pedido.direccion %}
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-geo-alt text-primary me-3 fs-4"></i>
+                                    <div>
+                                        <h6 class="mb-0 fw-semibold">Dirección</h6>
+                                        <p class="mb-0 text-muted">{{ pedido.direccion }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Order Items -->
+            <div class="card-custom">
+                <div class="card-body">
+                    <h4 class="card-title fw-bold text-dark mb-4">
+                        <i class="bi bi-basket text-primary me-2"></i>Productos del Pedido
+                    </h4>
+
+                    <div class="row g-4">
+                        {% for detalle in detalles %}
+                        <div class="col-12">
+                            <div class="d-flex align-items-center p-3 border rounded">
+                                <!-- Product Image -->
+                                <div class="flex-shrink-0 me-3">
+                                    {% if detalle.producto.imagen %}
+                                        <img src="{{ detalle.producto.imagen.url }}" alt="{{ detalle.producto.nombre }}"
+                                             class="rounded" style="width: 80px; height: 80px; object-fit: cover;">
+                                    {% else %}
+                                        <div class="bg-light d-flex align-items-center justify-content-center rounded"
+                                             style="width: 80px; height: 80px;">
+                                            <i class="bi bi-image text-muted fs-4"></i>
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                <!-- Product Details -->
+                                <div class="flex-grow-1">
+                                    <h5 class="fw-bold text-dark mb-1">{{ detalle.producto.nombre }}</h5>
+                                    <p class="text-muted small mb-2">{{ detalle.producto.descripcion|truncatechars:100 }}</p>
+                                    <div class="row g-3">
+                                        <div class="col-md-3">
+                                            <small class="text-muted">Código</small>
+                                            <p class="mb-0 fw-semibold">{{ detalle.producto.codigo }}</p>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <small class="text-muted">Cantidad</small>
+                                            <p class="mb-0 fw-semibold">{{ detalle.cantidad }}</p>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <small class="text-muted">Precio Unitario</small>
+                                            <p class="mb-0 fw-semibold">${{ detalle.precio_unitario|floatformat:0 }}</p>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <small class="text-muted">Subtotal</small>
+                                            <p class="mb-0 fw-bold text-primary">${{ detalle.subtotal|floatformat:0 }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            </div>
+        </div>
+
+        <!-- Order Summary -->
+        <div class="col-lg-4">
+            <div class="right-stack">
+            <div class="card-custom">
+                <div class="card-body">
+                    <h4 class="card-title fw-bold text-dark mb-4">
+                        <i class="bi bi-calculator text-primary me-2"></i>Resumen
+                    </h4>
+
+                    <div class="d-flex justify-content-between mb-3">
+                        <span class="text-muted">Subtotal ({{ detalles|length }} productos):</span>
+                        <span class="fw-semibold">${{ pedido.total|floatformat:0 }}</span>
+                    </div>
+
+                    <div class="d-flex justify-content-between mb-3">
+                        <span class="text-muted">Descuento:</span>
+                        <span class="fw-semibold text-success">-${{ pedido.descuento|floatformat:0 }}</span>
+                    </div>
+
+                    <div class="d-flex justify-content-between mb-3">
+                        <span class="text-muted">Impuestos:</span>
+                        <span class="fw-semibold">${{ pedido.impuesto|floatformat:0 }}</span>
+                    </div>
+
+                    <div class="d-flex justify-content-between mb-3">
+                        <span class="text-muted">Envío:</span>
+                        <span class="fw-semibold text-success">Gratis</span>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <div class="d-flex justify-content-between mb-4">
+                        <h5 class="mb-0 fw-bold text-dark">Total Pagado:</h5>
+                        <h5 class="mb-0 fw-bold text-primary">${{ pedido.total|floatformat:0 }}</h5>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'ventas:historial_pedidos' %}" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left me-2"></i>Volver a Pedidos
+                        </a>
+                        <a href="{% url 'ventas:catalogo_cliente' %}" class="btn btn-primary-custom">
+                            <i class="bi bi-shop me-2"></i>Comprar Más
+                        </a>
+                        {% if pedido.estado == 'completada' %}
+                        <button class="btn btn-outline-success" onclick="window.print()">
+                            <i class="bi bi-printer me-2"></i>Imprimir Recibo
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Help Section -->
+            <div class="card-custom mt-3 help-card">
+                <div class="card-body text-center">
+                    <i class="bi bi-headset text-primary fs-1 mb-3"></i>
+                    <h6 class="fw-bold text-dark mb-2">¿Necesitas Ayuda?</h6>
+                    <p class="text-muted small mb-3">Contáctanos si tienes alguna pregunta sobre tu pedido</p>
+                    <div class="d-flex justify-content-center gap-2">
+                        <a href="tel:+34123456789" class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-telephone me-1"></i>Llamar
+                        </a>
+                        <a href="mailto:info@gafra.com" class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-envelope me-1"></i>Email
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% block extra_js %}
+<script>
+function printOrder() {
+    window.print();
+}
+</script>
+{% endblock %}
+{% endblock %}

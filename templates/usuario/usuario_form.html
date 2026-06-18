@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+{% block head_title %}{% if object %}Editar{% else %}Nuevo{% endif %} usuario{% endblock %}
+{% block header_title %}{% if object %}Editar{% else %}Nuevo{% endif %} usuario{% endblock %}
+{% block content %}
+<div class="card">
+    <div class="card-header"><h5 class="mb-0">{% if object %}Editar{% else %}Nuevo{% endif %} usuario</h5></div>
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="{{ form.username.id_for_label }}" class="form-label">Nombre de usuario *</label>
+                        {{ form.username }}
+                        {% for error in form.username.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="{{ form.email.id_for_label }}" class="form-label">Email *</label>
+                        {{ form.email }}
+                        {% for error in form.email.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="{{ form.first_name.id_for_label }}" class="form-label">Nombre</label>
+                        {{ form.first_name }}
+                        {% for error in form.first_name.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="{{ form.last_name.id_for_label }}" class="form-label">Apellido</label>
+                        {{ form.last_name }}
+                        {% for error in form.last_name.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% if not object %}
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="{{ form.password.id_for_label }}" class="form-label">Contraseña *</label>
+                        {{ form.password }}
+                        {% for error in form.password.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="{{ form.password_confirm.id_for_label }}" class="form-label">Confirmar contraseña *</label>
+                        {{ form.password_confirm }}
+                        {% for error in form.password_confirm.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="{{ form.rol.id_for_label }}" class="form-label">Rol *</label>
+                        {{ form.rol }}
+                        {% for error in form.rol.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="{{ form.telefono.id_for_label }}" class="form-label">Teléfono</label>
+                        {{ form.telefono }}
+                        {% for error in form.telefono.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                    </div>
+                </div>
+            </div>
+            {# Eliminado campo de usuario activo #}
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger">
+                    {% for error in form.non_field_errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-success">Guardar</button>
+                <a href="{% url 'usuario:list' %}" class="btn btn-secondary">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

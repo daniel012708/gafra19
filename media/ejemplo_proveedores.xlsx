@@ -1,0 +1,2 @@
+nombre,razon_social,rfc,contacto,telefono,email,direccion,ciudad,estado,pais,codigo_postal,tipo,sitio_web,activo
+Proveedor demo,Razon demo,DEMO123456,Contacto demo,5551234567,proveedor@ejemplo.com,Direccion demo,Ciudad demo,Estado demo,Pais demo,12345,Nacional,,1

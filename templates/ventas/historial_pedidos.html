@@ -1,0 +1,159 @@
+{% extends 'base_cliente.html' %}
+{% load static %}
+
+{% block title %}Mis Pedidos - GAFRA Store{% endblock %}
+
+{% block content %}
+<!-- Header Section removed per request -->
+<section class="container">
+    {% if pedidos %}
+        <!-- Orders List -->
+        <div class="row g-4">
+            {% for pedido in pedidos %}
+            <div class="col-12">
+                <div class="card-custom">
+                    <div class="card-body compact-card">
+                        <div class="row align-items-center">
+                            <!-- Order Info -->
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-center mb-2">
+                                    <h5 class="card-title fw-bold text-dark mb-0 me-3">
+                                        Pedido #{{ pedido.numero_venta }}
+                                    </h5>
+                                    {% if pedido.estado == 'completada' %}
+                                        <span class="badge bg-success fs-6">Completado</span>
+                                    {% elif pedido.estado == 'en_progreso' %}
+                                        <span class="badge bg-info text-dark fs-6">En proceso</span>
+                                    {% elif pedido.estado == 'pendiente' %}
+                                        <span class="badge bg-warning text-dark fs-6">Pendiente</span>
+                                    {% else %}
+                                        <span class="badge bg-danger fs-6">Cancelado</span>
+                                    {% endif %}
+                                </div>
+                                <p class="text-muted mb-2">
+                                    <i class="bi bi-calendar me-2"></i>{{ pedido.fecha|date:"l, d F Y" }} a las {{ pedido.fecha|date:"H:i" }}
+                                </p>
+                                {% if pedido.telefono %}
+                                <p class="text-muted small mb-0">
+                                    <i class="bi bi-telephone me-2"></i>{{ pedido.telefono }}
+                                </p>
+                                {% endif %}
+                                {% if pedido.direccion %}
+                                <p class="text-muted small mb-0">
+                                    <i class="bi bi-geo-alt me-2"></i>{{ pedido.direccion }}
+                                </p>
+                                {% endif %}
+                            </div>
+
+                            <!-- Order Total & Actions -->
+                            <div class="col-md-6 text-end">
+                                <div class="mb-3">
+                                    <span class="h4 fw-bold text-primary mb-0">${{ pedido.total|floatformat:0 }}</span>
+                                    <p class="text-muted small mb-0">{{ pedido.detalles.count }} producto{{ pedido.detalles.count|pluralize }}</p>
+                                </div>
+                                <a href="{% url 'ventas:detalle_pedido' pedido.pk %}" class="btn btn-primary-custom">
+                                    <i class="bi bi-eye me-2"></i>Ver Detalles
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Order Items Preview -->
+                        <div class="mt-3 pt-3 border-top">
+                            <div class="row g-3">
+                                {% for detalle in pedido.detalles.all|slice:":3" %}
+                                <div class="col-md-4">
+                                    <div class="d-flex align-items-center">
+                                        {% if detalle.producto.imagen %}
+                                            <img src="{{ detalle.producto.imagen.url }}" alt="{{ detalle.producto.nombre }}"
+                                                 class="rounded me-3" style="width: 50px; height: 50px; object-fit: cover;">
+                                        {% else %}
+                                            <div class="bg-light d-flex align-items-center justify-content-center rounded me-3"
+                                                 style="width: 50px; height: 50px;">
+                                                <i class="bi bi-image text-muted"></i>
+                                            </div>
+                                        {% endif %}
+                                        <div class="flex-grow-1">
+                                            <h6 class="mb-0 fw-semibold small">{{ detalle.producto.nombre }}</h6>
+                                            <p class="text-muted small mb-0">{{ detalle.cantidad }} × ${{ detalle.precio_unitario|floatformat:0 }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                                {% if pedido.detalles.count > 3 %}
+                                <div class="col-md-12">
+                                    <p class="text-muted small mb-0 text-center">
+                                        ... y {{ pedido.detalles.count|add:"-3" }} producto{{ pedido.detalles.count|add:"-3"|pluralize }} más
+                                    </p>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="text-center mt-5">
+            <a href="{% url 'ventas:catalogo_cliente' %}" class="btn btn-primary-custom btn-lg">
+                <i class="bi bi-shop me-2"></i>Continuar Comprando
+            </a>
+        </div>
+
+    {% else %}
+        <!-- Empty Orders -->
+        <div class="text-center py-5">
+            <div class="mb-4">
+                <i class="bi bi-receipt text-muted" style="font-size: 5rem;"></i>
+            </div>
+            <h2 class="text-muted mb-3">Aún no tienes pedidos</h2>
+            <p class="text-muted mb-4">
+                ¡Es hora de hacer tu primera compra! Explora nuestro catálogo y encuentra productos increíbles.
+            </p>
+            <a href="{% url 'ventas:catalogo_cliente' %}" class="btn btn-primary-custom btn-lg">
+                <i class="bi bi-shop me-2"></i>Ir al Catálogo
+            </a>
+        </div>
+    {% endif %}
+</section>
+
+<!-- Order Status Legend -->
+{% if pedidos %}
+<section class="container my-5">
+    <div class="card-custom">
+        <div class="card-body">
+            <h5 class="card-title fw-bold text-dark mb-3">
+                <i class="bi bi-info-circle text-info me-2"></i>Estados de los Pedidos
+            </h5>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="d-flex align-items-center">
+                        <span class="badge bg-warning text-dark me-3">Pendiente</span>
+                        <span class="small text-muted">Tu pedido está siendo procesado</span>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="d-flex align-items-center">
+                        <span class="badge bg-info text-dark me-3">En proceso</span>
+                        <span class="small text-muted">Tu pedido está siendo preparado para salida</span>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="d-flex align-items-center">
+                        <span class="badge bg-success me-3">Completado</span>
+                        <span class="small text-muted">Tu pedido ha sido entregado</span>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="d-flex align-items-center">
+                        <span class="badge bg-danger me-3">Cancelado</span>
+                        <span class="small text-muted">El pedido fue cancelado</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endif %}
+{% endblock %}

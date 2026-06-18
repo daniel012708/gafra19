@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>{{ title|default:'Reporte' }}</title>
+  <style>
+    /* Page layout */
+    @page { size: A4; margin: 28mm 18mm 18mm 18mm; }
+    body { font-family: Arial, Helvetica, sans-serif; font-size: 12px; color: #111; padding: 0; margin: 0; }
+    .page { padding: 20px; }
+
+    /* Header */
+    .header { text-align: center; margin-bottom: 8px; }
+    .brand { color: #6C63FF; font-weight:700; font-size:28px; margin:0; }
+    .report-title { font-size:18px; margin:2px 0 4px 0; color:#222; }
+    .report-meta { color:#666; font-size:12px; margin:0; }
+
+    /* Top summary */
+    .summary { display:flex; gap:18px; justify-content:center; margin:14px 0 18px 0; }
+    .kpi { background: #fff; border:1px solid #eee; padding:10px 14px; border-radius:8px; box-shadow: 0 6px 18px rgba(16,24,40,0.04); min-width:120px; text-align:center; }
+    .kpi .value{ font-size:18px; font-weight:700; color:#0b3d91; }
+    .kpi .label{ font-size:11px; color:#666; margin-top:4px; }
+
+    /* Metadata grid */
+    .meta-grid { width:100%; margin-bottom:12px; }
+    .meta-grid .left, .meta-grid .right { display:inline-block; vertical-align:top; width:48%; }
+    .meta-grid .item{ font-size:12px; color:#333; margin-bottom:6px; }
+    .meta-grid b{ color:#0b3d91; }
+
+    /* Chart area */
+    .chart { text-align:center; margin: 12px 0; }
+    .chart img{ max-width: 520px; width:100%; height:auto; border:1px solid #f0f0f0; border-radius:6px; }
+
+    /* Table modern */
+    table.report-table { width:100%; border-collapse: collapse; font-size:13px; margin-top:12px; }
+    table.report-table thead th { background:#6C63FF; color:#fff; padding:10px; text-align:left; font-weight:700; }
+    table.report-table tbody td { padding:10px; border-bottom:1px solid #eee; vertical-align:middle; }
+    table.report-table tbody tr:nth-child(even){ background:#f9f9f9; }
+    table.report-table tfoot td{ padding:8px; font-weight:700; }
+
+    /* Status colors */
+    .status-completada { color: #16a34a; font-weight:700; }
+    .status-pendiente { color: #f59e0b; font-weight:700; }
+    .status-cancelado { color: #ef4444; font-weight:700; }
+
+    /* Footer */
+    .footer-note { text-align:center; font-size:11px; color:#666; margin-top:18px; }
+
+    /* Page number for PDF renderers that support running elements */
+    .pagenum:before { content: counter(page); }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="header">
+      {% if logo %}
+        <div style="text-align:center;margin-bottom:6px;">
+          <img src="{{ logo }}" alt="logo" style="max-height:60px;" />
+        </div>
+      {% endif %}
+      <h1 class="brand">GAFRA</h1>
+      <h2 class="report-title">{{ title|default:'Reporte' }}</h2>
+      <p class="report-meta">Fecha: {{ gen_date|default:now|date:"Y-m-d H:i" }}</p>
+    </div>
+
+    <div class="summary">
+      <div class="kpi">
+        <div class="value">{{ total_records|default:rows|length }}</div>
+        <div class="label">Total registros</div>
+      </div>
+      <div class="kpi">
+        <div class="value">{{ total_completadas|default:completed_count|default:0 }}</div>
+        <div class="label">Completadas</div>
+      </div>
+      <div class="kpi">
+        <div class="value">{{ total_pendientes|default:pending_count|default:0 }}</div>
+        <div class="label">Pendientes</div>
+      </div>
+    </div>
+
+    <div class="meta-grid">
+      <div class="left">
+        {% for k,v in meta.items %}
+          <div class="item"><b>{{ k }}:</b> {{ v }}</div>
+        {% endfor %}
+      </div>
+      <div class="right">
+        <div class="item"><b>Generado por:</b> {{ company|default:'GAFRA Sistema' }}</div>
+        <div class="item"><b>Usuario:</b> {{ user|default:'-' }}</div>
+      </div>
+    </div>
+
+    {% if chart_img %}
+      <div class="chart">
+        <img src="{{ chart_img }}" alt="Gráfico" />
+      </div>
+    {% endif %}
+
+    <table class="report-table">
+      <thead>
+        <tr>
+          {% for c in columns %}<th>{{ c }}</th>{% endfor %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in rows %}
+          <tr>
+            {% for c in columns %}
+              {% with cell=row[c] %}
+                <td>
+                  {% if cell is string and cell|lower in ['completada','completado','completa'] %}
+                    <span class="status-completada">{{ cell }}</span>
+                  {% elif cell is string and cell|lower in ['pendiente'] %}
+                    <span class="status-pendiente">{{ cell }}</span>
+                  {% elif cell is string and cell|lower in ['cancelado','cancelada'] %}
+                    <span class="status-cancelado">{{ cell }}</span>
+                  {% else %}
+                    {{ cell }}
+                  {% endif %}
+                </td>
+              {% endwith %}
+            {% endfor %}
+          </tr>
+        {% empty %}
+          <tr><td colspan="{{ columns|length }}">No hay datos disponibles.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <div class="footer-note">
+      <hr style="border:none;border-top:1px solid #eee;margin:12px 0;" />
+      <p style="font-size:12px;">Generado automáticamente por GAFRA Sistema</p>
+    </div>
+  </div>
+</body>
+</html>

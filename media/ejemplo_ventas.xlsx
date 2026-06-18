@@ -1,0 +1,2 @@
+cliente,vendedor,estado,descuento,impuesto,total,observaciones
+Cliente demo,admin,pendiente,0,0,100,Observaciones de ejemplo

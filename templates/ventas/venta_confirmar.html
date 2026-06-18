@@ -1,0 +1,45 @@
+{% block extra_head %}
+  <link rel="stylesheet" href="/static/css/ventas_moderno.css">
+{% endblock %}
+{% block head_title %}Confirmar Venta{% endblock %}
+{% block header_title %}Confirmar Venta{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="venta-card card">
+        <div class="card-header"><h5 class="mb-0">Confirmar Venta</h5></div>
+        <div class="card-body">
+          <form method="post" action="{% url 'ventas:confirmar' %}">
+            {% csrf_token %}
+            <div class="mb-3"><strong>Cliente:</strong> {{ cliente }}</div>
+            <h6>Productos:</h6>
+            <div class="table-responsive">
+              <table class="venta-table table align-middle">
+                <thead><tr><th>PRODUCTO</th><th>CANTIDAD</th><th>PRECIO</th><th>SUBTOTAL</th></tr></thead>
+                <tbody>
+                {% for d in detalles %}
+                  <tr>
+                    <td>{{ d.producto }}</td>
+                    <td>{{ d.cantidad }}</td>
+                    <td>${{ d.precio_unitario }}</td>
+                    <td>${{ d.subtotal }}</td>
+                  </tr>
+                {% endfor %}
+                </tbody>
+              </table>
+            </div>
+            <div class="text-end venta-total">
+              Total: ${{ total }}
+            </div>
+            <div class="d-flex gap-2 mt-3">
+              <button type="submit" class="venta-btn-main">Confirmar y Guardar Venta</button>
+              <a href="{% url 'ventas:crear' %}" class="venta-btn-secondary">Volver</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

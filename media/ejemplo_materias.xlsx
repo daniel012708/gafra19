@@ -1,0 +1,2 @@
+nombre,descripcion,marca,proveedor,precio_unitario,unidad_medida,stock_actual,stock_minimo,ubicacion,observaciones,activo
+Materia demo,Descripción demo,Marca demo,Proveedor demo,12.5,kg,100,10,Almacén,Observaciones,1

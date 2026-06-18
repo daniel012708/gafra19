@@ -1,0 +1,164 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block head_title %}Dashboard - GAFRA{% endblock %}
+{% block header_title %}Dashboard{% endblock %}
+{% block content %}
+<div class="row g-4">
+  <!-- Métricas clave y alertas -->
+  <div class="col-12">
+    <div class="row g-3">
+      <div class="col-md-3 col-6">
+        <div class="card shadow-soft p-3 text-center">
+          <div class="fw-bold text-muted">Ventas mes actual</div>
+          <div class="fs-3 fw-bold">${{ ventas_mes_actual|floatformat:2 }}</div>
+          <div class="small {% if crecimiento_ventas > 0 %}text-success{% elif crecimiento_ventas < 0 %}text-danger{% else %}text-muted{% endif %}">
+            {% if crecimiento_ventas > 0 %}+{{ crecimiento_ventas|floatformat:2 }} vs mes anterior{% elif crecimiento_ventas < 0 %}{{ crecimiento_ventas|floatformat:2 }} vs mes anterior{% else %}Sin cambio{% endif %}
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3 col-6">
+        <div class="card shadow-soft p-3 text-center">
+          <div class="fw-bold text-muted">Ticket promedio</div>
+          <div class="fs-3 fw-bold">${{ ticket_promedio|floatformat:2 }}</div>
+        </div>
+      </div>
+      <div class="col-md-3 col-6">
+        <div class="card shadow-soft p-3 text-center">
+          <div class="fw-bold text-muted">Clientes nuevos</div>
+          <div class="fs-3 fw-bold">{{ clientes_nuevos }}</div>
+        </div>
+      </div>
+      <div class="col-md-3 col-6">
+        <div class="card shadow-soft p-3 text-center">
+          <div class="fw-bold text-muted">Órdenes activas</div>
+          <div class="fs-3 fw-bold">{{ ordenes_activas }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Top productos vendidos y alertas de stock -->
+  <div class="col-12">
+    <div class="row g-3">
+      <div class="col-md-6">
+        <div class="card shadow-soft p-3 h-100">
+          <div class="fw-bold mb-2"><i data-lucide="star" class="me-2"></i>Top 5 productos más vendidos</div>
+          <ul class="list-group list-group-flush">
+            {% for nombre, cantidad in top_productos %}
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                <span>{{ nombre }}</span>
+                <span class="badge bg-primary rounded-pill">{{ cantidad }}</span>
+              </li>
+            {% empty %}
+              <li class="list-group-item text-muted">No hay ventas este mes.</li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card shadow-soft p-3 h-100">
+          <div class="fw-bold mb-2"><i data-lucide="alert-triangle" class="me-2 text-danger"></i>Productos con stock bajo</div>
+          <ul class="list-group list-group-flush">
+            {% for p in productos_stock_bajo %}
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                <span>{{ p.nombre }}</span>
+                <span class="badge bg-danger rounded-pill">{{ p.stock_actual }}</span>
+              </li>
+            {% empty %}
+              <li class="list-group-item text-muted">Sin alertas de stock bajo.</li>
+            {% endfor %}
+          </ul>
+          <div class="fw-bold mt-3 mb-2"><i data-lucide="alert-triangle" class="me-2 text-warning"></i>Materias primas con stock bajo</div>
+          <ul class="list-group list-group-flush">
+            {% for mp in materias_primas_stock_bajo %}
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                <span>{{ mp.nombre }}</span>
+                <span class="badge bg-warning text-dark rounded-pill">{{ mp.stock_actual }}</span>
+              </li>
+            {% empty %}
+              <li class="list-group-item text-muted">Sin alertas de materias primas.</li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Gráficos históricos y módulos (sección original) -->
+  <div class="col-12 mt-4">
+    <!-- Módulos navegación -->
+    <div class="modules-nav mb-4">
+      <a href="/proveedores/" class="module-item text-decoration-none text-reset">
+        <span class="module-bg-icon"><i data-lucide="truck"></i></span>
+        <div class="module-icon" style="background:linear-gradient(135deg,#6366F1,#8B5CF6); color:white;"><i data-lucide="truck"></i></div>
+        <div class="module-title">Proveedores</div>
+        <div class="module-sub">Gestión y compras</div>
+      </a>
+      <a href="/productos/" class="module-item text-decoration-none text-reset">
+        <span class="module-bg-icon"><i data-lucide="shopping-bag"></i></span>
+        <div class="module-icon" style="background:linear-gradient(135deg,#06B6D4,#06B6D4); color:white;"><i data-lucide="shopping-bag"></i></div>
+        <div class="module-title">Productos</div>
+        <div class="module-sub">Catálogo y stock</div>
+      </a>
+      <a href="/inventario/" class="module-item text-decoration-none text-reset">
+        <span class="module-bg-icon"><i data-lucide="box"></i></span>
+        <div class="module-icon" style="background:linear-gradient(135deg,#43e97b,#38f9d7); color:white;"><i data-lucide="box"></i></div>
+        <div class="module-title">Inventario</div>
+        <div class="module-sub">Entradas y salidas</div>
+      </a>
+      <a href="/clientes/" class="module-item text-decoration-none text-reset">
+        <span class="module-bg-icon"><i data-lucide="users"></i></span>
+        <div class="module-icon" style="background:linear-gradient(135deg,#fa709a,#fee140); color:white;"><i data-lucide="users"></i></div>
+        <div class="module-title">Clientes</div>
+        <div class="module-sub">Contactos y ventas</div>
+      </a>
+      <a href="/ventas/" class="module-item text-decoration-none text-reset">
+        <span class="module-bg-icon"><i data-lucide="file-text"></i></span>
+        <div class="module-icon" style="background:linear-gradient(135deg,#f093fb,#f5576c); color:white;"><i data-lucide="file-text"></i></div>
+        <div class="module-title">Ventas</div>
+        <div class="module-sub">Pedidos y facturas</div>
+      </a>
+      <a href="/produccion/" class="module-item text-decoration-none text-reset">
+        <span class="module-bg-icon"><i data-lucide="settings"></i></span>
+        <div class="module-icon" style="background:linear-gradient(135deg,#2c3e50,#4b5563); color:white;"><i data-lucide="settings"></i></div>
+        <div class="module-title">Producción</div>
+        <div class="module-sub">Órdenes y procesos</div>
+      </a>
+    </div>
+
+    <!-- Gráficos históricos -->
+    <div class="row g-3 mt-3">
+      <div class="col-12">
+        <div class="card rounded-16 shadow-soft p-3 compact-chart-card">
+          <div class="card-body">
+            <div class="row g-3">
+              <div class="col-12 col-md-4">
+                <div class="card h-100 p-2 compact-chart-card">
+                  <h6 class="mb-2"><i data-lucide="pie-chart" class="me-2"></i>Categorías</h6>
+                  <div class="chart-container" style="height:110px;"><canvas id="categoriasPie"></canvas></div>
+                </div>
+              </div>
+              <div class="col-12 col-md-4">
+                <div class="card h-100 p-2 compact-chart-card">
+                  <h6 class="mb-2"><i data-lucide="bar-chart-2" class="me-2"></i>Productos</h6>
+                        <div class="chart-container" style="height:110px;"><canvas id="productosBar"></canvas></div>
+                </div>
+              </div>
+              <div class="col-12 col-md-4">
+                <div class="card h-100 p-2 compact-chart-card">
+                  <h6 class="mb-2"><i data-lucide="trending-up" class="me-2"></i>Actividad</h6>
+                        <div class="chart-container" style="height:110px;"><canvas id="activityChart"></canvas></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Charts: Chart.js + centralized dashboard scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="{% static 'js/dashboard-charts.js' %}?v={{ STATIC_VERSION }}"></script>
+  </div>
+</div>
+{% endblock %}

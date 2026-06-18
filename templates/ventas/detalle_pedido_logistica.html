@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container py-4">
+  <div class="card shadow-sm mb-4">
+    <div class="card-body p-4 p-lg-5">
+      <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
+        <div>
+          <p class="text-uppercase text-muted small mb-1">Detalle de pedido</p>
+          <h3 class="mb-1">Pedido {{ pedido.numero_venta }}</h3>
+          <p class="text-muted mb-0">Cliente: {{ pedido.cliente.nombre|default:'Sin cliente' }}</p>
+        </div>
+        <div class="text-end">
+          <span class="badge bg-primary text-white px-3 py-2">{{ pedido.get_estado_display }}</span>
+          <div class="mt-2 text-muted">{{ pedido.fecha|date:"d/m/Y H:i" }}</div>
+        </div>
+      </div>
+
+      <div class="row g-3 mb-4">
+        <div class="col-md-4">
+          <div class="border rounded-3 p-3 h-100">
+            <small class="text-muted d-block mb-1">Cliente</small>
+            <strong>{{ pedido.cliente.nombre|default:'Sin cliente' }}</strong>
+            <div class="text-muted">{{ pedido.cliente.telefono|default:'Sin teléfono' }}</div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="border rounded-3 p-3 h-100">
+            <small class="text-muted d-block mb-1">Completado</small>
+            <strong>{{ pedido.fecha_completado|default:'Pendiente' }}</strong>
+            <div class="text-muted">Vendedor: {{ pedido.vendedor.username|default:'Sin vendedor' }}</div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="border rounded-3 p-3 h-100">
+            <small class="text-muted d-block mb-1">Total</small>
+            <strong>${{ pedido.total|floatformat:2 }}</strong>
+            <div class="text-muted">Observaciones: {{ pedido.observaciones|default:'Sin observaciones' }}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table table-hover align-middle">
+          <thead>
+            <tr>
+              <th>Producto</th>
+              <th class="text-center">Cantidad</th>
+              <th class="text-end">Precio</th>
+              <th class="text-end">Subtotal</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for detalle in detalles %}
+            <tr>
+              <td>{{ detalle.producto.nombre|default:'Sin producto' }}</td>
+              <td class="text-center">{{ detalle.cantidad }}</td>
+              <td class="text-end">${{ detalle.precio_unitario|floatformat:2 }}</td>
+              <td class="text-end">${{ detalle.subtotal|floatformat:2 }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="4" class="text-center text-muted py-4">No hay productos asociados a este pedido.</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="d-flex justify-content-between align-items-center mt-4 flex-wrap gap-2">
+        <a href="{% url 'ventas:pedidos_logistica' %}" class="btn btn-outline-secondary">Volver a logística</a>
+        <a href="{% url 'ventas:completar_pedido_logistica' pedido.pk %}" class="btn btn-login">Marcar como completado</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

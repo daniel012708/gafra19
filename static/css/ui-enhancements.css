@@ -1,0 +1,108 @@
+/* UI enhancements: styled switches and buttons */
+
+/* Nice switch: tweak Bootstrap switch appearance */
+.form-check.form-switch .form-check-input {
+  width: 44px;
+  height: 24px;
+  background-color: #e9ecef;
+  border-radius: 24px;
+  position: relative;
+  transition: background-color .2s ease;
+}
+
+.form-check.form-switch .form-check-input:checked {
+  background-color: #6f42c1; /* purple tone */
+  border-color: #6f42c1;
+}
+
+.form-check.form-switch .form-check-input::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  background: white;
+  border-radius: 50%;
+  transition: transform .2s ease;
+  box-shadow: 0 1px 3px rgba(0,0,0,.2);
+}
+
+.form-check.form-switch .form-check-input:checked::after {
+  transform: translateX(20px);
+}
+
+/* Button enhancements */
+.btn-outline-primary.btn-sm {
+  border-width: 1.5px;
+}
+
+.btn-login {
+  background: linear-gradient(90deg, #667eea, #764ba2);
+  color: #fff;
+  border: 0;
+}
+
+/* Formset row subtle styling */
+.ingrediente-form-row, .detalle-form-row {
+  background: rgba(255,255,255,0.03);
+}
+
+/* Smaller remove button */
+.remove-ingrediente, .remove-detalle {
+  min-width: 72px;
+}
+
+/* fade out animation used when confirming delete */
+.fade-out {
+  animation: fadeOut 0.3s forwards;
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; transform: translateY(0); }
+  to { opacity: 0; transform: translateY(-6px); }
+}
+
+/* Ensure modal sits above other UI elements */
+#confirmDeleteModal {
+  z-index: 13000;
+}
+
+/* Improve modal footer button contrast and spacing */
+.modal-content .modal-footer .btn {
+  min-width: 88px;
+}
+.modal-content .modal-footer .btn-danger {
+  background-color: #d9534f; /* ensure a clear red */
+  border-color: #d43f3a;
+}
+
+/* Toast container adjustments */
+.toast {
+  min-width: 220px;
+}
+
+/* Ensure modal/backdrop layering and body scrolling while modal open */
+.modal {
+  z-index: 14000 !important;
+}
+.modal-backdrop {
+  z-index: 13900 !important;
+}
+/* Prevent layout clipping when modal opens inside app layout */
+body.modal-open {
+  overflow: auto !important;
+}
+
+/* Toast container top-right */
+.toast-container-custom {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 15000;
+}
+
+/* Slightly larger toast for readability */
+.toast.align-items-center {
+  min-width: 260px;
+}

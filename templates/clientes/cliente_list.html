@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block head_title %}Clientes{% endblock %}
+{% block header_title %}Clientes{% endblock %}
+{% block content %}
+<div class="card">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <h5 class="mb-0">Clientes</h5>
+    <div class="d-flex gap-2">
+  <a href="{% url 'clientes:create' %}" class="btn btn-primary btn-sm">Nuevo cliente</a>
+  <a href="{% url 'clientes:carga_masiva' %}" class="btn btn-outline-success btn-sm">Carga masiva</a>
+  <a href="{% url 'clientes:reportes' %}" class="btn btn-outline-secondary btn-sm">Reportes</a>
+    </div>
+  </div>
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-striped table-hover mb-0 align-middle">
+        <thead class="table-light">
+          <tr>
+            <th style="min-width: 140px;">Nombre</th>
+            <th style="min-width: 110px;">Documento</th>
+            <th style="min-width: 180px;">Dirección</th>
+            <th style="min-width: 110px;">Teléfono</th>
+            <th style="min-width: 180px;">Email</th>
+            <th style="min-width: 120px;">Fecha registro</th>
+            <th style="min-width: 120px;">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for cliente in clientes %}
+          <tr style="vertical-align: middle;">
+            <td><strong>{{ cliente.nombre }}</strong></td>
+            <td>{{ cliente.documento }}</td>
+            <td>{{ cliente.direccion }}</td>
+            <td>{{ cliente.telefono }}</td>
+            <td><a href="mailto:{{ cliente.email }}">{{ cliente.email }}</a></td>
+            <td>{{ cliente.fecha_registro|date:"d/m/Y" }}</td>
+            <td class="table-actions">
+              <div class="btn-group" role="group">
+                <a href="{% url 'clientes:update' cliente.pk %}" class="btn btn-sm btn-info text-white" title="Editar"><i class="bi bi-pencil"></i> Editar</a>
+                <a href="{% url 'clientes:delete' cliente.pk %}" class="btn btn-sm btn-danger" title="Eliminar"><i class="bi bi-trash"></i> Eliminar</a>
+              </div>
+            </td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="7" class="text-center py-3">No hay clientes registrados.</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

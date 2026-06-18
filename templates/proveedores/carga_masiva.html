@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Carga masiva de proveedores desde Excel</h2>
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Subir archivo</button>
+</form>
+<p>Descarga un ejemplo de formato: <a href="/media/ejemplo_proveedores.xlsx">ejemplo_proveedores.xlsx</a></p>
+{% endblock %}

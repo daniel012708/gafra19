@@ -1,0 +1,675 @@
+/* Modern sales module styles */
+.venta-card {
+  border-radius: 18px;
+  box-shadow: 0 4px 24px 0 rgba(80, 80, 180, 0.10);
+  border: none;
+  background: #fff;
+}
+.venta-card .card-header {
+  background: linear-gradient(90deg, #bfe9ff 0%, #7ec8ff 100%);
+  color: #fff;
+  border-radius: 18px 18px 0 0;
+  font-weight: 600;
+  letter-spacing: 1px;
+  font-size: 1.2rem;
+}
+.venta-card .card-body {
+  padding: 2rem 2.5rem;
+}
+.venta-table {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px 0 rgba(80, 80, 180, 0.07);
+  margin-bottom: 1.5rem;
+}
+.venta-table th {
+  background: linear-gradient(90deg, #bfe9ff 0%, #7ec8ff 100%);
+  color: #fff;
+  font-weight: 600;
+  border: none;
+  font-size: 1rem;
+  letter-spacing: 1px;
+}
+.venta-table td {
+  background: #f8f9fa;
+  border: none;
+  font-size: 1rem;
+}
+.venta-table tr:hover td {
+  background: #eaf0ff;
+  transition: background 0.2s;
+}
+.venta-btn-main {
+  background: linear-gradient(90deg, #43e97b 0%, #38f9d7 100%);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  padding: 0.6rem 1.5rem;
+  font-size: 1.1rem;
+  box-shadow: 0 2px 8px 0 rgba(67, 233, 123, 0.10);
+  transition: background 0.2s, box-shadow 0.2s;
+}
+.venta-btn-main:hover {
+  background: linear-gradient(90deg, #38f9d7 0%, #43e97b 100%);
+  box-shadow: 0 4px 16px 0 rgba(67, 233, 123, 0.18);
+}
+.venta-btn-secondary {
+  background: none;
+  color: #6a82fb;
+  border: none;
+  font-weight: 500;
+  font-size: 1.1rem;
+  margin-left: 1rem;
+  transition: color 0.2s;
+}
+.venta-btn-secondary:hover {
+  color: #7ec8ff;
+  text-decoration: underline;
+}
+.venta-input, .venta-select {
+  border-radius: 8px;
+  border: 1.5px solid #e0e4f6;
+  font-size: 1rem;
+  padding: 0.5rem 1rem;
+  transition: border 0.2s, box-shadow 0.2s;
+}
+.venta-input:focus, .venta-select:focus {
+  border-color: #7ec8ff;
+  box-shadow: 0 0 0 2px #7ec8ff33;
+  outline: none;
+}
+.venta-label {
+  font-weight: 600;
+  color: #7ec8ff;
+  margin-bottom: 0.3rem;
+}
+.venta-total {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #43e97b;
+  margin-top: 1rem;
+}
+.venta-subtotal {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #7ec8ff;
+}
+
+/* Catalog / Product Cards */
+.card-custom {
+  border-radius: 14px;
+  box-shadow: 0 8px 30px rgba(32, 48, 80, 0.08);
+  overflow: hidden;
+  border: none;
+  background: #ffffff;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  display: flex;
+  flex-direction: column;
+}
+.card-custom:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 18px 40px rgba(32, 48, 80, 0.12);
+}
+
+.product-image {
+  width: 100%;
+  height: 260px; /* fixed height for uniform cards */
+  object-fit: cover;
+  display: block;
+  background-color: #f6f7fb;
+}
+
+.product-thumb {
+  width: 72px;
+  height: 72px;
+  display: inline-block;
+}
+
+.card-body .card-title {
+  min-height: 3.2rem; /* keep product title area consistent */
+}
+.card-body .card-text {
+  min-height: 2.4rem; /* keep description area consistent */
+}
+
+/* Grid fixes to ensure equal height columns */
+.row.g-4 > .col-xl-3, .row.g-4 > .col-lg-4, .row.g-4 > .col-md-6 {
+  display: flex;
+}
+.row.g-4 > .col-xl-3 > .card-custom, .row.g-4 > .col-lg-4 > .card-custom, .row.g-4 > .col-md-6 > .card-custom {
+  flex: 1 1 auto;
+}
+
+/* Navbar and footer improvements for base_cliente layout */
+.navbar-custom {
+  background: linear-gradient(90deg, rgba(191,233,255,0.95), rgba(126,200,255,0.95));
+  box-shadow: 0 6px 20px rgba(31, 41, 55, 0.12);
+  padding: 0.85rem 0;
+}
+.navbar-custom .navbar-brand, .navbar-custom .nav-link {
+  color: #ffffff !important;
+}
+.navbar-custom .nav-link:hover {
+  color: #ffeef0 !important;
+}
+.cart-badge {
+  background: #fff;
+  color: #111;
+  border-radius: 999px;
+  padding: 0.08rem 0.5rem;
+  font-weight: 700;
+  font-size: 0.85rem;
+  margin-left: 0.4rem;
+}
+#checkoutForm .card-custom { margin-bottom: 0.75rem !important; border-radius: 12px !important; }
+#checkoutForm .card-body { padding: 0.9rem 1rem !important; }
+#checkoutForm .card-title { font-size: 1.05rem; margin-bottom: 0.6rem; }
+
+/* Detalle de pedido: hacer info boxes más pequeñas y compactas
+   Keep font-size unchanged; reduce box footprint by ~50% */
+.detalle-pedido .glass-effect {
+  padding: 0.35rem 0.45rem !important;
+  border-radius: 8px !important;
+  box-shadow: 0 6px 14px rgba(0,0,0,0.04) !important;
+  display: inline-block;
+  width: 180px; /* reduced box width */
+  min-height: 56px;
+  vertical-align: top;
+  overflow: hidden;
+  font-size: inherit; /* DO NOT change font sizing */
+}
+.detalle-pedido .glass-effect h6 { font-size: 0.85rem; margin-bottom: 0.25rem; }
+.detalle-pedido .glass-effect p { font-size: 0.95rem; margin-bottom: 0; }
+.detalle-pedido .glass-effect .fs-5 { font-size: 1rem !important; }
+.detalle-pedido .badge { font-size: 0.82rem; padding: 0.25rem 0.6rem; }
+
+/* Reduce spacing around the info grid */
+.detalle-pedido .row.g-4 { gap: 0.6rem; }
+
+/* Make product preview items also more compact */
+.detalle-pedido .card-custom .d-flex.align-items-center.p-3 { padding: 0.6rem !important; }
+.detalle-pedido .card-custom .rounded img { width: 40px !important; height: 40px !important; }
+
+/* Make individual info blocks more compact spacing */
+.detalle-pedido .info-block {
+  padding: 0.25rem 0.4rem !important;
+}
+
+/* Position summary/help column fixed on the right for large screens */
+@media (min-width: 992px) {
+  .detalle-pedido .col-lg-4 {
+    /* reserve space but keep column normal for small screens */
+    position: relative;
+  }
+  /* fix the right stacked column to the right edge on desktop */
+  .detalle-pedido .right-stack {
+    position: fixed;
+    right: 24px;
+    top: 110px; /* increased spacing from top/navbar */
+    width: 300px;
+    z-index: 1050;
+  }
+  .detalle-pedido .right-stack .card-custom { margin-bottom: 12px; }
+  /* push main content left so it doesn't sit under the fixed right stack */
+  .detalle-pedido .col-lg-8 {
+    margin-right: 340px;
+  }
+}
+
+/* Fix left stack (order info + products) to left edge on very large screens */
+@media (min-width: 1200px) {
+  .detalle-pedido .left-stack {
+    position: fixed;
+    left: 24px;
+    top: 110px; /* increased spacing from top/navbar */
+    /* leave room for the right stack (340px) + gutters */
+    width: calc(100% - 24px - 340px - 48px);
+    max-width: 760px;
+    z-index: 40;
+    padding-bottom: 140px; /* avoid overlapping footer */
+  }
+  /* Slightly reduce heading size and padding inside left fixed stack */
+  .detalle-pedido .left-stack .card-body h4.card-title {
+    font-size: 1.15rem;
+    margin-bottom: 0.9rem;
+  }
+  .detalle-pedido .left-stack .card-custom { box-shadow: 0 8px 22px rgba(0,0,0,0.06); }
+  .detalle-pedido .left-stack .glass-effect { width: 160px; padding: 0.5rem !important; }
+  .detalle-pedido .left-stack img { width: 60px !important; height: 60px !important; }
+}
+
+@media (max-width: 1199px) {
+  .detalle-pedido .left-stack { position: static; width: 100%; padding-bottom: 0; }
+}
+
+/* Make text inside right stacked cards dark/black for better contrast */
+.detalle-pedido .right-stack .card-body,
+.detalle-pedido .right-stack .card-body h4,
+.detalle-pedido .right-stack .card-body .fw-semibold,
+.detalle-pedido .right-stack .card-body .fw-bold,
+.detalle-pedido .right-stack .card-body .text-muted,
+.detalle-pedido .right-stack .card-body p,
+.detalle-pedido .right-stack .card-body span {
+  color: #0b1220 !important; /* strong dark text */
+}
+
+/* Make secondary/outline buttons show dark text */
+.detalle-pedido .right-stack .btn-outline-secondary,
+.detalle-pedido .right-stack .btn-outline-primary,
+.detalle-pedido .right-stack .btn.btn-outline-primary,
+.detalle-pedido .right-stack .btn.btn-outline-secondary {
+  color: #0b1220 !important;
+  background-color: #ffffff !important;
+  border-color: rgba(11,18,32,0.08) !important;
+}
+
+/* Keep primary action contrast intact */
+.detalle-pedido .right-stack .btn-primary-custom { color: #fff !important; }
+# Help card smaller styling
+.help-card { border-radius: 12px; }
+.help-card .card-body { padding: 0.9rem 1rem !important; }
+.help-card i.bi-headset { font-size: 1.6rem !important; }
+.help-card h6 { font-size: 1rem !important; margin-bottom: 0.25rem !important; }
+.help-card p { font-size: 0.85rem !important; margin-bottom: 0.5rem !important; }
+.help-card .btn { padding: 0.35rem 0.5rem !important; font-size: 0.82rem !important; }
+.help-card .btn-sm { padding: 0.28rem 0.45rem !important; }
+#checkoutForm .row.g-3 { gap: 0.75rem; }
+#checkoutForm .form-text { margin-top: 0.25rem; margin-bottom: 0; }
+
+/* Gradient hero header that contains a centered pill-style navigation */
+.top-hero-nav.bg-gradient {
+  background: linear-gradient(90deg, #eef6ff 0%, #f7fbff 100%);
+  padding-top: 8px;
+  padding-bottom: 8px;
+  box-shadow: none;
+}
+#checkoutForm .d-flex.gap-3 { gap: 0.5rem !important; }
+#checkoutForm .d-flex.gap-3 .btn { padding: 0.5rem 0.75rem; font-size: 0.95rem; }
+
+.nav-pill {
+  background: transparent;
+  padding: 6px;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 960px;
+}
+
+.nav-pill .pill-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: #ffffff;
+  color: #0b1220;
+  padding: 10px 14px;
+  border-radius: 10px;
+  margin-right: 10px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+  border: 1px solid #e6f0ff;
+}
+
+.nav-pill .pill-item i {
+  font-size: 1rem;
+  color: #3b82f6;
+}
+
+.nav-pill .pill-item span { font-size: 0.95rem; }
+
+.nav-pill .pill-item:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(10,20,60,0.12);
+}
+
+.nav-pill .pill-item.active {
+  position: relative;
+  background: #fff;
+}
+
+/* active indicator (blue bar under the active pill) */
+.nav-pill .pill-item.active::after {
+  content: '';
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: -8px;
+  height: 3px;
+  border-radius: 4px;
+  background: linear-gradient(90deg,#cfefff,#9fd5ff);
+}
+
+@media (max-width: 768px) {
+  .nav-pill { max-width: 100%; overflow-x: auto; padding: 8px; }
+  .nav-pill .pill-item { padding: 10px 12px; margin-right: 8px; }
+}
+
+.footer-custom {
+  background: linear-gradient(180deg, #e9f0ff 0%, #e6eef9 100%);
+  color: #0b1220;
+  padding: 3.5rem 0;
+}
+.footer-custom a { color: #0b1220 !important; }
+.footer-custom h5, .footer-custom p, .footer-custom li, .footer-custom span, .footer-custom address {
+  color: #0b1220 !important;
+}
+.footer-custom .list-unstyled li a:hover { text-decoration: underline; color: #3750ff !important; }
+
+/* Ensure footer links are readable on light gradient */
+.footer-custom .list-unstyled li a { color: #0b1220 !important; opacity: 0.95; }
+
+/* Buttons consistent with new look */
+.btn-primary-custom {
+  background: linear-gradient(135deg,#bfe9ff,#7ec8ff);
+  border: none;
+  color: #fff;
+  font-weight: 700;
+}
+.btn-outline-primary {
+  border-color: rgba(126,200,255,0.3);
+  color: #7ec8ff;
+}
+
+/* Small responsive tweak */
+@media (max-width: 576px) {
+  .product-image { height: 200px; }
+}
+/* ===== BACKGROUND GENERAL ===== */
+body {
+  background: linear-gradient(135deg, #eef2ff, #f8fafc);
+  font-family: 'Segoe UI', sans-serif;
+}
+
+/* ===== HERO ===== */
+.hero-section {
+  background: linear-gradient(135deg, #6a82fb, #fc5c7d);
+  padding: 70px 0;
+  border-radius: 0 0 40px 40px;
+  color: white;
+}
+
+.hero-section h1 {
+  font-size: 42px;
+  font-weight: 800;
+}
+
+.hero-section p {
+  color: rgba(255,255,255,0.9);
+}
+
+/* ===== SEARCH BAR ===== */
+.search-bar {
+  background: white;
+  padding: 25px;
+  border-radius: 20px;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.08);
+  margin-top: -50px;
+}
+
+/* ===== CARDS ===== */
+.card-custom {
+  border-radius: 18px;
+  overflow: hidden;
+  background: #fff;
+  transition: 0.3s;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+}
+
+.card-custom:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 20px 45px rgba(0,0,0,0.15);
+}
+
+/* ===== IMAGE ===== */
+.product-image {
+  height: 250px;
+  object-fit: cover;
+  transition: 0.3s;
+}
+
+.card-custom:hover .product-image {
+  transform: scale(1.05);
+}
+
+/* ===== PRICE ===== */
+.price-tag {
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: #2b9fff;
+}
+
+/* ===== BADGE ===== */
+.badge-custom {
+  background: linear-gradient(135deg, #43e97b, #38f9d7);
+  padding: 5px 10px;
+  border-radius: 10px;
+  font-size: 12px;
+}
+
+/* ===== BUTTON ===== */
+.btn-primary-custom {
+  background: linear-gradient(135deg,#bfe9ff,#7ec8ff);
+  border: none;
+  color: white;
+  font-weight: 600;
+  transition: 0.3s;
+}
+
+.btn-primary-custom:hover {
+  transform: scale(1.05);
+}
+
+/* Compact card-body for historial_pedidos (preserve font-size, use full width) */
+.compact-card {
+  padding: 0.8rem 1rem !important;
+  width: 100% !important; /* use full available width for order cards */
+  min-height: auto !important;
+  display: block !important;
+  overflow: visible !important;
+  box-sizing: border-box !important;
+  font-size: inherit !important; /* keep text size unchanged */
+}
+
+@media (max-width: 991px) {
+  .compact-card {
+    padding: 0.6rem 0.9rem !important;
+    width: 100% !important;
+  }
+}
+
+/* ===== FAVORITE ===== */
+.favorite-btn {
+  top: 10px;
+  right: 10px;
+}
+
+/* ===== EMPTY STATE ===== */
+.empty-state {
+  padding: 80px 0;
+}/* ===== NAVBAR FLOTANTE ===== */
+.navbar-custom { display:flex; justify-content:center; margin-top:8px; }
+
+.navbar-pill {
+  display:flex; gap:12px; align-items:center; padding:6px 12px; border-radius:14px;
+}
+
+/* LINKS */
+.navbar-pill a { color:#0b1220; text-decoration:none; font-size:14px; }
+
+/* ICON */
+.nav-icon { width:28px; height:28px; border-radius:50%; background:#fff; display:flex; align-items:center; justify-content:center; }
+
+/* ===== TWEAKS: compact hero, price badge, card spacing ===== */
+.hero-section {
+  background: linear-gradient(135deg, #f1f5ff 0%, #f8fafc 100%);
+  padding: 36px 0;
+  border-radius: 0 0 28px 28px;
+  color: #0b1220;
+}
+.hero-section h1 { font-size: 34px; font-weight: 800; color: #0b1220; }
+.hero-section p { color: #556078; margin-bottom: 0.5rem; }
+
+.card-custom .p-3 { padding: 1rem; }
+
+/* Price badge */
+.price-badge {
+  display: inline-block;
+  background: linear-gradient(90deg,#bfe9ff,#7ec8ff);
+  color: #fff;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+/* Force slightly smaller images for more compressed cards */
+.product-image { height: 220px !important; }
+
+@media (max-width: 768px) {
+  .product-image { height: 180px !important; }
+  .hero-section h1 { font-size: 26px; }
+}
+
+/* Slightly increase card gaps on large screens */
+
+/* Cart view specific tweaks */
+.ver-carrito .cart-item-row { padding: 0.6rem 1rem !important; }
+.ver-carrito .cart-item-img { width:64px; height:64px; object-fit:cover; }
+.ver-carrito .card-custom { border-radius: 12px !important; box-shadow: 0 6px 18px rgba(0,0,0,0.06) !important; }
+.ver-carrito .card-custom .card-body { padding: 0.6rem !important; }
+.ver-carrito .card-custom.sticky-top { top: 10px !important; }
+.ver-carrito .small-actions-card { margin-top: 0.5rem !important; }
+.ver-carrito .small-actions-card .btn { padding: 0.35rem 0.5rem; font-size: 0.88rem; }
+.ver-carrito .card-title { font-size: 0.95rem; }
+.ver-carrito .lead { margin-bottom: 0; }
+
+/* Make 'Mis Pedidos' link dark blue */
+.mis-pedidos-link {
+  color: #0b3a8c !important;
+  border-color: rgba(11,58,140,0.12) !important;
+}
+
+/* Tweak total button size in summary */
+.ver-carrito .btn-primary-custom.btn-lg { padding: 0.5rem 0.75rem; font-size: 0.95rem; }
+
+/* Further compact cart items */
+.ver-carrito .cart-item-row { padding: 0.35rem 0.6rem !important; }
+.ver-carrito .cart-item-img { width:56px; height:56px; }
+.ver-carrito input[type="number"] { width:44px !important; }
+.ver-carrito .text-end strong { font-size: 0.95rem; }
+.ver-carrito .card-custom { margin-bottom: 0.6rem !important; }
+/* Limit the width of the cart item container for large screens */
+@media (min-width: 992px) {
+  .ver-carrito .row.g-4 { max-width: 1100px; margin-left: auto; margin-right: auto; }
+}
+
+  /* Force darker/black text for form labels and helper text (checkout) */
+  .card-custom .form-label,
+  .card-custom .form-text,
+  .card-custom .lead,
+  .card-custom .form-check-label,
+  .card-custom .text-muted,
+  .card-custom small,
+  .card-custom p,
+  .card-custom label,
+  .card-custom .form-control,
+  .card-custom select,
+  .card-custom textarea {
+    color: #0b1220 !important;
+    opacity: 1 !important;
+  }
+
+  /* Ensure placeholder text is also darker */
+  .card-custom ::placeholder { color: #8a8f95 !important; opacity: 1 !important; }
+
+  /* Make checkout form buttons' text black */
+  #checkoutForm .btn {
+    color: #0b1220 !important;
+  }
+
+  #checkoutForm .btn i { color: #0b1220 !important; }
+
+
+
+.row.g-4 { gap: 1.5rem 1.25rem; }
+
+/* Grid that forces 4 cards per row on wide screens and keeps images uniform */
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem 1.25rem;
+}
+
+.products-grid > .product-col { display: block; }
+.products-grid .card-custom { height: 100%; display:flex; flex-direction:column; }
+.products-grid .position-relative { overflow: hidden; }
+/* Strongly enforce image sizing inside product grid to avoid external overrides */
+.products-grid .position-relative img.product-image { width:100% !important; height:260px !important; object-fit:cover !important; display:block !important; }
+.products-grid .p-3 { display:flex; flex-direction:column; flex:1 1 auto; }
+.products-grid .p-3 .d-flex, .products-grid .p-3 form { margin-top: auto; }
+
+@media (max-width: 1200px) {
+  .products-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (max-width: 768px) {
+  .products-grid { grid-template-columns: repeat(2, 1fr); }
+  .products-grid .position-relative img { height: 200px; }
+}
+
+@media (max-width: 480px) {
+  .products-grid { grid-template-columns: 1fr; }
+  .products-grid .position-relative img { height: 160px; }
+}
+
+/* Strong overrides to make product images smaller and centered */
+.products-grid .position-relative img.product-image {
+  height: 180px !important;
+  object-fit: cover !important;
+  object-position: center center !important;
+}
+
+@media (max-width: 1200px) {
+  .products-grid .position-relative img.product-image { height: 160px !important; }
+}
+
+@media (max-width: 768px) {
+  .products-grid .position-relative img.product-image { height: 140px !important; }
+}
+
+@media (max-width: 480px) {
+  .products-grid .position-relative img.product-image { height: 120px !important; }
+}
+
+/* ===== UNIFORM PRODUCT CARDS ===== */
+/* Make cards full-height inside grid columns */
+.row.g-4 > [class*="col-"] > .card-custom { height: 100%; display: flex; flex-direction: column; }
+
+/* Ensure image area keeps fixed height and is cropped */
+.row.g-4 > [class*="col-"] > .card-custom .position-relative { flex: 0 0 auto; overflow: hidden; }
+.row.g-4 > [class*="col-"] > .card-custom .position-relative img { width:100%; height:220px; object-fit:cover; display:block; }
+
+/* Make content stretch so action row sits at the bottom */
+.row.g-4 > [class*="col-"] > .card-custom .p-3 { display:flex; flex-direction:column; flex:1 1 auto; }
+.row.g-4 > [class*="col-"] > .card-custom .p-3 .d-flex, .row.g-4 > [class*="col-"] > .card-custom .p-3 form { margin-top: auto; }
+
+/* Truncate title and description consistently */
+.row.g-4 > [class*="col-"] > .card-custom h5 { min-height: 48px; overflow: hidden; }
+.row.g-4 > [class*="col-"] > .card-custom p { min-height: 38px; }
+
+/* Small screens: slightly reduce image height */
+@media (max-width: 576px) {
+  .row.g-4 > [class*="col-"] > .card-custom .position-relative img { height:160px; }
+}
+
+/* Ensure footer appears below all fixed stacks by reserving extra space
+   at the bottom of the detalle-pedido container on large screens. */
+@media (min-width: 992px) {
+  .detalle-pedido {
+    padding-bottom: 420px !important;
+  }
+  .footer-custom {
+    position: relative !important;
+    z-index: 5 !important;
+  }
+}

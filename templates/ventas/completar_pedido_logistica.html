@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block head_title %}Completar pedido{% endblock %}
+{% block header_title %}Completar pedido{% endblock %}
+{% block content %}
+<div class="card mx-auto" style="max-width: 720px;">
+    <div class="card-body">
+        <h5 class="mb-3">Completar pedido {{ pedido.numero_venta }}</h5>
+        <p class="text-muted mb-4">Esta acción marcará el pedido como completado y registrará la fecha de finalización.</p>
+        <form method="post">
+            {% csrf_token %}
+            <div class="alert alert-warning">
+                ¿Confirmas que el pedido está listo para cerrarse?
+            </div>
+            <div class="d-flex gap-2 justify-content-end">
+                <a href="{% url 'ventas:pedidos_logistica' %}" class="btn btn-outline-secondary">Cancelar</a>
+                <button type="submit" class="btn btn-success" onclick="return confirm('¿Marcar este pedido como completado?');">Sí, completar</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

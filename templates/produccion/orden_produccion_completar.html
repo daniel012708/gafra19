@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+{% block head_title %}Completar Orden de Producción{% endblock %}
+{% block header_title %}Completar Orden de Producción{% endblock %}
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">Completar Producción</h5>
+    </div>
+    <div class="card-body">
+        <!-- Detalles de la Orden -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <h6>Detalles de la Orden</h6>
+                <table class="table table-sm">
+                    <tr>
+                        <td><strong>Producto:</strong></td>
+                        <td>{{ orden.producto.nombre }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Cantidad a Producir:</strong></td>
+                        <td>{{ orden.cantidad_a_producir }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Estado:</strong></td>
+                        <td>
+                            <span class="badge bg-info">{{ orden.get_estado_display }}</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Fecha Inicio:</strong></td>
+                        <td>{{ orden.fecha_inicio|date:"d/m/Y H:i" }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Fecha Finalización:</strong></td>
+                        <td>{% if orden.fecha_fin %}{{ orden.fecha_fin|date:"d/m/Y H:i" }}{% else %}-{% endif %}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Responsable:</strong></td>
+                        <td>{{ orden.responsable.get_full_name|default:orden.responsable.username }}</td>
+                    </tr>
+                </table>
+            </div>
+            <div class="col-md-6">
+                <h6>Ingredientes Utilizados</h6>
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>Materia Prima</th>
+                            <th>Cantidad Total</th>
+                            <th>Unidad</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for ingrediente in ingredientes %}
+                        <tr>
+                            <td>{{ ingrediente.materia_prima.nombre }}</td>
+                            <td>{{ ingrediente.cantidad_total }}</td>
+                            <td>{{ ingrediente.materia_prima.get_unidad_medida_display }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Formulario de Producción Diaria -->
+        <div class="row">
+            <div class="col-md-8 mx-auto">
+                <h6>Observaciones</h6>
+                <form method="post">
+                    {% csrf_token %}
+                    {% for field in form %}
+                        <div class="mb-3">
+                            {{ field.label_tag }}
+                            {{ field }}
+                            {% if field.help_text %}
+                                <div class="form-text">{{ field.help_text }}</div>
+                            {% endif %}
+                            {% for error in field.errors %}
+                                <div class="text-danger small">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
+
+                    <div class="alert alert-info">
+                        <strong>Nota:</strong> Al completar la producción, se generarán {{ orden.cantidad_a_producir }} unidades de {{ orden.producto.nombre }} en el inventario de productos.
+                    </div>
+
+                    <div class="d-flex gap-2 justify-content-center">
+                        <button type="submit" class="btn btn-success">
+                            <i class="bi bi-check-circle me-2"></i>Completar Producción
+                        </button>
+                        <a href="{% url 'produccion:list' %}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left me-2"></i>Cancelar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

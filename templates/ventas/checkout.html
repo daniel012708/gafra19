@@ -1,0 +1,213 @@
+{% extends 'base_cliente.html' %}
+{% load static %}
+
+{% block title %}Finalizar Compra - GAFRA Store{% endblock %}
+
+{% block content %}
+<!-- Header Section -->
+<section class="container mb-5">
+    <div class="text-center">
+        <h1 class="display-5 fw-bold text-dark mb-3">
+            <i class="bi bi-credit-card text-primary me-3"></i>Finalizar Compra
+        </h1>
+        <p class="lead text-muted">Completa tu pedido y confirma la información de envío</p>
+    </div>
+</section>
+
+<section class="container">
+    <div class="row g-4">
+        <!-- Order Summary -->
+        <div class="col-lg-4 order-lg-2">
+            <div class="card-custom sticky-top" style="top: 120px;">
+                <div class="card-body">
+                    <h4 class="card-title fw-bold text-dark mb-4">
+                        <i class="bi bi-receipt text-primary me-2"></i>Resumen del Pedido
+                    </h4>
+
+                    <!-- Order Items -->
+                    <div class="mb-4">
+                        {% for item in items %}
+                        <div class="d-flex align-items-center mb-3 pb-3 border-bottom">
+                            <div class="flex-shrink-0 me-3">
+                                {% if item.producto.imagen %}
+                                    <img src="{{ item.producto.imagen.url }}" alt="{{ item.producto.nombre }}"
+                                         class="rounded" style="width: 50px; height: 50px; object-fit: cover;">
+                                {% else %}
+                                    <div class="bg-light d-flex align-items-center justify-content-center rounded"
+                                         style="width: 50px; height: 50px;">
+                                        <i class="bi bi-image text-muted"></i>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="flex-grow-1">
+                                <h6 class="mb-0 fw-semibold">{{ item.producto.nombre }}</h6>
+                                <small class="text-muted">{{ item.producto.codigo }}</small>
+                                <div class="d-flex justify-content-between mt-1">
+                                    <small class="text-muted">{{ item.cantidad }} × ${{ item.producto.precio_venta|floatformat:0 }}</small>
+                                    <small class="fw-semibold">${{ item.subtotal|floatformat:0 }}</small>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Totals -->
+                    <div class="border-top pt-3">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">Subtotal:</span>
+                            <span class="fw-semibold">${{ total|floatformat:0 }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">Envío:</span>
+                            <span class="fw-semibold text-success">Gratis</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">Impuestos:</span>
+                            <span class="fw-semibold">$0</span>
+                        </div>
+                        <hr class="my-3">
+                        <div class="d-flex justify-content-between">
+                            <h5 class="mb-0 fw-bold text-dark">Total:</h5>
+                            <h5 class="mb-0 fw-bold text-primary">${{ total|floatformat:0 }}</h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Checkout Form -->
+        <div class="col-lg-8 order-lg-1">
+            <form method="post" id="checkoutForm">
+                {% csrf_token %}
+
+                <!-- Customer Information -->
+                <div class="card-custom mb-4">
+                    <div class="card-body">
+                        <h4 class="card-title fw-bold text-dark mb-4">
+                            <i class="bi bi-person text-primary me-2"></i>Información del Cliente
+                        </h4>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Nombre Completo</label>
+                                <input type="text" class="form-control" value="{{ user.get_full_name|default:user.username }}" disabled readonly>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Email</label>
+                                <input type="email" class="form-control" value="{{ user.email }}" disabled readonly>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="telefono" class="form-label fw-semibold">Teléfono *</label>
+                                <input type="tel" class="form-control" id="telefono" name="telefono"
+                                       placeholder="Ej: +34 123 456 789" required>
+                                <div class="form-text">Necesario para coordinar la entrega</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="direccion" class="form-label fw-semibold">Dirección de Envío *</label>
+                                <input type="text" class="form-control" id="direccion" name="direccion"
+                                       placeholder="Calle, número, piso, ciudad, código postal" required>
+                                <div class="form-text">Dirección completa para la entrega</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payment Information -->
+                <div class="card-custom mb-4">
+                    <div class="card-body">
+                        <h4 class="card-title fw-bold text-dark mb-4">
+                            <i class="bi bi-credit-card text-primary me-2"></i>Información de Pago
+                        </h4>
+
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle me-2"></i>
+                            <strong>Nota:</strong> Esta es una demostración. En un sistema real, aquí irían los campos de pago seguro.
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Método de Pago</label>
+                                <select class="form-select" name="metodo_pago" required>
+                                    <option value="">Seleccionar método</option>
+                                    <option value="tarjeta">Tarjeta de Crédito/Débito</option>
+                                    <option value="transferencia">Transferencia Bancaria</option>
+                                    <option value="efectivo">Pago en Efectivo</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Notas del Pedido (Opcional)</label>
+                                <textarea class="form-control" name="notas" rows="2"
+                                          placeholder="Instrucciones especiales de entrega..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Terms and Conditions -->
+                <div class="card-custom mb-4">
+                    <div class="card-body">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="terminos" name="terminos" required>
+                            <label class="form-check-label fw-semibold" for="terminos">
+                                Acepto los <a href="#" class="text-primary text-decoration-none">términos y condiciones</a> de compra y la <a href="#" class="text-primary text-decoration-none">política de privacidad</a>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="d-flex gap-3 mb-5">
+                    <a href="{% url 'ventas:ver_carrito' %}" class="btn btn-outline-secondary flex-fill">
+                        <i class="bi bi-arrow-left me-2"></i>Volver al Carrito
+                    </a>
+                    <button type="submit" class="btn btn-primary-custom btn-lg flex-fill">
+                        <i class="bi bi-check-circle me-2"></i>Confirmar Pedido
+                    </button>
+                </div>
+
+                <!-- Security Notice -->
+                <div class="text-center">
+                    <small class="text-muted">
+                        <i class="bi bi-shield-check me-1"></i>
+                        Tu información está protegida con encriptación SSL de 256 bits
+                    </small>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+
+{% block extra_js %}
+<script>
+document.getElementById('checkoutForm').addEventListener('submit', function(e) {
+    const telefono = document.getElementById('telefono').value.trim();
+    const direccion = document.getElementById('direccion').value.trim();
+    const terminos = document.getElementById('terminos').checked;
+
+    if (!telefono || !direccion) {
+        e.preventDefault();
+        alert('Por favor completa todos los campos obligatorios.');
+        return;
+    }
+
+    if (!terminos) {
+        e.preventDefault();
+        alert('Debes aceptar los términos y condiciones.');
+        return;
+    }
+
+    // Show loading state
+    const submitBtn = this.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Procesando...';
+    submitBtn.disabled = true;
+
+    // Re-enable after 10 seconds as fallback
+    setTimeout(() => {
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+    }, 10000);
+});
+</script>
+{% endblock %}
+{% endblock %}

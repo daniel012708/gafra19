@@ -1,0 +1,37 @@
+{% extends "admin/index.html" %}
+{% load static %}
+{% block content %}
+  {{ block.super }}
+  <div class="module">
+    <h2>Reportes</h2>
+    <ul>
+      <li><a class="button" href="/productos/reportes/">Productos</a></li>
+      <li><a class="button" href="/clientes/reportes/">Clientes</a></li>
+      <li><a class="button" href="/inventario/reportes/">Inventario</a></li>
+      <li><a class="button" href="/proveedores/reportes/">Proveedores</a></li>
+      <li><a class="button" href="/produccion/reportes/">Producción</a></li>
+      <li><a class="button" href="/ventas/reportes/">Ventas</a></li>
+    </ul>
+  </div>
+  <script>
+    // Expand collapsed app sections in Django admin so the lateral menu appears deployed
+    document.addEventListener('DOMContentLoaded', function() {
+      try {
+        document.querySelectorAll('.app-list .collapse-toggle, .app-list h2').forEach(function(toggle){
+          // some Django versions use .collapse-toggle, others use the h2 itself
+          var t = toggle;
+          // if it's an h2, ensure it behaves like the toggle
+          t.classList.remove('collapsed');
+          t.setAttribute('aria-expanded', 'true');
+          var next = t.nextElementSibling;
+          if(next && (next.classList.contains('models') || next.tagName.toLowerCase() === 'ul')){
+            next.style.display = 'block';
+          }
+        });
+      } catch(e) {
+        // no-op on error
+        console && console.debug && console.debug('admin expand script error', e);
+      }
+    });
+  </script>
+{% endblock %}

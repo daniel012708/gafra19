@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block head_title %}Agregar entrada de materia prima{% endblock %}
+{% block header_title %}Agregar entrada: {{ materia.nombre }}{% endblock %}
+{% block content %}
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Agregar entrada de materia prima</h5>
+        <a href="{% url 'inventario:list' %}" class="btn btn-secondary btn-sm">Volver a inventario</a>
+    </div>
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label class="form-label">Materia prima</label>
+                <input type="text" class="form-control" value="{{ materia.nombre }}" readonly>
+            </div>
+            {% for field in form %}
+                <div class="mb-3">
+                    {{ field.label_tag }}
+                    {{ field }}
+                    {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
+                    {% for error in field.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                </div>
+            {% endfor %}
+            <button type="submit" class="btn btn-success">Agregar entrada</button>
+            <a href="{% url 'inventario:list' %}" class="btn btn-secondary">Cancelar</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

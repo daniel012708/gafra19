@@ -1,0 +1,171 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block head_title %}Gafra{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/ui-enhancements.css' %}?v={{ STATIC_VERSION }}">
+    <link rel="stylesheet" href="{% static 'css/custom.css' %}?v={{ STATIC_VERSION }}">
+    <link rel="stylesheet" href="{% static 'css/saas.css' %}?v={{ STATIC_VERSION }}">
+        <style>
+        /* Sidebar and main content layout fix (kept minimal to avoid conflicts) */
+        .app-sidebar {
+            width: 240px;
+            min-width: 240px;
+            max-width: 240px;
+            height: 100vh;
+            background: transparent; /* use theme background from saas.css */
+            box-shadow: var(--shadow, 0 0 24px rgba(102,126,234,0.08));
+            flex-shrink: 0;
+            position: fixed;
+            left: 0;
+            top: 0;
+            z-index: 1030;
+            overflow-y: visible; /* disable internal scrolling */
+            transition: width 0.2s;
+        }
+        .app-main {
+            margin-left: 92px; /* align with collapsed rail width */
+            flex-grow: 1;
+            min-width: 0;
+            z-index: 1;
+            padding-left: 0;
+            overflow-x: auto;
+            transition: margin-left .22s cubic-bezier(.2,.9,.3,1);
+        }
+        .app-sidebar.collapsed {
+            width: 60px;
+            min-width: 60px;
+            max-width: 60px;
+        }
+        @media (max-width: 900px) {
+            .app-sidebar { transform: translateX(-100%); }
+            .app-sidebar.active { transform: translateX(0); }
+            .app-main { margin-left: 0; }
+        }
+        </style>
+    </head>
+    <body>
+        <div class="app-wrapper d-flex">
+            <aside class="app-sidebar" id="appSidebar" aria-label="Sidebar">
+                <div class="sidebar-inner d-flex flex-column align-items-center">
+                    <div class="d-flex w-100 justify-content-center mb-2 position-relative">
+                        <a href="/" class="sidebar-brand d-flex align-items-center" title="GAFRA">
+                            <img src="{% static 'img/logo.svg' %}" alt="Gafra" class="brand-logo" onerror="this.style.display='none'">
+                        </a>
+                        <div class="window-controls d-none d-md-flex">
+                            <span class="dot dot-red"></span>
+                            <span class="dot dot-yellow"></span>
+                            <span class="dot dot-green"></span>
+                        </div>
+                    </div>
+
+                    <div class="sidebar-search w-100 d-none d-md-block mb-2 px-2">
+                        <form role="search" action="" method="get">
+                            <div class="input-group input-group-sm">
+                                <input name="q" class="form-control form-control-sm rounded-pill" type="search" placeholder="Buscar..." aria-label="Buscar">
+                            </div>
+                        </form>
+                    </div>
+
+                    <nav class="nav flex-column sidebar-nav" role="navigation">
+                        <a class="nav-link nav-icon" href="/"><i class="bi bi-house-door"></i><span class="nav-text">Inicio</span></a>
+                        <a class="nav-link nav-icon mt-2" href="/"><i class="bi bi-kanban"></i><span class="nav-text">Area</span></a>
+                        <a class="nav-link nav-icon mt-2" href="/usuario/"><i class="bi bi-people"></i><span class="nav-text">Usuarios</span></a>
+                        <a class="nav-link nav-icon mt-2" href="/proveedores/"><i class="bi bi-truck"></i><span class="nav-text">Proveedores</span></a>
+                        <a class="nav-link nav-icon mt-2" href="/inventario/"><i class="bi bi-box-seam"></i><span class="nav-text">Inventario</span></a>
+                        <a class="nav-link nav-icon mt-2" href="/productos/"><i class="bi bi-basket"></i><span class="nav-text">Productos</span></a>
+                        <a class="nav-link nav-icon mt-2" href="/produccion/"><i class="bi bi-gear"></i><span class="nav-text">Producción</span></a>
+                        <a class="nav-link nav-icon mt-2" href="/clientes/"><i class="bi bi-person-lines-fill"></i><span class="nav-text">Clientes</span></a>
+                        <a class="nav-link nav-icon mt-2" href="/ventas/"><i class="bi bi-receipt"></i><span class="nav-text">Ventas</span></a>
+                    </nav>
+
+                    <div class="sidebar-footer mt-auto mb-2 text-center">
+                        <a href="{% url 'usuario:profile' %}" class="d-inline-block sidebar-user" title="{{ user.get_full_name|default:user.username }}">
+                            <img src="{% static 'img/avatar.svg' %}" alt="user" class="rounded avatar-sm" onerror="this.style.display='none'">
+                            <div class="sidebar-user-meta d-none">
+                                <div class="sidebar-user-name">{{ user.get_full_name|default:user.username }}</div>
+                                <div class="sidebar-user-role">{{ user.is_staff|yesno:"Admin,Cliente" }}</div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </aside>
+
+            <div class="app-main flex-grow-1">
+                <header class="app-topbar d-flex justify-content-between align-items-center">
+                    <div class="topbar-left d-flex align-items-center gap-3 w-100">
+                        <form class="w-100 d-none d-md-flex topbar-search" role="search" action="" method="get">
+                            <div class="input-group input-group-sm w-100">
+                                <input name="q" class="form-control form-control-sm rounded-pill" type="search" placeholder="Buscar productos, clientes..." aria-label="Buscar">
+                                <button class="btn btn-sm btn-primary ms-2 d-none d-md-inline-flex" type="submit">Buscar</button>
+                            </div>
+                        </form>
+                    </div>
+                        <div class="topbar-right d-flex align-items-center">
+                            <!-- Intentionally left blank: only search bar and mobile toggle are shown per design -->
+                        </div>
+                </header>
+
+                <main class="app-content p-4" id="content">
+                    <div class="container-fluid">
+                        <div class="container-fluid">
+                            <div class="container-lg">
+                                {% block content %}{% endblock %}
+                            </div>
+                        </div>
+                    </div>
+                </main>
+            </div>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+    <script src="{% static 'js/toasts.js' %}"></script>
+        <script src="https://cdn.jsdelivr.net/npm/lucide@0.244.0/dist/lucide.min.js"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function(){
+                try{ if(window.lucide && typeof lucide.replace === 'function'){ lucide.replace({ 'aria-hidden': 'true' }); } }catch(e){ console && console.debug && console.debug(e); }
+            });
+        </script>
+
+        <script>
+            // hover-expand behavior: expand while hovering (no pin)
+            (function(){
+                const sidebar = document.getElementById('appSidebar');
+                if(!sidebar) return;
+                // start collapsed on desktop
+                if(window.innerWidth >= 768) sidebar.classList.add('collapsed');
+                sidebar.addEventListener('mouseenter', function(){ sidebar.classList.add('expanded'); sidebar.classList.remove('collapsed'); });
+                sidebar.addEventListener('mouseleave', function(){ sidebar.classList.remove('expanded'); sidebar.classList.add('collapsed'); });
+            })();
+        </script>
+
+        <script>
+            // Render Django messages via client-side toast API
+            document.addEventListener('DOMContentLoaded', function(){
+                {% if messages %}
+                    {% for message in messages %}
+                        (function(){
+                            var tags = '{{ message.tags }}';
+                            var text = `{{ message|escapejs }}`;
+                            if (tags.indexOf('error') !== -1 || tags.indexOf('danger') !== -1) { toastError(text); }
+                            else if (tags.indexOf('success') !== -1) { toastSuccess(text); }
+                            else { showToast(text, 'primary'); }
+                        })();
+                    {% endfor %}
+                {% endif %}
+            });
+        </script>
+
+        <script>
+            // Ensure theme classes are neutral
+            document.addEventListener('DOMContentLoaded', function(){ try{ document.documentElement.classList.remove('theme-dark'); document.body.classList.remove('theme-dark'); }catch(e){} });
+        </script>
+    </body>
+</html>

@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container py-4">
+	<div class="card shadow-sm">
+		<div class="card-body p-4 p-lg-5">
+			<h3 class="mb-1">Reporte de Productos</h3>
+			<p class="text-muted mb-4">{{ total_productos }} producto{{ total_productos|pluralize }} y {{ productos_bajo_stock }} con stock bajo.</p>
+			<form method="get" class="row g-3 mb-4">
+				<div class="col-md-4">
+					<label class="form-label">Búsqueda rápida</label>
+					<input type="search" name="q" value="{{ q }}" class="form-control" placeholder="Nombre, código o descripción">
+				</div>
+				<div class="col-md-3">
+					<label class="form-label">Categoría</label>
+					<input type="text" name="categoria" value="{{ categoria }}" class="form-control" placeholder="Nombre de categoría">
+				</div>
+				<div class="col-md-2">
+					<label class="form-label">Estado</label>
+					<select name="estado" class="form-select">
+						<option value="">Todos</option>
+						<option value="activo" {% if estado == 'activo' %}selected{% endif %}>Activo</option>
+						<option value="inactivo" {% if estado == 'inactivo' %}selected{% endif %}>Inactivo</option>
+					</select>
+				</div>
+				<div class="col-md-1">
+					<label class="form-label">Desde</label>
+					<input type="date" name="desde" value="{{ desde }}" class="form-control">
+				</div>
+				<div class="col-md-2">
+					<label class="form-label">Hasta</label>
+					<input type="date" name="hasta" value="{{ hasta }}" class="form-control">
+				</div>
+				<div class="col-12 d-flex flex-wrap gap-2 justify-content-end">
+					<button type="submit" class="btn btn-outline-primary">Aplicar filtros</button>
+					<button type="submit" name="export" value="pdf" class="btn btn-login">Descargar PDF filtrado</button>
+					<button type="submit" name="export" value="csv" class="btn btn-outline-secondary">Descargar CSV filtrado</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+{% endblock %}

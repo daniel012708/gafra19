@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+{% block head_title %}Órdenes de Producción{% endblock %}
+{% block header_title %}Órdenes de Producción{% endblock %}
+
+{% block extra_head %}
+<style>
+.table-hover tbody tr:hover {
+    background-color: rgba(99, 102, 241, 0.05);
+}
+
+.orden-pendiente {
+    border-left: 4px solid #fbbf24;
+}
+
+.orden-en-progreso {
+    border-left: 4px solid #3b82f6;
+    background-color: rgba(59, 130, 246, 0.02);
+}
+
+.orden-completada {
+    border-left: 4px solid #10b981;
+    background-color: rgba(16, 185, 129, 0.02);
+}
+
+.btn-group-sm .btn {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+}
+
+.badge {
+    font-size: 0.75rem;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Alertas de atención -->
+    {% if ordenes_en_progreso_count > 0 %}
+    <div class="alert alert-info alert-dismissible fade show mb-3" role="alert">
+        <i class="bi bi-info-circle-fill me-2"></i>
+        <strong>{{ ordenes_en_progreso_count }}</strong> orden(es) en progreso lista(s) para completarse.
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endif %}
+
+    <div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Órdenes de Producción</h5>
+        <div class="d-flex gap-2">
+            <a href="{% url 'produccion:carga_masiva' %}" class="btn btn-outline-success btn-sm">Carga masiva</a>
+            <a href="{% url 'produccion:reportes' %}" class="btn btn-outline-secondary btn-sm">Reportes</a>
+        </div>
+        <div class="d-flex gap-2">
+            <!-- Filtros por estado -->
+            <div class="dropdown">
+                <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                    <i class="bi bi-funnel"></i> Filtrar
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="{% url 'produccion:list' %}">Todas</a></li>
+                    <li><a class="dropdown-item" href="?estado=pendiente">Pendientes</a></li>
+                    <li><a class="dropdown-item" href="?estado=en_progreso">En Progreso</a></li>
+                    <li><a class="dropdown-item" href="?estado=completada">Completadas</a></li>
+                </ul>
+            </div>
+            <a href="{% url 'produccion:create' %}" class="btn btn-primary btn-sm">
+                <i class="bi bi-plus-circle"></i> Nueva Orden
+            </a>
+        </div>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-striped table-hover mb-0 align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Producto</th>
+                        <th>Receta</th>
+                        <th>Cantidad</th>
+                        <th>Responsable</th>
+                        <th>Estado</th>
+                        <th>Fecha Creación</th>
+                        <th>Fecha Inicio</th>
+                        <th>Fecha Fin</th>
+                        <th>Notas</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for orden in ordenes_produccion %}
+                    <tr class="{% if orden.estado == 'pendiente' %}orden-pendiente{% elif orden.estado == 'en_progreso' %}orden-en-progreso{% else %}orden-completada{% endif %}">
+                        <td><span class="badge bg-secondary">OP-{{ orden.id }}</span></td>
+                        <td><strong>{{ orden.producto.nombre }}</strong></td>
+                        <td>
+                            {% if orden.receta %}
+                                {% if orden.receta.descripcion %}
+                                    <span title="{{ orden.receta.descripcion }}">Receta de {{ orden.producto.nombre }}</span>
+                                {% else %}
+                                    Receta de {{ orden.producto.nombre }}
+                                {% endif %}
+                            {% else %}
+                                <span class="text-muted">-</span>
+                            {% endif %}
+                        </td>
+                        <td><span class="badge bg-light text-dark">{{ orden.cantidad_a_producir }}</span></td>
+                        <td>{% if orden.responsable %}<span class="badge bg-info text-dark">{{ orden.responsable.get_full_name|default:orden.responsable.username }}</span>{% else %}<span class="text-muted">-</span>{% endif %}</td>
+                        <td>
+                            <span class="badge {% if orden.estado == 'pendiente' %}bg-warning{% elif orden.estado == 'en_progreso' %}bg-info{% else %}bg-success{% endif %}">
+                                {{ orden.get_estado_display }}
+                            </span>
+                        </td>
+                        <td>{{ orden.fecha_creacion|date:"d/m/Y H:i" }}</td>
+                        <td>{% if orden.fecha_inicio %}{{ orden.fecha_inicio|date:"d/m/Y H:i" }}{% else %}-{% endif %}</td>
+                        <td>{% if orden.fecha_fin %}{{ orden.fecha_fin|date:"d/m/Y H:i" }}{% else %}-{% endif %}</td>
+                        <td>{% if orden.notas %}<span title="{{ orden.notas }}">{{ orden.notas|truncatechars:30 }}</span>{% else %}<span class="text-muted">-</span>{% endif %}</td>
+                        <td class="table-actions">
+                            <div class="btn-group btn-group-sm" role="group">
+                                {% if orden.estado == 'pendiente' %}
+                                    <a href="{% url 'produccion:iniciar' orden.pk %}" class="btn btn-success btn-sm"
+                                       onclick="return confirm('¿Iniciar producción? Se consumirán las materias primas necesarias.')"
+                                       title="Iniciar producción">
+                                        <i class="bi bi-play-fill"></i> Iniciar
+                                    </a>
+                                {% elif orden.estado == 'en_progreso' %}
+                                    <a href="{% url 'produccion:completar' orden.pk %}" class="btn btn-primary btn-sm"
+                                       title="Completar producción">
+                                        <i class="bi bi-check-circle-fill"></i> Completar
+                                    </a>
+                                {% endif %}
+                                {% if orden.estado == 'pendiente' %}
+                                    <a href="{% url 'produccion:update' orden.pk %}" class="btn btn-outline-secondary btn-sm"
+                                       title="Editar orden">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <a href="{% url 'produccion:delete' orden.pk %}" class="btn btn-outline-danger btn-sm"
+                                       onclick="return confirm('¿Eliminar esta orden de producción?')"
+                                       title="Eliminar orden">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="7" class="text-center py-3">No hay órdenes de producción.</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</div>
+{% endblock %}

@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Historial general de movimientos de materias primas</h2>
+    <a href="{% url 'inventario:list' %}" class="btn btn-secondary mb-3">&larr; Volver al inventario</a>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Fecha</th>
+                <th>Materia Prima</th>
+                <th>Tipo</th>
+                <th>Cantidad</th>
+                <th>Precio unitario</th>
+                <th>Motivo</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for mov in movimientos %}
+            <tr>
+                <td>{{ mov.fecha|date:'d/m/Y H:i' }}</td>
+                <td>{{ mov.materia_prima.nombre }} ({{ mov.materia_prima.codigo }})</td>
+                <td>{{ mov.get_tipo_display }}</td>
+                <td>{{ mov.cantidad }}</td>
+                <td>{% if mov.precio_unitario %}${{ mov.precio_unitario }}{% else %}-{% endif %}</td>
+                <td>{{ mov.motivo|default:'-' }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="6" class="text-center">Sin movimientos registrados.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% if is_paginated %}
+    <nav>
+      <ul class="pagination">
+        {% if page_obj.has_previous %}
+          <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Anterior</a></li>
+        {% endif %}
+        <li class="page-item disabled"><span class="page-link">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span></li>
+        {% if page_obj.has_next %}
+          <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Siguiente</a></li>
+        {% endif %}
+      </ul>
+    </nav>
+    {% endif %}
+</div>
+{% endblock %}
