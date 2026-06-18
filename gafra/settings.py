@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -19,13 +20,35 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
+def env_bool(name, default=False):
+    value = os.environ.get(name)
+    if value is None:
+        return default
+    return value.lower() in {'1', 'true', 'yes', 'on'}
+
+
+def env_list(name, default=None):
+    value = os.environ.get(name)
+    if not value:
+        return default or []
+    return [item.strip() for item in value.split(',') if item.strip()]
+
+
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-h^a05x+^i-voyr2gq7^ktw##o)e--5j(s#_t@m1=84*cn)_%7p'
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-h^a05x+^i-voyr2gq7^ktw##o)e--5j(s#_t@m1=84*cn)_%7p')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env_bool('DJANGO_DEBUG', True)
 
-ALLOWED_HOSTS = ['sash-handshake-acting.ngrok-free.dev', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = env_list('DJANGO_ALLOWED_HOSTS', ['sash-handshake-acting.ngrok-free.dev', 'localhost', '127.0.0.1'])
+render_hostname = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
+if render_hostname and render_hostname not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.append(render_hostname)
+
+CSRF_TRUSTED_ORIGINS = []
+for host in ALLOWED_HOSTS:
+    if host not in {'localhost', '127.0.0.1'} and '://' not in host:
+        CSRF_TRUSTED_ORIGINS.append(f'https://{host}')
 
 
 # Application definition
@@ -89,11 +112,18 @@ LOGIN_REDIRECT_URL = '/'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
-import os
+# Default to a local SQLite database for development. In production,
+# prefer DATABASE_URL (for Render/Postgres). To use MySQL set
+# GAFRA_USE_MYSQL=1 and provide the usual DB envs.
+database_url = os.environ.get('DATABASE_URL')
 
-# Default to a local SQLite database for development. To use MySQL set
-# the environment variable GAFRA_USE_MYSQL=1 and provide the usual DB envs.
-if os.environ.get('GAFRA_USE_MYSQL') in ('1', 'true', 'True'):
+if database_url:
+    import dj_database_url
+
+    DATABASES = {
+        'default': dj_database_url.parse(database_url, conn_max_age=600, ssl_require=not DEBUG)
+    }
+elif os.environ.get('GAFRA_USE_MYSQL') in ('1', 'true', 'True'):
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.mysql',
@@ -178,5 +208,15 @@ STATIC_VERSION = '1.0'
 # Media files (uploaded by users)
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+if not DEBUG:
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SECURE_SSL_REDIRECT = env_bool('DJANGO_SECURE_SSL_REDIRECT', True)
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_HSTS_SECONDS = 60 * 60 * 24 * 30
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    SECURE_REFERRER_POLICY = 'same-origin'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

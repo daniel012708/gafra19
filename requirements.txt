@@ -4,3 +4,6 @@ openpyxl
 whitenoise>=6.0
 weasyprint
 reportlab
+gunicorn
+dj-database-url
+psycopg2-binary
