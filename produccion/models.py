@@ -2,8 +2,9 @@ from django.db import models
 from django.contrib.auth.models import User
 from productos.models import Producto, Receta
 from inventario.models import MateriaPrima
+from gafra.soft_delete import SoftDeleteModel
 
-class OrdenProduccion(models.Model):
+class OrdenProduccion(SoftDeleteModel):
     ESTADO_CHOICES = (
         ('pendiente', 'Pendiente'),
         ('en_progreso', 'En Progreso'),
@@ -11,8 +12,8 @@ class OrdenProduccion(models.Model):
         ('cancelada', 'Cancelada'),
     )
 
-    producto = models.ForeignKey(Producto, on_delete=models.CASCADE)
-    receta = models.ForeignKey(Receta, on_delete=models.CASCADE)
+    producto = models.ForeignKey(Producto, on_delete=models.PROTECT)
+    receta = models.ForeignKey(Receta, on_delete=models.PROTECT)
     cantidad_a_producir = models.IntegerField()
     estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default='pendiente')
     fecha_inicio = models.DateTimeField(null=True, blank=True)
@@ -22,7 +23,8 @@ class OrdenProduccion(models.Model):
     fecha_creacion = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"OP-{self.id} - {self.producto.nombre} ({self.cantidad_a_producir})"
+        estado = " [ELIMINADA]" if self.deleted else ""
+        return f"OP-{self.id} - {self.producto.nombre} ({self.cantidad_a_producir}){estado}"
 
     def puede_iniciar(self):
         """Verifica si hay suficientes materias primas para iniciar la producción"""
@@ -67,8 +69,8 @@ class OrdenProduccion(models.Model):
         verbose_name_plural = 'Órdenes de Producción'
         ordering = ['-fecha_creacion']
 
-class ProduccionDiaria(models.Model):
-    orden_produccion = models.ForeignKey(OrdenProduccion, on_delete=models.CASCADE)
+class ProduccionDiaria(SoftDeleteModel):
+    orden_produccion = models.ForeignKey(OrdenProduccion, on_delete=models.PROTECT)
     fecha = models.DateField()
     cantidad_producida = models.IntegerField(default=0)
     tiempo_trabajado = models.IntegerField(help_text='Tiempo en minutos', default=0)
@@ -76,7 +78,8 @@ class ProduccionDiaria(models.Model):
     responsable = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
-        return f"{self.orden_produccion} - {self.fecha}"
+        estado = " [ELIMINADA]" if self.deleted else ""
+        return f"{self.orden_produccion} - {self.fecha}{estado}"
 
     class Meta:
         verbose_name = 'Producción Diaria'

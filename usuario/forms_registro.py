@@ -111,6 +111,8 @@ class RegistroClienteForm(forms.ModelForm):
             first_name=self.cleaned_data['first_name'],
             last_name=self.cleaned_data['last_name']
         )
+        user.is_active = True
+        user.save(update_fields=['is_active'])
         usuario = Usuario(user=user, rol='cliente', telefono=self.cleaned_data['telefono'], activo=True)
         if commit:
             usuario.save()

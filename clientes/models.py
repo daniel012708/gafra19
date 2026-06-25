@@ -1,7 +1,8 @@
 from django.db import models
+from gafra.soft_delete import SoftDeleteModel
 
 
-class Cliente(models.Model):
+class Cliente(SoftDeleteModel):
     nombre = models.CharField(max_length=150)
     documento = models.CharField(max_length=50, blank=True)
     direccion = models.CharField(max_length=255, blank=True)
@@ -10,7 +11,8 @@ class Cliente(models.Model):
     fecha_registro = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.nombre
+        estado = " (ELIMINADO)" if self.deleted else ""
+        return f"{self.nombre}{estado}"
 
     class Meta:
         verbose_name = 'Cliente'

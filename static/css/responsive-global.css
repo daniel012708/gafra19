@@ -1,0 +1,162 @@
+/* Global responsive safeguards shared by admin and client layouts */
+:root {
+  --mobile-gap: 0.75rem;
+}
+
+html,
+body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+img,
+svg,
+video,
+canvas {
+  max-width: 100%;
+  height: auto;
+}
+
+.card,
+.client-card,
+.client-surface,
+.card-custom,
+.app-topbar,
+.client-header-card,
+.client-footer-card {
+  max-width: 100%;
+  overflow-wrap: break-word;
+}
+
+.table-responsive {
+  width: 100%;
+}
+
+.auto-table-responsive {
+  margin-bottom: 0.5rem;
+}
+
+.table th,
+.table td {
+  white-space: normal;
+}
+
+.list-search-form .form-control,
+.list-search-form .form-select,
+.list-search-form .input-group,
+.list-search-form .btn,
+.list-card-actions .btn,
+.client-filter-panel .form-control,
+.client-filter-panel .form-select,
+.client-filter-panel .btn {
+  min-width: 0;
+}
+
+@media (max-width: 992px) {
+  .container,
+  .container-sm,
+  .container-md,
+  .container-lg,
+  .container-xl,
+  .container-xxl,
+  .container-fluid {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+
+  .app-content .container-lg,
+  .app-content .container-fluid {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .table {
+    min-width: 640px;
+  }
+
+  .table-action-group {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
+
+  .table-action-group .btn {
+    flex: 1 1 auto;
+  }
+
+  .btn,
+  .btn-sm,
+  .btn-lg {
+    min-height: 42px;
+  }
+
+  .input-group > .btn {
+    min-height: 42px;
+  }
+}
+
+@media (max-width: 768px) {
+  .client-main,
+  .app-content {
+    padding-bottom: 1.5rem !important;
+  }
+
+  .row {
+    --bs-gutter-x: 1rem;
+    --bs-gutter-y: 1rem;
+  }
+
+  .client-nav {
+    scroll-snap-type: x proximity;
+  }
+
+  .client-nav-link,
+  .client-user-menu .dropdown-toggle {
+    scroll-snap-align: start;
+  }
+
+  .client-hero-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .list-search-form,
+  .list-card-actions {
+    gap: var(--mobile-gap);
+  }
+
+  .list-search-form .btn,
+  .list-card-actions .btn,
+  .d-grid .btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 576px) {
+  .modal-dialog {
+    margin: 0.5rem;
+  }
+
+  .client-auth-page,
+  .client-main,
+  .app-content {
+    padding-left: 0.5rem !important;
+    padding-right: 0.5rem !important;
+  }
+
+  .card,
+  .client-card,
+  .card-custom,
+  .client-filter-panel {
+    border-radius: 16px;
+  }
+
+  .pagination {
+    gap: 0.35rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .pagination .page-link {
+    min-width: 38px;
+    text-align: center;
+  }
+}

@@ -17,6 +17,8 @@
     <!-- Modern ventas styles (navbar + cards) -->
     <link rel="stylesheet" href="{% static 'css/ventas_moderno.css' %}">
     <link rel="stylesheet" href="{% static 'css/cliente_portal.css' %}">
+    <link rel="stylesheet" href="{% static 'css/responsive-global.css' %}">
+    <link rel="stylesheet" href="{% static 'css/tables-no-scroll.css' %}">
 
    
 
@@ -209,6 +211,14 @@
 
         document.addEventListener('DOMContentLoaded', function () {
             document.querySelectorAll('form[method="post"]').forEach(syncCsrfToken);
+
+            document.querySelectorAll('.client-main table').forEach(function(table){
+                if (table.closest('.table-responsive')) return;
+                const wrapper = document.createElement('div');
+                wrapper.className = 'table-responsive auto-table-responsive';
+                table.parentNode.insertBefore(wrapper, table);
+                wrapper.appendChild(table);
+            });
 
             document.addEventListener('submit', function (event) {
                 const form = event.target;

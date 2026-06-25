@@ -1,8 +1,9 @@
 
 from django.db import models
+from gafra.soft_delete import SoftDeleteModel
 from .movimientos import ProveedorMovimiento
 
-class Proveedor(models.Model):
+class Proveedor(SoftDeleteModel):
     nombre = models.CharField("Nombre comercial", max_length=150)
     razon_social = models.CharField("Razón social", max_length=200, blank=True)
     rfc = models.CharField("RFC", max_length=13, blank=True)
@@ -21,7 +22,8 @@ class Proveedor(models.Model):
     fecha_actualizacion = models.DateTimeField(auto_now=True)
     
     def __str__(self):
-        return self.nombre
+        estado = " (ELIMINADO)" if self.deleted else ""
+        return f"{self.nombre}{estado}"
     
     class Meta:
         verbose_name = 'Proveedor'

@@ -1,12 +1,13 @@
 from django.db import models
 from proveedores.models import Proveedor
+from gafra.soft_delete import SoftDeleteModel
 
-class MateriaPrima(models.Model):
+class MateriaPrima(SoftDeleteModel):
     codigo = models.CharField(max_length=20, unique=True, editable=False)
     nombre = models.CharField(max_length=200)
     descripcion = models.TextField(blank=True)
     marca = models.CharField(max_length=100, blank=True)
-    proveedor = models.ForeignKey(Proveedor, on_delete=models.CASCADE)
+    proveedor = models.ForeignKey(Proveedor, on_delete=models.PROTECT)
     precio_unitario = models.DecimalField(max_digits=10, decimal_places=2)
     UNIDADES = [
         ('kg', 'Kilogramo (kg)'),
@@ -31,26 +32,27 @@ class MateriaPrima(models.Model):
     def save(self, *args, **kwargs):
         if not self.codigo:
             # Generar código automático tipo MP-0001
-            last = MateriaPrima.objects.order_by('-id').first()
+            last = MateriaPrima.objects.all_including_deleted().order_by('-id').first()
             next_id = (last.id + 1) if last else 1
             self.codigo = f"MP-{next_id:04d}"
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"{self.nombre} - {self.proveedor.nombre}"
+        estado = " [ELIMINADA]" if self.deleted else ""
+        return f"{self.nombre} - {self.proveedor.nombre}{estado}"
 
     class Meta:
         verbose_name = 'Materia Prima'
         verbose_name_plural = 'Materias Primas'
 
-class MovimientoMateriaPrima(models.Model):
+class MovimientoMateriaPrima(SoftDeleteModel):
     TIPO_MOVIMIENTO = (
         ('entrada', 'Entrada'),
         ('salida', 'Salida'),
         ('ajuste', 'Ajuste'),
     )
 
-    materia_prima = models.ForeignKey(MateriaPrima, on_delete=models.CASCADE)
+    materia_prima = models.ForeignKey(MateriaPrima, on_delete=models.PROTECT)
     tipo = models.CharField(max_length=20, choices=TIPO_MOVIMIENTO)
     cantidad = models.DecimalField(max_digits=10, decimal_places=2)
     precio_unitario = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
@@ -58,7 +60,8 @@ class MovimientoMateriaPrima(models.Model):
     fecha = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.get_tipo_display()} - {self.materia_prima.nombre}"
+        estado = " [ELIMINADO]" if self.deleted else ""
+        return f"{self.get_tipo_display()} - {self.materia_prima.nombre}{estado}"
 
     class Meta:
         verbose_name = 'Movimiento de Materia Prima'

@@ -116,6 +116,7 @@ class UsuarioForm(forms.ModelForm):
             user.first_name = self.cleaned_data['first_name']
             user.last_name = self.cleaned_data['last_name']
             user.email = self.cleaned_data['email']
+            user.is_active = bool(self.cleaned_data.get('activo', True))
             user.save()
         else:
             # Creando nuevo usuario
@@ -126,6 +127,8 @@ class UsuarioForm(forms.ModelForm):
                 first_name=self.cleaned_data['first_name'],
                 last_name=self.cleaned_data['last_name']
             )
+            user.is_active = bool(self.cleaned_data.get('activo', True))
+            user.save(update_fields=['is_active'])
             instance.user = user
 
         if commit:

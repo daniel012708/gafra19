@@ -13,6 +13,8 @@
     <link rel="stylesheet" href="{% static 'css/ui-enhancements.css' %}?v={{ STATIC_VERSION }}">
     <link rel="stylesheet" href="{% static 'css/custom.css' %}?v={{ STATIC_VERSION }}">
     <link rel="stylesheet" href="{% static 'css/saas.css' %}?v={{ STATIC_VERSION }}">
+    <link rel="stylesheet" href="{% static 'css/responsive-global.css' %}?v={{ STATIC_VERSION }}">
+    <link rel="stylesheet" href="{% static 'css/tables-no-scroll.css' %}?v={{ STATIC_VERSION }}">
         <style>
         .app-sidebar {
             width: 288px;
@@ -28,7 +30,8 @@
             left: 0;
             top: 0;
             z-index: 1030;
-            overflow: hidden;
+            overflow-x: hidden;
+            overflow-y: auto;
             border-right: 1px solid rgba(148, 163, 184, .14);
         }
         .app-main {
@@ -44,7 +47,8 @@
         }
         .app-sidebar.expanded .sidebar-inner,
         .sidebar-inner {
-            min-height: 100vh;
+            height: 100%;
+            max-height: 100vh;
             width: 100%;
             max-width: 100%;
             margin: 0;
@@ -52,6 +56,9 @@
             border-right: 0;
             align-items: stretch !important;
             overflow-y: auto;
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior: contain;
             scrollbar-width: thin;
             scrollbar-color: rgba(96, 165, 250, .45) transparent;
         }
@@ -270,6 +277,10 @@
         .app-content {
             padding: 1.5rem 1.25rem 2rem !important;
         }
+        .content-shell {
+            width: min(100%, 1720px);
+            margin: 0 auto;
+        }
         .app-content .table {
             table-layout: auto;
             width: 100%;
@@ -334,14 +345,62 @@
             overflow-y: visible;
             -webkit-overflow-scrolling: touch;
         }
-        @media (max-width: 900px) {
+        .sidebar-toggle {
+            display: none;
+            min-width: 42px;
+            min-height: 42px;
+            border-radius: 12px;
+        }
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, .46);
+            border: 0;
+            padding: 0;
+            margin: 0;
+            z-index: 1020;
+            cursor: pointer;
+        }
+        body.sidebar-open {
+            overflow: hidden;
+        }
+        body.sidebar-open .sidebar-overlay {
+            display: block;
+        }
+        @media (max-width: 992px) {
             .app-sidebar {
-                width: 248px;
-                min-width: 248px;
-                max-width: 248px;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 220px;
+                min-width: 220px;
+                max-width: 220px;
+                height: 100vh;
+                transform: none;
+                transition: none;
             }
-            .app-main { margin-left: 248px; }
-            .app-sidebar.expanded ~ .app-main { margin-left: 248px; }
+            .app-main,
+            .app-sidebar.expanded ~ .app-main {
+                margin-left: 220px !important;
+            }
+            .app-topbar {
+                margin: .65rem .65rem 0;
+                padding: .8rem .9rem;
+                border-radius: 16px;
+            }
+            .sidebar-toggle {
+                display: none;
+            }
+            .topbar-search {
+                display: none !important;
+            }
+            .app-content {
+                padding: 1rem .7rem 1.4rem !important;
+            }
+            .content-shell {
+                width: 100%;
+            }
         }
         @media (max-width: 768px) {
             .app-topbar {
@@ -362,24 +421,75 @@
                 padding: .65rem .7rem;
                 font-size: .92rem;
             }
-        }
-        @media (max-width: 640px) {
-            .app-sidebar {
+            .list-search-form .btn,
+            .list-card-actions .btn {
                 width: 100%;
-                min-width: 100%;
-                max-width: 100%;
-                height: auto;
-                position: static;
-                border-right: 0;
-                box-shadow: none;
             }
-            .app-main { margin-left: 0; }
+            .app-content .card {
+                padding: 1rem;
+            }
+        }
+        @media (max-width: 640px) and (pointer: coarse) {
+            .app-sidebar {
+                width: min(86vw, 320px);
+                min-width: min(86vw, 320px);
+                max-width: min(86vw, 320px);
+                transform: translateX(-108%);
+                transition: transform .28s ease;
+            }
+            .app-sidebar.mobile-open {
+                transform: translateX(0);
+            }
+            .app-main,
+            .app-sidebar.expanded ~ .app-main {
+                margin-left: 0 !important;
+            }
+            .sidebar-toggle {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+            }
             .sidebar-inner {
-                min-height: auto;
+                min-height: 100vh;
                 padding: 1rem .85rem;
             }
             .sidebar-brand {
                 padding: .8rem .9rem;
+            }
+        }
+        @media (max-width: 640px) and (pointer: fine) {
+            .app-sidebar {
+                width: 220px;
+                min-width: 220px;
+                max-width: 220px;
+                transform: none;
+                transition: none;
+            }
+            .app-main,
+            .app-sidebar.expanded ~ .app-main {
+                margin-left: 220px !important;
+            }
+            .sidebar-toggle {
+                display: none;
+            }
+            .sidebar-overlay {
+                display: none !important;
+            }
+            .sidebar-inner {
+                min-height: 100vh;
+                padding: 1rem .85rem;
+            }
+        }
+        @media (min-width: 1800px) {
+            .app-content {
+                padding-left: 1.8rem !important;
+                padding-right: 1.8rem !important;
+            }
+            .content-shell {
+                width: min(100%, 1880px);
+            }
+            .topbar-search .form-control {
+                font-size: 1rem;
             }
         }
         </style>
@@ -434,10 +544,20 @@
                     </div>
                 </div>
             </aside>
+            <button class="sidebar-overlay" id="sidebarOverlay" aria-label="Cerrar menú"></button>
 
             <div class="app-main flex-grow-1">
                 <header class="app-topbar d-flex justify-content-between align-items-center">
                     <div class="topbar-left d-flex align-items-center gap-3 w-100">
+                        <button
+                            type="button"
+                            class="btn btn-outline-secondary btn-sm sidebar-toggle"
+                            id="sidebarToggle"
+                            aria-label="Abrir menú"
+                            aria-controls="appSidebar"
+                            aria-expanded="false">
+                            <i class="bi bi-list"></i>
+                        </button>
                         <form class="w-100 d-none d-md-flex topbar-search" role="search" action="" method="get">
                             <div class="input-group input-group-sm w-100">
                                 <input name="q" class="form-control form-control-sm rounded-pill" type="search" placeholder="Buscar productos, clientes..." aria-label="Buscar">
@@ -451,12 +571,8 @@
                 </header>
 
                 <main class="app-content p-4" id="content">
-                    <div class="container-fluid">
-                        <div class="container-fluid">
-                            <div class="container-lg">
-                                {% block content %}{% endblock %}
-                            </div>
-                        </div>
+                    <div class="content-shell">
+                        {% block content %}{% endblock %}
                     </div>
                 </main>
             </div>
@@ -604,10 +720,59 @@
             // Keep sidebar expanded on desktop and match main card heights
             document.addEventListener('DOMContentLoaded', function(){
                 try{
+                    const sidebar = document.getElementById('appSidebar');
+                    const sidebarToggle = document.getElementById('sidebarToggle');
+                    const sidebarOverlay = document.getElementById('sidebarOverlay');
+                    const mobileQuery = window.matchMedia('(max-width: 640px) and (pointer: coarse)');
+
+                    function setSidebarState(isOpen){
+                        if(!sidebar) return;
+                        sidebar.classList.toggle('mobile-open', !!isOpen);
+                        document.body.classList.toggle('sidebar-open', !!isOpen);
+                        if(sidebarToggle){
+                            sidebarToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+                        }
+                    }
+
+                    if(sidebarToggle){
+                        sidebarToggle.addEventListener('click', function(){
+                            if(!mobileQuery.matches) return;
+                            const willOpen = !sidebar.classList.contains('mobile-open');
+                            setSidebarState(willOpen);
+                        });
+                    }
+
+                    if(sidebarOverlay){
+                        sidebarOverlay.addEventListener('click', function(){
+                            setSidebarState(false);
+                        });
+                    }
+
+                    document.addEventListener('keydown', function(event){
+                        if(event.key === 'Escape'){
+                            setSidebarState(false);
+                        }
+                    });
+
+                    window.addEventListener('resize', function(){
+                        if(!mobileQuery.matches){
+                            setSidebarState(false);
+                        }
+                    });
+
+                    // Ensure all content tables can scroll horizontally on small screens.
+                    document.querySelectorAll('.app-content table').forEach(function(table){
+                        if(table.closest('.table-responsive')) return;
+                        const wrapper = document.createElement('div');
+                        wrapper.className = 'table-responsive auto-table-responsive';
+                        table.parentNode.insertBefore(wrapper, table);
+                        wrapper.appendChild(table);
+                    });
+
                     if(window.innerWidth >= 768){
                         // Make cards in the main container match the height of the welcome card
                         const welcome = document.querySelector('.welcome-card');
-                        const cards = Array.from(document.querySelectorAll('.app-content .container-lg .card'));
+                        const cards = Array.from(document.querySelectorAll('.app-content .content-shell .card'));
                         if(welcome && cards.length){
                             const welcomeH = welcome.getBoundingClientRect().height;
                             let maxH = welcomeH;

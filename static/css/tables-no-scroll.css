@@ -1,0 +1,115 @@
+/* Force tables to fit without horizontal scrolling */
+
+.table-responsive {
+  overflow-x: visible !important;
+  width: 100%;
+}
+
+.table-responsive.auto-table-responsive {
+  overflow-x: visible !important;
+}
+
+.table {
+  width: 100% !important;
+  table-layout: auto !important;
+  border-collapse: collapse !important;
+}
+
+.table thead th,
+.table tbody td {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: normal !important;
+  padding: 10px 8px !important;
+  font-size: 14px !important;
+  line-height: 1.35 !important;
+}
+
+.table thead th {
+  font-weight: 700 !important;
+  padding: 12px 8px !important;
+}
+
+.table tbody td {
+  vertical-align: middle !important;
+}
+
+/* Compress action buttons in tables */
+.table-action-group {
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.table-action-group .btn {
+  padding: 6px 10px !important;
+  font-size: 12px !important;
+  min-height: auto !important;
+  white-space: nowrap;
+}
+
+/* Make tables more compact */
+.table-compact th,
+.table-compact td {
+  padding: 8px 6px !important;
+  font-size: 13px !important;
+}
+
+/* Truncate long text in cells */
+.table td,
+.table th {
+  max-width: 150px;
+}
+
+/* For mobile screens, make even more compact */
+@media (max-width: 768px) {
+  .table thead th,
+  .table tbody td {
+    padding: 8px 4px !important;
+    font-size: 12px !important;
+    line-height: 1.25 !important;
+  }
+
+  .table-action-group .btn {
+    padding: 4px 8px !important;
+    font-size: 11px !important;
+  }
+
+  /* Hide less important columns on small screens */
+  .table td:nth-child(n+5),
+  .table th:nth-child(n+5) {
+    display: none;
+  }
+
+  /* Ensure first 4 columns are visible */
+  .table td:nth-child(-n+4),
+  .table th:nth-child(-n+4) {
+    display: table-cell !important;
+    max-width: 100%;
+    word-break: break-word;
+  }
+}
+
+@media (max-width: 576px) {
+  .table thead th,
+  .table tbody td {
+    padding: 6px 3px !important;
+    font-size: 11px !important;
+    line-height: 1.2 !important;
+  }
+
+  .table-action-group .btn {
+    padding: 3px 6px !important;
+    font-size: 10px !important;
+  }
+
+  /* Show only first 3 columns on extra small screens */
+  .table td:nth-child(n+4),
+  .table th:nth-child(n+4) {
+    display: none;
+  }
+
+  .table td:nth-child(-n+3),
+  .table th:nth-child(-n+3) {
+    display: table-cell !important;
+  }
+}

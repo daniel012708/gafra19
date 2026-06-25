@@ -1,5 +1,6 @@
 from django.db import models
 from proveedores.models import Proveedor
+from gafra.soft_delete import SoftDeleteModel
 
 class Categoria(models.Model):
     nombre = models.CharField(max_length=100, unique=True)
@@ -12,7 +13,7 @@ class Categoria(models.Model):
         verbose_name = 'Categoría'
         verbose_name_plural = 'Categorías'
 
-class Producto(models.Model):
+class Producto(SoftDeleteModel):
     codigo = models.CharField(max_length=50, unique=True, editable=False)
     nombre = models.CharField(max_length=200)
     descripcion = models.TextField()
@@ -26,12 +27,13 @@ class Producto(models.Model):
     fecha_actualizacion = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"{self.codigo} - {self.nombre}"
+        estado = " [ELIMINADO]" if self.deleted else ""
+        return f"{self.codigo} - {self.nombre}{estado}"
 
     def save(self, *args, **kwargs):
         if not self.codigo:
             # Generar código automático tipo PRD-0001
-            last = Producto.objects.order_by('-id').first()
+            last = Producto.objects.all_including_deleted().order_by('-id').first()
             if last and last.codigo and last.codigo.startswith('PRD-'):
                 try:
                     last_num = int(last.codigo.split('-')[1])
@@ -47,14 +49,15 @@ class Producto(models.Model):
         verbose_name_plural = 'Productos'
         ordering = ['nombre']
 
-class Receta(models.Model):
-    producto = models.OneToOneField(Producto, on_delete=models.CASCADE, related_name='receta')
+class Receta(SoftDeleteModel):
+    producto = models.OneToOneField(Producto, on_delete=models.PROTECT, related_name='receta')
     descripcion = models.TextField(blank=True)
     tiempo_produccion = models.IntegerField(help_text='Tiempo en minutos', default=60)
     activo = models.BooleanField(default=True)
 
     def __str__(self):
-        return f"Receta de {self.producto.nombre}"
+        estado = " [ELIMINADA]" if self.deleted else ""
+        return f"Receta de {self.producto.nombre}{estado}"
 
     class Meta:
         verbose_name = 'Receta'
@@ -62,7 +65,7 @@ class Receta(models.Model):
 
 
 # Historial de movimientos de productos
-class ProductoMovimiento(models.Model):
+class ProductoMovimiento(SoftDeleteModel):
     TIPO_MOVIMIENTO = [
         ('creacion', 'Creación'),
         ('modificacion', 'Modificación'),
@@ -71,7 +74,7 @@ class ProductoMovimiento(models.Model):
         ('ajuste', 'Ajuste'),
     ]
 
-    producto = models.ForeignKey(Producto, on_delete=models.CASCADE, related_name='movimientos')
+    producto = models.ForeignKey(Producto, on_delete=models.PROTECT, related_name='movimientos')
     tipo = models.CharField(max_length=20, choices=TIPO_MOVIMIENTO)
     cantidad = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     usuario = models.CharField(max_length=150, blank=True)

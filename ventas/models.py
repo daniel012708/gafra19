@@ -4,9 +4,10 @@ from productos.models import Producto
 from clientes.models import Cliente
 from django.db import transaction
 from django.utils import timezone
+from gafra.soft_delete import SoftDeleteModel
 
 
-class Venta(models.Model):
+class Venta(SoftDeleteModel):
     ESTADOS = (
         ('pendiente', 'Pendiente'),
         ('en_progreso', 'En proceso'),
@@ -17,7 +18,7 @@ class Venta(models.Model):
     numero_venta = models.CharField(max_length=50, unique=True, blank=True)
     fecha = models.DateTimeField(auto_now_add=True)
     vendedor = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
-    cliente = models.ForeignKey(Cliente, on_delete=models.SET_NULL, null=True, blank=True)
+    cliente = models.ForeignKey(Cliente, on_delete=models.PROTECT, null=True, blank=True, related_name='ventas')
     estado = models.CharField(max_length=20, choices=ESTADOS, default='pendiente')
     fecha_completado = models.DateTimeField(null=True, blank=True)
     descuento = models.DecimalField(max_digits=10, decimal_places=2, default=0)
@@ -26,7 +27,8 @@ class Venta(models.Model):
     observaciones = models.TextField(blank=True)
     
     def __str__(self):
-        return f"Venta {self.numero_venta}"
+        estado = " [ELIMINADA]" if self.deleted else ""
+        return f"Venta {self.numero_venta}{estado}"
     
     class Meta:
         verbose_name = 'Venta'
@@ -39,7 +41,7 @@ class Venta(models.Model):
             today = timezone.now().date()
             prefix = today.strftime('V%Y%m%d')
             # find last with this prefix
-            last = Venta.objects.filter(numero_venta__startswith=prefix).order_by('-numero_venta').first()
+            last = Venta.objects.all_including_deleted().filter(numero_venta__startswith=prefix).order_by('-numero_venta').first()
             if last and last.numero_venta:
                 try:
                     seq = int(last.numero_venta.split('-')[-1])
@@ -64,15 +66,16 @@ class Venta(models.Model):
         self.total = total - descuento + (self.impuesto or Decimal('0'))
         self.save()
 
-class DetalleVenta(models.Model):
-    venta = models.ForeignKey(Venta, on_delete=models.CASCADE, related_name='detalles')
-    producto = models.ForeignKey(Producto, on_delete=models.SET_NULL, null=True)
+class DetalleVenta(SoftDeleteModel):
+    venta = models.ForeignKey(Venta, on_delete=models.PROTECT, related_name='detalles')
+    producto = models.ForeignKey(Producto, on_delete=models.PROTECT, null=True, related_name='detalles_venta')
     cantidad = models.IntegerField()
     precio_unitario = models.DecimalField(max_digits=10, decimal_places=2)
     subtotal = models.DecimalField(max_digits=10, decimal_places=2)
     
     def __str__(self):
-        return f"{self.venta.numero_venta} - {self.producto.nombre}"
+        estado = " [ELIMINADO]" if self.deleted else ""
+        return f"{self.venta.numero_venta} - {self.producto.nombre}{estado}"
     
     class Meta:
         verbose_name = 'Detalle de Venta'
