@@ -825,9 +825,19 @@ body.client-portal-body::after {
 }
 
 .ver-carrito .client-qty-input {
-    width: 58px !important;
-    min-height: 36px;
+    width: 64px !important;
+    min-height: 40px;
     border-radius: 10px;
+    text-align: center;
+    color: var(--client-text) !important;
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+
+.ver-carrito .client-qty-input::-webkit-inner-spin-button,
+.ver-carrito .client-qty-input::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
 }
 
 .ver-carrito .client-qty-btn {
@@ -850,12 +860,17 @@ body.client-portal-body::after {
     padding-bottom: 32px;
 }
 
-.detalle-pedido .left-stack,
-.detalle-pedido .right-stack {
+.detalle-pedido .left-stack {
     display: flex;
     flex-direction: column;
     gap: 16px;
-    height: 100%;
+}
+
+.detalle-pedido .right-stack {
+    display: grid;
+    grid-template-rows: auto 1fr;
+    gap: 16px;
+    align-content: start;
 }
 
 .detalle-pedido .left-stack > .client-surface,
@@ -869,11 +884,25 @@ body.client-portal-body::after {
 }
 
 .detalle-pedido .right-stack .help-card {
-    flex: 1;
+    align-self: stretch;
+    min-height: 120px;
 }
 
 .detalle-pedido .client-info-box p {
     margin-bottom: 0;
+}
+
+/* Ensure Bootstrap col-lg-4 stretches so the inner grid fills height */
+.detalle-pedido > .row {
+    align-items: stretch;
+}
+
+.detalle-pedido > .row > .right-stack {
+    display: grid;
+    grid-template-rows: auto 1fr;
+    gap: 16px;
+    align-content: start;
+    height: auto;
 }
 
 .detalle-pedido .client-order-item-row {
