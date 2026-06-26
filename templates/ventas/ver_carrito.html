@@ -15,7 +15,7 @@
 </section>
 
 {% if items %}
-<section>
+<section class="ver-carrito">
     <div class="row g-4">
         <div class="col-lg-8">
             <div class="client-surface client-list-card">
@@ -25,59 +25,51 @@
                         <p class="client-section-copy">Cada cambio se guarda al instante para que no pierdas el ritmo.</p>
                     </div>
                 </div>
-                    {% for item in items %}
-                    <div class="client-cart-card cart-item-row">
-                        <div class="row align-items-center">
-                            <div class="col-md-2">
-                                {% if item.producto.imagen %}
-                                    <img src="{{ item.producto.imagen.url }}" alt="{{ item.producto.nombre }}"
-                                         class="img-fluid rounded cart-item-img client-thumb" style="object-fit: cover; width:64px; height:64px;">
-                                {% else %}
-                                    <div class="bg-light d-flex align-items-center justify-content-center rounded"
-                                         style="width: 64px; height: 64px;">
-                                        <i class="bi bi-image text-muted fs-4"></i>
-                                    </div>
-                                {% endif %}
+                {% for item in items %}
+                <article class="client-cart-card cart-item-row">
+                    <div class="cart-item-media">
+                        {% if item.producto.imagen %}
+                            <img src="{{ item.producto.imagen.url }}" alt="{{ item.producto.nombre }}" class="cart-item-img client-thumb">
+                        {% else %}
+                            <div class="cart-item-img-placeholder">
+                                <i class="bi bi-image text-muted fs-4"></i>
                             </div>
-
-                            <div class="col-md-4">
-                                <h5 class="fw-bold text-dark mb-1">{{ item.producto.nombre }}</h5>
-                                <p class="text-muted small mb-0">{{ item.producto.descripcion|truncatechars:60 }}</p>
-                                <small class="text-muted">Código: {{ item.producto.codigo }}</small>
-                            </div>
-
-                            <div class="col-md-2">
-                                <span class="client-price-tag">${{ item.producto.precio_venta|floatformat:0 }}</span>
-                            </div>
-
-                            <div class="col-md-2">
-                                <form method="post" action="{% url 'ventas:actualizar_carrito' item.id %}" class="d-flex align-items-center">
-                                    {% csrf_token %}
-                                    <button type="button" class="btn btn-outline-secondary btn-sm me-2"
-                                            onclick="changeQuantity(this, -1)">-</button>
-                                    <input type="number" name="cantidad" value="{{ item.cantidad }}" min="1"
-                                       max="{{ item.producto.stock_actual }}" class="form-control form-control-sm text-center"
-                                       style="width: 50px;" onchange="this.form.submit()">
-                                    <button type="button" class="btn btn-outline-secondary btn-sm ms-2"
-                                            onclick="changeQuantity(this, 1)">+</button>
-                                </form>
-                            </div>
-
-                            <div class="col-md-2 text-end">
-                                <div class="mb-2">
-                                    <strong class="text-dark">${{ item.subtotal|floatformat:0 }}</strong>
-                                </div>
-                                <form method="post" action="{% url 'ventas:eliminar_carrito' item.id %}">
-                                    {% csrf_token %}
-                                    <button type="submit" class="btn btn-outline-danger btn-sm"
-                                            onclick="return confirm('¿Eliminar este producto del carrito?')">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
+                        {% endif %}
                     </div>
-                    {% endfor %}
+
+                    <div class="cart-item-main">
+                        <h5 class="fw-bold text-dark mb-1">{{ item.producto.nombre }}</h5>
+                        <p class="text-muted small mb-1">{{ item.producto.descripcion|truncatechars:80 }}</p>
+                        <small class="text-muted">Código: {{ item.producto.codigo }}</small>
+                    </div>
+
+                    <div class="cart-item-unit">
+                        <small class="text-muted d-block">Precio</small>
+                        <span class="client-price-tag">${{ item.producto.precio_venta|floatformat:0 }}</span>
+                    </div>
+
+                    <div class="cart-item-qty">
+                        <small class="text-muted d-block">Cantidad</small>
+                        <form method="post" action="{% url 'ventas:actualizar_carrito' item.id %}" class="cart-qty-form">
+                            {% csrf_token %}
+                            <button type="button" class="btn btn-outline-secondary btn-sm client-qty-btn" onclick="changeQuantity(this, -1)">-</button>
+                            <input type="number" name="cantidad" value="{{ item.cantidad }}" min="1" max="{{ item.producto.stock_actual }}" class="form-control form-control-sm text-center client-qty-input" onchange="this.form.submit()">
+                            <button type="button" class="btn btn-outline-secondary btn-sm client-qty-btn" onclick="changeQuantity(this, 1)">+</button>
+                        </form>
+                    </div>
+
+                    <div class="cart-item-total text-end">
+                        <small class="text-muted d-block">Subtotal</small>
+                        <strong class="text-dark d-block mb-2">${{ item.subtotal|floatformat:0 }}</strong>
+                        <form method="post" action="{% url 'ventas:eliminar_carrito' item.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-outline-danger btn-sm" onclick="return confirm('¿Eliminar este producto del carrito?')">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </form>
+                    </div>
+                </article>
+                {% endfor %}
             </div>
 
             <div class="text-center mt-4">

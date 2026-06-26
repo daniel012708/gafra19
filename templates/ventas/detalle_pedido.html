@@ -6,13 +6,13 @@
 {% block content %}
 <section class="client-page-hero mb-4">
     <span class="client-kicker"><i class="bi bi-truck"></i> Detalle del pedido</span>
-    <h1 class="client-title">Pedido {{ pedido.numero_venta }} con información clara, útil y sin bloques apretados.</h1>
-    <p class="client-subtitle">Consulta estado, entrega, productos y resumen en una disposición mucho más cómoda para leer.</p>
+    <h1 class="client-title">Pedido {{ pedido.numero_venta }}</h1>
+    <p class="client-subtitle">Consulta estado, productos y resumen de pago en una vista más ordenada y fácil de leer.</p>
 </section>
 
 <section class="detalle-pedido">
     <div class="row g-4">
-        <div class="col-lg-8">
+        <div class="col-lg-8 left-stack">
             <div class="client-surface mb-4">
                 <div class="card-body">
                     <h4 class="card-title fw-bold text-dark mb-4">
@@ -130,9 +130,10 @@
                         {% endfor %}
                     </div>
                 </div>
+            </div>
         </div>
 
-        <div class="col-lg-4">
+        <div class="col-lg-4 right-stack">
             <div class="client-surface client-summary-card mb-3">
                 <div class="card-body">
                     <h4 class="card-title fw-bold text-dark mb-4">
@@ -196,6 +197,7 @@
                         </a>
                     </div>
                 </div>
+            </div>
         </div>
     </div>
 </section>
