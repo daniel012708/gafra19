@@ -66,11 +66,33 @@ from .forms_excel import ExcelUploadForm
 import pandas as pd
 from .models import Usuario
 from django.contrib.auth.models import User
+from gafra.utils_excel import build_excel_template_response
 
 # --- Carga masiva desde Excel ---
 @login_required
 @module_access_required('admin', module_key='usuario')
 def carga_masiva_usuarios(request):
+    if request.method == 'GET' and request.GET.get('template') == '1':
+        return build_excel_template_response(
+            filename='ejemplo_usuarios.xlsx',
+            columns=['username', 'password', 'rol', 'telefono', 'activo'],
+            sample_rows=[
+                {
+                    'username': 'daniel',
+                    'password': 'Gafra2026!',
+                    'rol': 'admin',
+                    'telefono': '3001234567',
+                    'activo': True,
+                },
+                {
+                    'username': 'thomas',
+                    'password': 'Gafra2026!',
+                    'rol': 'logistica',
+                    'telefono': '3011234567',
+                    'activo': True,
+                },
+            ],
+        )
     if request.method == 'POST':
         form = ExcelUploadForm(request.POST, request.FILES)
         if form.is_valid():

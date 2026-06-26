@@ -7,11 +7,51 @@ from .forms_excel import ExcelUploadForm
 import pandas as pd
 from .models import Proveedor
 from gafra.access import ModuleAccessMixin, module_access_required
+from gafra.utils_excel import build_excel_template_response
 
 # --- Carga masiva desde Excel ---
 @login_required
 @module_access_required('admin', 'almacenista', 'logistica', module_key='proveedores')
 def carga_masiva_proveedores(request):
+    if request.method == 'GET' and request.GET.get('template') == '1':
+        return build_excel_template_response(
+            filename='ejemplo_proveedores.xlsx',
+            columns=['nombre', 'razon_social', 'rfc', 'contacto', 'telefono', 'email', 'direccion', 'ciudad', 'estado', 'pais', 'codigo_postal', 'tipo', 'sitio_web', 'activo'],
+            sample_rows=[
+                {
+                    'nombre': 'Maderas Andinas',
+                    'razon_social': 'Maderas Andinas SAS',
+                    'rfc': 'GFR000000001',
+                    'contacto': 'Andrea Torres',
+                    'telefono': '3154567890',
+                    'email': 'ventas@maderasandinas.com',
+                    'direccion': 'Calle 80 # 25-40',
+                    'ciudad': 'Bogota',
+                    'estado': 'Bogota',
+                    'pais': 'Colombia',
+                    'codigo_postal': '110111',
+                    'tipo': 'Nacional',
+                    'sitio_web': 'https://maderasandinas.com',
+                    'activo': True,
+                },
+                {
+                    'nombre': 'Textiles Nido',
+                    'razon_social': 'Textiles Nido SAS',
+                    'rfc': 'GFR000000002',
+                    'contacto': 'Camilo Rojas',
+                    'telefono': '3185678901',
+                    'email': 'contacto@textilesnido.com',
+                    'direccion': 'Carrera 32 # 10-22',
+                    'ciudad': 'Medellin',
+                    'estado': 'Antioquia',
+                    'pais': 'Colombia',
+                    'codigo_postal': '050021',
+                    'tipo': 'Nacional',
+                    'sitio_web': 'https://textilesnido.com',
+                    'activo': True,
+                },
+            ],
+        )
     if request.method == 'POST':
         form = ExcelUploadForm(request.POST, request.FILES)
         if form.is_valid():

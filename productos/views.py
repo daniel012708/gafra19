@@ -204,10 +204,36 @@ from django.shortcuts import render, redirect
 from .forms_excel import ExcelUploadForm
 import pandas as pd
 from .models import Producto, Categoria
+from gafra.utils_excel import build_excel_template_response
 
 @login_required
 @module_access_required('admin', 'almacenista', 'logistica', 'vendedor', module_key='productos')
 def carga_masiva_productos(request):
+    if request.method == 'GET' and request.GET.get('template') == '1':
+        return build_excel_template_response(
+            filename='ejemplo_productos.xlsx',
+            columns=['nombre', 'descripcion', 'categoria', 'precio_costo', 'precio_venta', 'stock_actual', 'activo'],
+            sample_rows=[
+                {
+                    'nombre': 'Corral Premium Gris 90x110 cm',
+                    'descripcion': 'Corral plegable con malla lateral y doble seguro',
+                    'categoria': 'Corrales para bebe',
+                    'precio_costo': 210.00,
+                    'precio_venta': 349.90,
+                    'stock_actual': 18,
+                    'activo': True,
+                },
+                {
+                    'nombre': 'Cuna Clasica Blanca 120x60 cm',
+                    'descripcion': 'Cuna en pino inmunizado con ruedas y freno',
+                    'categoria': 'Cunas para bebe',
+                    'precio_costo': 320.00,
+                    'precio_venta': 529.90,
+                    'stock_actual': 12,
+                    'activo': True,
+                },
+            ],
+        )
     if request.method == 'POST':
         form = ExcelUploadForm(request.POST, request.FILES)
         if form.is_valid():

@@ -30,10 +30,34 @@ import pandas as pd
 from .models import OrdenProduccion
 from productos.models import Producto, Receta
 from django.contrib.auth.models import User
+from gafra.utils_excel import build_excel_template_response
 
 # --- Carga masiva desde Excel ---
 @login_required
 def carga_masiva_ordenes(request):
+    if request.method == 'GET' and request.GET.get('template') == '1':
+        return build_excel_template_response(
+            filename='ejemplo_ordenes.xlsx',
+            columns=['producto', 'receta', 'cantidad_a_producir', 'estado', 'responsable', 'notas'],
+            sample_rows=[
+                {
+                    'producto': 'Corral Premium Gris 90x110 cm',
+                    'receta': 'Receta de Corral Premium Gris 90x110 cm',
+                    'cantidad_a_producir': 12,
+                    'estado': 'pendiente',
+                    'responsable': 'thomas',
+                    'notas': 'Lote semanal de corrales premium',
+                },
+                {
+                    'producto': 'Cuna Clasica Blanca 120x60 cm',
+                    'receta': 'Receta de Cuna Clasica Blanca 120x60 cm',
+                    'cantidad_a_producir': 8,
+                    'estado': 'en_progreso',
+                    'responsable': 'salazar',
+                    'notas': 'Produccion de reposicion para ventas',
+                },
+            ],
+        )
     if request.method == 'POST':
         form = ExcelUploadForm(request.POST, request.FILES)
         if form.is_valid():
@@ -312,41 +336,28 @@ def reportes(request):
         qs = ordenes_qs[:1000]
         rows = []
         for o in qs:
-            rows.append({
-                'ID': o.id,
-                'Producto': o.producto.nombre if o.producto else '',
-                'Cantidad': o.cantidad_a_producir,
-                'Estado': o.estado,
-                'Responsable': o.responsable.username if o.responsable else '',
-                'Fecha creación': o.fecha_creacion.isoformat() if o.fecha_creacion else ''
-            })
+            rows.append([
+                o.id,
+                o.producto.nombre if o.producto else '',
+                o.cantidad_a_producir,
+                o.estado,
+                o.responsable.username if o.responsable else '',
+                o.fecha_creacion.strftime('%Y-%m-%d %H:%M') if o.fecha_creacion else '',
+            ])
 
         total = ordenes_qs.count()
         total_completadas = ordenes_qs.filter(estado__icontains='complet').count()
         total_pendientes = ordenes_qs.filter(estado__icontains='pendient').count()
 
-        # Small human-friendly description summary
-        description = (
-            f'Total registros consultados: {len(rows)}. ' \
-            f'Total en sistema: {total}. ' \
-            f'Completadas: {total_completadas}. Pendientes: {total_pendientes}.'
-        )
-
         context = {
             'title': 'Reporte de Producción',
+            'subtitle': f"{len(rows)} órdenes filtradas · Completadas: {total_completadas} · Pendientes: {total_pendientes}",
             'columns': ['ID','Producto','Cantidad','Estado','Responsable','Fecha creación'],
             'rows': rows,
-            'description': description,
-            'total_records': len(rows),
-            'total_completadas': total_completadas,
-            'total_pendientes': total_pendientes,
-            'meta': {
-                'Consulta': 'Últimas órdenes',
-                'Generado': timezone.now().strftime('%Y-%m-%d %H:%M')
-            }
+            'ahora': timezone.now().strftime('%Y-%m-%d %H:%M'),
         }
 
-        return render_pdf_from_template(request, 'reports/pro_report.html', context, filename='produccion_report.pdf')
+        return render_pdf_from_template(request, 'reports/generic_report.html', context, filename='produccion_report.pdf')
 
     return render(request, 'produccion/reportes.html', {
         'total_ordenes': total_ordenes,

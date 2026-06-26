@@ -205,10 +205,36 @@ import pandas as pd
 from .models import Venta
 from clientes.models import Cliente
 from django.contrib.auth.models import User
+from gafra.utils_excel import build_excel_template_response
 
 # --- Carga masiva desde Excel ---
 @login_required
 def carga_masiva_ventas(request):
+    if request.method == 'GET' and request.GET.get('template') == '1':
+        return build_excel_template_response(
+            filename='ejemplo_ventas.xlsx',
+            columns=['cliente', 'vendedor', 'estado', 'descuento', 'impuesto', 'total', 'observaciones'],
+            sample_rows=[
+                {
+                    'cliente': 'Maria Fernanda Rios',
+                    'vendedor': 'daniel',
+                    'estado': 'completada',
+                    'descuento': 10.00,
+                    'impuesto': 66.48,
+                    'total': 416.38,
+                    'observaciones': 'Venta de cuna y colchoneta',
+                },
+                {
+                    'cliente': 'Juan Esteban Mejia',
+                    'vendedor': 'daniel',
+                    'estado': 'pendiente',
+                    'descuento': 0,
+                    'impuesto': 0,
+                    'total': 349.90,
+                    'observaciones': 'Separado de corral premium',
+                },
+            ],
+        )
     if request.method == 'POST':
         form = ExcelUploadForm(request.POST, request.FILES)
         if form.is_valid():

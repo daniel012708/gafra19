@@ -8,11 +8,45 @@ import pandas as pd
 from .models import MateriaPrima
 from proveedores.models import Proveedor
 from gafra.access import ModuleAccessMixin, module_access_required
+from gafra.utils_excel import build_excel_template_response
 
 # --- Carga masiva desde Excel ---
 @login_required
 @module_access_required('admin', 'almacenista', 'logistica', module_key='inventario')
 def carga_masiva_materias(request):
+    if request.method == 'GET' and request.GET.get('template') == '1':
+        return build_excel_template_response(
+            filename='ejemplo_materias.xlsx',
+            columns=['nombre', 'descripcion', 'marca', 'proveedor', 'precio_unitario', 'unidad_medida', 'stock_actual', 'stock_minimo', 'ubicacion', 'observaciones', 'activo'],
+            sample_rows=[
+                {
+                    'nombre': 'Espuma de alta densidad',
+                    'descripcion': 'Espuma para colchonetas linea premium',
+                    'marca': 'FoamKids',
+                    'proveedor': 'GAFRA DEMO PROV 01 - Maderas Andinas',
+                    'precio_unitario': 38.50,
+                    'unidad_medida': 'kg',
+                    'stock_actual': 680,
+                    'stock_minimo': 150,
+                    'ubicacion': 'Bodega-1-A2',
+                    'observaciones': 'Uso para colchonetas y protectores',
+                    'activo': True,
+                },
+                {
+                    'nombre': 'Tubos metalicos',
+                    'descripcion': 'Tubo estructural para corrales',
+                    'marca': 'MetalBaby',
+                    'proveedor': 'GAFRA DEMO PROV 04 - Metal Kids Industrial',
+                    'precio_unitario': 29.50,
+                    'unidad_medida': 'm',
+                    'stock_actual': 540,
+                    'stock_minimo': 120,
+                    'ubicacion': 'Bodega-2-B1',
+                    'observaciones': 'Corte por orden de produccion',
+                    'activo': True,
+                },
+            ],
+        )
     if request.method == 'POST':
         form = ExcelUploadForm(request.POST, request.FILES)
         if form.is_valid():

@@ -4,6 +4,7 @@ from .forms_excel import ExcelUploadForm
 import pandas as pd
 from .models import Cliente
 from django.db.models import Q
+from gafra.utils_excel import build_excel_template_response
 
 # --- Carga masiva desde Excel ---
 from gafra.access import ModuleAccessMixin, module_access_required
@@ -12,6 +13,27 @@ from gafra.access import ModuleAccessMixin, module_access_required
 @login_required
 @module_access_required('admin', 'vendedor', module_key='clientes')
 def carga_masiva_clientes(request):
+    if request.method == 'GET' and request.GET.get('template') == '1':
+        return build_excel_template_response(
+            filename='ejemplo_clientes.xlsx',
+            columns=['nombre', 'documento', 'direccion', 'telefono', 'email'],
+            sample_rows=[
+                {
+                    'nombre': 'Maria Fernanda Rios',
+                    'documento': 'CC10203040',
+                    'direccion': 'Chapinero, Carrera 11 # 63-22, Bogota',
+                    'telefono': '3203456789',
+                    'email': 'maria.rios@example.com',
+                },
+                {
+                    'nombre': 'Juan Esteban Mejia',
+                    'documento': 'CC20304050',
+                    'direccion': 'Laureles, Calle 33 # 75-18, Medellin',
+                    'telefono': '3214567890',
+                    'email': 'juan.mejia@example.com',
+                },
+            ],
+        )
     if request.method == 'POST':
         form = ExcelUploadForm(request.POST, request.FILES)
         if form.is_valid():
