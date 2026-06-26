@@ -7,3 +7,9 @@ db.sqlite3
 db.sqlite3.bak
 staticfiles/
 gafra19/
+.venv/
+venv/
+env/
+*.env
+.env
+media/productos/

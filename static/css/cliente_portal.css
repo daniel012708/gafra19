@@ -847,7 +847,7 @@ body.client-portal-body::after {
 }
 
 .detalle-pedido {
-    padding-bottom: 0 !important;
+    padding-bottom: 32px;
 }
 
 .detalle-pedido .left-stack,
@@ -855,6 +855,7 @@ body.client-portal-body::after {
     display: flex;
     flex-direction: column;
     gap: 16px;
+    height: 100%;
 }
 
 .detalle-pedido .left-stack > .client-surface,
@@ -865,6 +866,10 @@ body.client-portal-body::after {
 .detalle-pedido .right-stack .client-summary-card {
     position: sticky;
     top: 108px;
+}
+
+.detalle-pedido .right-stack .help-card {
+    flex: 1;
 }
 
 .detalle-pedido .client-info-box p {
