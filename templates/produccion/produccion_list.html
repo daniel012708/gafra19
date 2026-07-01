@@ -91,11 +91,14 @@
                 </thead>
                 <tbody>
                 {% for orden in ordenes_produccion %}
-                    <tr class="{% if orden.estado == 'pendiente' %}orden-pendiente{% elif orden.estado == 'en_progreso' %}orden-en-progreso{% else %}orden-completada{% endif %}">
+                    <tr class="{% if not orden.producto.activo %}table-secondary text-muted{% elif orden.estado == 'pendiente' %}orden-pendiente{% elif orden.estado == 'en_progreso' %}orden-en-progreso{% else %}orden-completada{% endif %}"
+                        {% if not orden.producto.activo %}style="opacity:0.5;"{% endif %}>
                         <td><span class="badge bg-secondary">OP-{{ orden.id }}</span></td>
                         <td>
                             <div class="cell-stack">
-                                <span class="cell-title">{{ orden.producto.nombre }}</span>
+                                <span class="cell-title">{{ orden.producto.nombre }}
+                                  {% if not orden.producto.activo %}<span class="badge bg-danger ms-1" style="font-size:0.7em;">Producto inactivo</span>{% endif %}
+                                </span>
                                 <span class="cell-muted">{{ orden.receta.descripcion|default:'Sin receta descriptiva'|truncatechars:36 }}</span>
                             </div>
                         </td>
@@ -116,6 +119,9 @@
                         <td>{% if orden.notas %}<span title="{{ orden.notas }}">{{ orden.notas|truncatechars:30 }}</span>{% else %}<span class="text-muted">-</span>{% endif %}</td>
                         <td class="table-actions text-end">
                             <div class="table-action-group" role="group">
+                                {% if not orden.producto.activo %}
+                                    <span class="btn btn-outline-secondary btn-sm disabled text-muted" title="Producto inactivo — no se puede operar"><i class="bi bi-lock"></i> Bloqueado</span>
+                                {% else %}
                                 <a href="{% url 'produccion:detail' orden.pk %}" class="btn btn-outline-primary btn-sm" title="Ver detalle">
                                     Ver
                                 </a>
@@ -135,13 +141,14 @@
                                     <a href="{% url 'produccion:update' orden.pk %}" class="btn btn-outline-secondary btn-sm"
                                        title="Editar orden">Editar
                                     </a>
-                                                {% if orden.activo %}
-                                                  <a href="{% url 'produccion:delete' orden.pk %}" class="btn btn-outline-warning btn-sm"
-                                                      title="Desactivar orden"><i class="bi bi-slash-circle"></i> Desactivar</a>
-                                                {% else %}
-                                                  <a href="{% url 'produccion:delete' orden.pk %}" class="btn btn-outline-success btn-sm"
-                                                      title="Activar orden"><i class="bi bi-check-circle"></i> Activar</a>
-                                                {% endif %}
+                                    {% if orden.activo %}
+                                      <a href="{% url 'produccion:delete' orden.pk %}" class="btn btn-outline-warning btn-sm"
+                                          title="Desactivar orden"><i class="bi bi-slash-circle"></i> Desactivar</a>
+                                    {% else %}
+                                      <a href="{% url 'produccion:delete' orden.pk %}" class="btn btn-outline-success btn-sm"
+                                          title="Activar orden"><i class="bi bi-check-circle"></i> Activar</a>
+                                    {% endif %}
+                                {% endif %}
                                 {% endif %}
                             </div>
                         </td>

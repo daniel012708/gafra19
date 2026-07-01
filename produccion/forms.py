@@ -9,8 +9,8 @@ from .models import OrdenProduccion, ProduccionDiaria
 class OrdenProduccionForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Solo mostrar productos que tienen receta
-        self.fields['producto'].queryset = Producto.objects.filter(receta__activo=True)
+        # Solo mostrar productos activos que tienen receta activa
+        self.fields['producto'].queryset = Producto.objects.filter(receta__activo=True, activo=True)
 
     class Meta:
         model = OrdenProduccion

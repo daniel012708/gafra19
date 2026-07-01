@@ -171,6 +171,10 @@ def orden_produccion_create(request):
 def orden_produccion_iniciar(request, pk):
     orden = get_object_or_404(OrdenProduccion, pk=pk)
 
+    if not orden.producto.activo:
+        messages.error(request, 'No se puede iniciar la orden: el producto está inactivo.')
+        return redirect('produccion:list')
+
     if orden.estado != 'pendiente':
         messages.error(request, 'Esta orden ya ha sido iniciada.')
         return redirect('produccion:list')
@@ -194,6 +198,10 @@ def orden_produccion_iniciar(request, pk):
 @module_access_required('admin', 'logistica', module_key='produccion')
 def orden_produccion_completar(request, pk):
     orden = get_object_or_404(OrdenProduccion, pk=pk)
+
+    if not orden.producto.activo:
+        messages.error(request, 'No se puede completar la orden: el producto está inactivo.')
+        return redirect('produccion:list')
 
     if orden.estado != 'en_progreso':
         messages.error(request, 'Esta orden no está en progreso.')
@@ -265,6 +273,10 @@ class OrdenProduccionUpdateView(ModuleAccessMixin, UpdateView):
     allowed_roles = ('admin', 'logistica')
 
     def form_valid(self, form):
+        # Bloquear edición si el producto está inactivo
+        if not form.instance.producto.activo:
+            messages.error(self.request, 'No se puede editar la orden: el producto está inactivo.')
+            return redirect('produccion:list')
         # Asignar automáticamente la receta del producto
         form.instance.receta = form.instance.producto.receta
         messages.success(self.request, f'Orden de producción actualizada exitosamente.')
