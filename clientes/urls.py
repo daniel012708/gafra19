@@ -10,5 +10,5 @@ urlpatterns = [
     path('<int:pk>/', views.ClienteDetailView.as_view(), name='detail'),
     path('nuevo/', views.ClienteCreateView.as_view(), name='create'),
     path('<int:pk>/editar/', views.ClienteUpdateView.as_view(), name='update'),
-    path('<int:pk>/eliminar/', views.ClienteDeleteView.as_view(), name='delete'),
+    path('<int:pk>/eliminar/', views.ClienteToggleActivoView.as_view(), name='delete'),
 ]

@@ -54,7 +54,11 @@
                             <div class="table-action-group">
                                 <a href="{% url 'proveedores:detail' proveedor.pk %}" class="btn btn-sm btn-outline-primary">Ver</a>
                                 <a href="{% url 'proveedores:update' proveedor.pk %}" class="btn btn-sm btn-outline-secondary">Editar</a>
-                                <a href="{% url 'proveedores:delete' proveedor.pk %}" class="btn btn-sm btn-outline-danger">Eliminar</a>
+                                {% if proveedor.activo %}
+                                  <a href="{% url 'proveedores:delete' proveedor.pk %}" class="btn btn-sm btn-outline-warning"><i class="bi bi-slash-circle"></i> Desactivar</a>
+                                {% else %}
+                                  <a href="{% url 'proveedores:delete' proveedor.pk %}" class="btn btn-sm btn-outline-success"><i class="bi bi-check-circle"></i> Activar</a>
+                                {% endif %}
                             </div>
                         </td>
                     </tr>

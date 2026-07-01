@@ -25,9 +25,10 @@ class Venta(SoftDeleteModel):
     impuesto = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     total = models.DecimalField(max_digits=10, decimal_places=2)
     observaciones = models.TextField(blank=True)
+    activo = models.BooleanField(default=True)
     
     def __str__(self):
-        estado = " [ELIMINADA]" if self.deleted else ""
+        estado = " (Inactiva)" if not self.activo else ""
         return f"Venta {self.numero_venta}{estado}"
     
     class Meta:

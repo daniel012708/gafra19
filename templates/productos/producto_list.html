@@ -74,7 +74,11 @@
               <div class="table-action-group">
                 <a href="{% url 'productos:detail' producto.pk %}" class="btn btn-sm btn-outline-primary">Ver</a>
                 <a href="{% url 'productos:update' producto.pk %}" class="btn btn-sm btn-outline-secondary">Editar</a>
-                <a href="{% url 'productos:delete' producto.pk %}" class="btn btn-sm btn-outline-danger">Eliminar</a>
+                {% if producto.activo %}
+                  <a href="{% url 'productos:delete' producto.pk %}" class="btn btn-sm btn-outline-warning"><i class="bi bi-slash-circle"></i> Desactivar</a>
+                {% else %}
+                  <a href="{% url 'productos:delete' producto.pk %}" class="btn btn-sm btn-outline-success"><i class="bi bi-check-circle"></i> Activar</a>
+                {% endif %}
               </div>
             </td>
           </tr>

@@ -27,7 +27,18 @@ class VentaForm(forms.ModelForm):
         }
 
     def clean_observaciones(self):
-        obs = self.cleaned_data.get('observaciones', '').strip()
-        if len(obs) > 500:
-            raise forms.ValidationError('Las observaciones no pueden superar los 500 caracteres.')
+        obs = self.cleaned_data.get('observaciones', '')
+        if obs:
+            obs = obs.strip()
+            if not obs:
+                raise forms.ValidationError('Las observaciones no pueden contener solo espacios.')
+            if len(obs) > 500:
+                raise forms.ValidationError('Las observaciones no pueden superar los 500 caracteres.')
         return obs
+
+    def clean(self):
+        cleaned_data = super().clean()
+        observaciones = cleaned_data.get('observaciones')
+        if observaciones:
+            cleaned_data['observaciones'] = observaciones.strip()
+        return cleaned_data

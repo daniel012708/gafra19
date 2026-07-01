@@ -1,14 +1,23 @@
 {% extends 'base.html' %}
-{% block head_title %}Eliminar inventario{% endblock %}
-{% block header_title %}Eliminar inventario{% endblock %}
+{% block head_title %}{% if accion == 'desactivar' %}Desactivar{% else %}Activar{% endif %} inventario{% endblock %}
+{% block header_title %}{% if accion == 'desactivar' %}Desactivar{% else %}Activar{% endif %} inventario{% endblock %}
 {% block content %}
 <div class="card">
-    <div class="card-header"><h5 class="mb-0">Eliminar inventario</h5></div>
+    <div class="card-header"><h5 class="mb-0">{% if accion == 'desactivar' %}Desactivar{% else %}Activar{% endif %} inventario</h5></div>
     <div class="card-body">
-        <p>¿Seguro que deseas eliminar "{{ object }}"?</p>
+        {% if accion == 'desactivar' %}
+          <p>¿Seguro que deseas <strong>desactivar</strong> "{{ object }}"?</p>
+          <p class="text-muted">El registro no será eliminado. Podrá reactivarlo en cualquier momento.</p>
+        {% else %}
+          <p>¿Seguro que deseas <strong>activar</strong> "{{ object }}"?</p>
+        {% endif %}
         <form method="post">
             {% csrf_token %}
-            <button type="submit" class="btn btn-danger">Sí, eliminar</button>
+            {% if accion == 'desactivar' %}
+              <button type="submit" class="btn btn-warning"><i class="bi bi-slash-circle"></i> Desactivar</button>
+            {% else %}
+              <button type="submit" class="btn btn-success"><i class="bi bi-check-circle"></i> Activar</button>
+            {% endif %}
             <a href="{% url 'inventario:list' %}" class="btn btn-secondary">Cancelar</a>
         </form>
     </div>

@@ -51,7 +51,11 @@
               <div class="table-action-group" role="group">
                 <a href="{% url 'clientes:detail' cliente.pk %}" class="btn btn-sm btn-outline-primary" title="Ver"><i class="bi bi-eye"></i> Ver</a>
                 <a href="{% url 'clientes:update' cliente.pk %}" class="btn btn-sm btn-outline-secondary" title="Editar"><i class="bi bi-pencil"></i> Editar</a>
-                <a href="{% url 'clientes:delete' cliente.pk %}" class="btn btn-sm btn-outline-danger" title="Eliminar"><i class="bi bi-trash"></i> Eliminar</a>
+                {% if cliente.activo %}
+                  <a href="{% url 'clientes:delete' cliente.pk %}" class="btn btn-sm btn-outline-warning" title="Desactivar"><i class="bi bi-slash-circle"></i> Desactivar</a>
+                {% else %}
+                  <a href="{% url 'clientes:delete' cliente.pk %}" class="btn btn-sm btn-outline-success" title="Activar"><i class="bi bi-check-circle"></i> Activar</a>
+                {% endif %}
               </div>
             </td>
           </tr>

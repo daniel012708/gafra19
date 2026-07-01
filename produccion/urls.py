@@ -10,7 +10,7 @@ urlpatterns = [
     path('<int:pk>/', views.OrdenProduccionDetailView.as_view(), name='detail'),
     path('nuevo/', views.OrdenProduccionCreateView.as_view(), name='create'),
     path('<int:pk>/editar/', views.OrdenProduccionUpdateView.as_view(), name='update'),
-    path('<int:pk>/eliminar/', views.OrdenProduccionDeleteView.as_view(), name='delete'),
+    path('<int:pk>/eliminar/', views.OrdenProduccionToggleActivoView.as_view(), name='delete'),
     path('<int:pk>/iniciar/', views.orden_produccion_iniciar, name='iniciar'),
     path('<int:pk>/completar/', views.orden_produccion_completar, name='completar'),
 ]

@@ -61,8 +61,8 @@ def carga_masiva_clientes(request):
         form = ExcelUploadForm()
     return render(request, 'clientes/carga_masiva.html', {'form': form})
 from django.urls import reverse_lazy
-from django.views.generic import ListView, CreateView, UpdateView, DeleteView, DetailView
-from gafra.soft_delete import SoftDeleteMixin
+from django.views.generic import ListView, CreateView, UpdateView, DetailView, View
+from gafra.soft_delete import ToggleActivoMixin
 
 from .models import Cliente
 from .forms import ClienteForm
@@ -115,7 +115,7 @@ class ClienteUpdateView(ModuleAccessMixin, UpdateView):
     allowed_roles = ('admin', 'vendedor')
 
 
-class ClienteDeleteView(SoftDeleteMixin, ModuleAccessMixin, DeleteView):
+class ClienteToggleActivoView(ToggleActivoMixin, ModuleAccessMixin, View):
     model = Cliente
     template_name = 'clientes/cliente_confirm_delete.html'
     success_url = reverse_lazy('clientes:list')

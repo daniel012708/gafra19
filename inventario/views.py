@@ -82,7 +82,8 @@ def carga_masiva_materias(request):
     return render(request, 'inventario/carga_masiva.html', {'form': form})
 
 from django.urls import reverse_lazy
-from django.views.generic import ListView, CreateView, UpdateView, DeleteView, DetailView
+from django.views.generic import ListView, CreateView, UpdateView, DetailView, View
+from gafra.soft_delete import ToggleActivoMixin
 from django.db import models
 
 from .models import MateriaPrima
@@ -142,7 +143,7 @@ class MateriaPrimaUpdateView(ModuleAccessMixin, UpdateView):
     allowed_roles = ('admin', 'almacenista', 'logistica')
 
 
-class MateriaPrimaDeleteView(ModuleAccessMixin, DeleteView):
+class MateriaPrimaToggleActivoView(ToggleActivoMixin, ModuleAccessMixin, View):
     model = MateriaPrima
     template_name = 'inventario/inventario_confirm_delete.html'
     success_url = reverse_lazy('inventario:list')

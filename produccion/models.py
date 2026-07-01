@@ -21,9 +21,10 @@ class OrdenProduccion(SoftDeleteModel):
     responsable = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     notas = models.TextField(blank=True)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
+    activo = models.BooleanField(default=True)
 
     def __str__(self):
-        estado = " [ELIMINADA]" if self.deleted else ""
+        estado = " (Inactiva)" if not self.activo else ""
         return f"OP-{self.id} - {self.producto.nombre} ({self.cantidad_a_producir}){estado}"
 
     def puede_iniciar(self):

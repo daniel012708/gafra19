@@ -78,6 +78,29 @@ class SoftDeleteMixin:
         return super().delete(request, *args, **kwargs)
 
 
+# Mixin para vistas que desactivan/activan en lugar de eliminar
+class ToggleActivoMixin:
+    """Mixin para reemplazar el borrado por activación/desactivación del campo activo"""
+
+    def get(self, request, *args, **kwargs):
+        from django.shortcuts import render, get_object_or_404
+        obj = get_object_or_404(self.model, pk=kwargs['pk'])
+        return render(request, self.template_name, {
+            'object': obj,
+            'accion': 'desactivar' if obj.activo else 'activar',
+        })
+
+    def post(self, request, *args, **kwargs):
+        from django.shortcuts import get_object_or_404, redirect
+        from django.contrib import messages
+        obj = get_object_or_404(self.model, pk=kwargs['pk'])
+        obj.activo = not obj.activo
+        obj.save(update_fields=['activo'])
+        accion = 'activado' if obj.activo else 'desactivado'
+        messages.success(request, f'Registro {accion} correctamente.')
+        return redirect(self.success_url)
+
+
 # Utilidades para filtrar objetos en vistas
 class SoftDeleteQuerySetMixin:
     """Mixin para que las vistas genéricas filtren por deleted=False por defecto"""

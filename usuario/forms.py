@@ -1,5 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
+from django.core.validators import RegexValidator
+import re
 from .models import Usuario
 
 
@@ -8,21 +10,44 @@ class UsuarioForm(forms.ModelForm):
         min_length=4,
         max_length=150,
         widget=forms.TextInput(attrs={'class': 'form-control'}),
-        help_text='Mínimo 4 caracteres.'
+        help_text='Mínimo 4 caracteres. Solo letras, números, puntos, guiones e guiones bajos.',
+        validators=[
+            RegexValidator(
+                regex=r'^[a-zA-Z0-9._-]+$',
+                message='El nombre de usuario solo puede contener letras, números, puntos, guiones e guiones bajos.',
+                code='invalid_username'
+            )
+        ]
     )
     first_name = forms.CharField(
         min_length=2,
         max_length=30,
         required=False,
         widget=forms.TextInput(attrs={'class': 'form-control'}),
-        help_text='Mínimo 2 caracteres.'
+        help_text='Mínimo 2 caracteres. Solo letras, espacios y apóstrofos.',
+        validators=[
+            RegexValidator(
+                regex=r"^[a-záéíóúàèìòùâêîôûäëïöüñ\s\'-]+$",
+                message='El nombre solo puede contener letras, espacios, apóstrofos y guiones.',
+                code='invalid_first_name',
+                flags=re.IGNORECASE
+            )
+        ]
     )
     last_name = forms.CharField(
         min_length=2,
         max_length=30,
         required=False,
         widget=forms.TextInput(attrs={'class': 'form-control'}),
-        help_text='Mínimo 2 caracteres.'
+        help_text='Mínimo 2 caracteres. Solo letras, espacios y apóstrofos.',
+        validators=[
+            RegexValidator(
+                regex=r"^[a-záéíóúàèìòùâêîôûäëïöüñ\s\'-]+$",
+                message='El apellido solo puede contener letras, espacios, apóstrofos y guiones.',
+                code='invalid_last_name',
+                flags=re.IGNORECASE
+            )
+        ]
     )
     email = forms.EmailField(
         widget=forms.EmailInput(attrs={'class': 'form-control'}),
@@ -32,7 +57,7 @@ class UsuarioForm(forms.ModelForm):
         widget=forms.PasswordInput(attrs={'class': 'form-control'}),
         required=False,
         min_length=8,
-        help_text='Mínimo 8 caracteres, debe incluir letras, números y símbolos.'
+        help_text='Mínimo 8 caracteres. Debe incluir mayúsculas, minúsculas, números y símbolos.'
     )
     password_confirm = forms.CharField(
         widget=forms.PasswordInput(attrs={'class': 'form-control'}),
@@ -68,6 +93,58 @@ class UsuarioForm(forms.ModelForm):
         email = cleaned_data.get('email')
         password = cleaned_data.get('password')
         password_confirm = cleaned_data.get('password_confirm')
+        first_name = cleaned_data.get('first_name')
+        last_name = cleaned_data.get('last_name')
+        telefono = cleaned_data.get('telefono')
+        rol = cleaned_data.get('rol')
+
+        # Validar que se seleccione un rol
+        if not rol:
+            self.add_error('rol', 'Debe seleccionar un rol.')
+
+        # Limpiar espacios en blanco al inicio y final
+        if username:
+            cleaned_data['username'] = username.strip()
+        if first_name:
+            cleaned_data['first_name'] = first_name.strip()
+        if last_name:
+            cleaned_data['last_name'] = last_name.strip()
+        if email:
+            cleaned_data['email'] = email.strip()
+        if telefono:
+            cleaned_data['telefono'] = telefono.strip()
+
+        # Validar que nombre no contenga números
+        if first_name and re.search(r'\d', first_name):
+            self.add_error('first_name', 'El nombre no puede contener números.')
+
+        # Validar que apellido no contenga números
+        if last_name and re.search(r'\d', last_name):
+            self.add_error('last_name', 'El apellido no puede contener números.')
+
+        # Validar que nombre no esté vacío después de espacios
+        if first_name and not first_name.strip():
+            self.add_error('first_name', 'El nombre no puede contener solo espacios.')
+
+        # Validar que apellido no esté vacío después de espacios
+        if last_name and not last_name.strip():
+            self.add_error('last_name', 'El apellido no puede contener solo espacios.')
+
+        # Validar teléfono
+        if telefono:
+            # No permitir números negativos o caracteres inválidos al inicio
+            if telefono[0] == '-':
+                self.add_error('telefono', 'El teléfono no puede comenzar con un guión (números negativos no permitidos).')
+            # Solo dígitos, espacios, guiones, paréntesis y símbolo +
+            if not re.match(r'^[+]?[(]?[\d\s\-.)]+$', telefono):
+                self.add_error('telefono', 'Formato de teléfono inválido. Solo se permiten dígitos, espacios, guiones, paréntesis y símbolo +.')
+            # No permitir guiones seguidos
+            elif '--' in telefono:
+                self.add_error('telefono', 'No se permiten guiones consecutivos.')
+            elif len(re.sub(r'\D', '', telefono)) < 7:
+                self.add_error('telefono', 'El teléfono debe tener al menos 7 dígitos.')
+            elif len(re.sub(r'\D', '', telefono)) > 15:
+                self.add_error('telefono', 'El teléfono no puede tener más de 15 dígitos.')
 
         # Validar unicidad de username
         if username:
@@ -85,23 +162,34 @@ class UsuarioForm(forms.ModelForm):
             if qs.exists():
                 self.add_error('email', 'Ya existe un usuario con ese email.')
 
-        # Validar contraseñas
-        if password or password_confirm:
-            if password != password_confirm:
-                self.add_error('password_confirm', 'Las contraseñas no coinciden.')
-            # Validar seguridad de la contraseña
-            import re
-            if password:
-                if len(password) < 8:
-                    self.add_error('password', 'La contraseña debe tener al menos 8 caracteres.')
-                if not re.search(r'[A-Z]', password):
-                    self.add_error('password', 'Debe incluir al menos una letra mayúscula.')
-                if not re.search(r'[a-z]', password):
-                    self.add_error('password', 'Debe incluir al menos una letra minúscula.')
-                if not re.search(r'\d', password):
-                    self.add_error('password', 'Debe incluir al menos un número.')
-                if not re.search(r'[^A-Za-z0-9]', password):
-                    self.add_error('password', 'Debe incluir al menos un símbolo.')
+        # Validar contraseñas - obligatorias al crear nuevo usuario
+        if not self.instance or not self.instance.pk:
+            # Creando nuevo usuario
+            if not password:
+                self.add_error('password', 'La contraseña es obligatoria.')
+            if not password_confirm:
+                self.add_error('password_confirm', 'Debe confirmar la contraseña.')
+
+        # Validar que las contraseñas coincidan
+        if (password or password_confirm) and password != password_confirm:
+            self.add_error('password_confirm', 'Las contraseñas no coinciden.')
+
+        # Validar seguridad de la contraseña
+        if password:
+            errors = []
+            if len(password) < 8:
+                errors.append('La contraseña debe tener al menos 8 caracteres.')
+            if not re.search(r'[A-Z]', password):
+                errors.append('Debe incluir al menos una letra mayúscula.')
+            if not re.search(r'[a-z]', password):
+                errors.append('Debe incluir al menos una letra minúscula.')
+            if not re.search(r'\d', password):
+                errors.append('Debe incluir al menos un número.')
+            if not re.search(r'[^A-Za-z0-9]', password):
+                errors.append('Debe incluir al menos un símbolo especial.')
+            
+            if errors:
+                self.add_error('password', ' '.join(errors))
 
         return cleaned_data
 

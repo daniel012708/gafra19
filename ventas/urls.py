@@ -14,7 +14,7 @@ urlpatterns = [
     path('nueva/', views.nueva_venta, name='crear'),
       path('confirmar/', views.confirmar_venta, name='confirmar'),
        path('<int:pk>/editar/', views.VentaUpdateView.as_view(), name='editar'),
-       path('<int:pk>/eliminar/', views.VentaDeleteView.as_view(), name='eliminar'),
+       path('<int:pk>/eliminar/', views.VentaToggleActivoView.as_view(), name='eliminar'),
     
     # URLs para clientes
     path('catalogo/', views.catalogo_cliente, name='catalogo_cliente'),

@@ -53,7 +53,11 @@
               <div class="table-action-group">
                 <a href="{% url 'usuario:detail' u.pk %}" class="btn btn-sm btn-outline-primary">Ver</a>
                 <a href="{% url 'usuario:update' u.pk %}" class="btn btn-sm btn-outline-secondary">Editar</a>
-                <a href="{% url 'usuario:delete' u.pk %}" class="btn btn-sm btn-outline-danger">Eliminar</a>
+                {% if u.activo %}
+                  <a href="{% url 'usuario:delete' u.pk %}" class="btn btn-sm btn-outline-warning"><i class="bi bi-slash-circle"></i> Desactivar</a>
+                {% else %}
+                  <a href="{% url 'usuario:delete' u.pk %}" class="btn btn-sm btn-outline-success"><i class="bi bi-check-circle"></i> Activar</a>
+                {% endif %}
               </div>
             </td>
           </tr>

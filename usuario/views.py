@@ -123,7 +123,8 @@ def carga_masiva_usuarios(request):
         form = ExcelUploadForm()
     return render(request, 'usuario/carga_masiva.html', {'form': form})
 from django.urls import reverse_lazy
-from django.views.generic import ListView, CreateView, UpdateView, DeleteView, DetailView
+from django.views.generic import ListView, CreateView, UpdateView, DetailView, View
+from gafra.soft_delete import ToggleActivoMixin
 
 from .models import Usuario
 from .forms import UsuarioForm
@@ -176,7 +177,7 @@ class UsuarioUpdateView(ModuleAccessMixin, UpdateView):
     allowed_roles = ('admin',)
 
 
-class UsuarioDeleteView(ModuleAccessMixin, DeleteView):
+class UsuarioToggleActivoView(ToggleActivoMixin, ModuleAccessMixin, View):
     model = Usuario
     template_name = 'usuario/usuario_confirm_delete.html'
     success_url = reverse_lazy('usuario:list')

@@ -88,7 +88,8 @@ def reportes(request):
     })
 from django.urls import reverse_lazy
 from django.contrib import messages
-from django.views.generic import ListView, CreateView, UpdateView, DeleteView, DetailView
+from django.views.generic import ListView, CreateView, UpdateView, DetailView, View
+from gafra.soft_delete import ToggleActivoMixin
 
 from .models import Producto
 from .forms import ProductoForm, IngredienteRecetaFormSet
@@ -186,17 +187,12 @@ class ProductoUpdateView(ModuleAccessMixin, UpdateView):
             return self.form_invalid(form)
 
 
-class ProductoDeleteView(ModuleAccessMixin, DeleteView):
+class ProductoToggleActivoView(ToggleActivoMixin, ModuleAccessMixin, View):
     model = Producto
     template_name = 'productos/producto_confirm_delete.html'
     success_url = reverse_lazy('productos:list')
     module_key = 'productos'
     allowed_roles = ('admin', 'almacenista', 'logistica', 'vendedor')
-    
-    def delete(self, request, *args, **kwargs):
-        obj = self.get_object()
-        messages.success(request, f'Producto "{obj}" eliminado correctamente.')
-        return super().delete(request, *args, **kwargs)
 
 
 # --- Carga masiva desde Excel ---

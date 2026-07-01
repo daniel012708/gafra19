@@ -135,9 +135,13 @@
                                     <a href="{% url 'produccion:update' orden.pk %}" class="btn btn-outline-secondary btn-sm"
                                        title="Editar orden">Editar
                                     </a>
-                                    <a href="{% url 'produccion:delete' orden.pk %}" class="btn btn-outline-danger btn-sm"
-                                       onclick="return confirm('¿Eliminar esta orden de producción?')"
-                                       title="Eliminar orden">Eliminar</a>
+                                                {% if orden.activo %}
+                                                  <a href="{% url 'produccion:delete' orden.pk %}" class="btn btn-outline-warning btn-sm"
+                                                      title="Desactivar orden"><i class="bi bi-slash-circle"></i> Desactivar</a>
+                                                {% else %}
+                                                  <a href="{% url 'produccion:delete' orden.pk %}" class="btn btn-outline-success btn-sm"
+                                                      title="Activar orden"><i class="bi bi-check-circle"></i> Activar</a>
+                                                {% endif %}
                                 {% endif %}
                             </div>
                         </td>

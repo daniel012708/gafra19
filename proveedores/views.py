@@ -88,7 +88,8 @@ def carga_masiva_proveedores(request):
         form = ExcelUploadForm()
     return render(request, 'proveedores/carga_masiva.html', {'form': form})
 from django.urls import reverse_lazy
-from django.views.generic import ListView, CreateView, UpdateView, DeleteView, DetailView
+from django.views.generic import ListView, CreateView, UpdateView, DetailView, View
+from gafra.soft_delete import ToggleActivoMixin
 
 from .models import Proveedor
 from .forms import ProveedorForm
@@ -165,22 +166,28 @@ class ProveedorUpdateView(ModuleAccessMixin, UpdateView):
 
 
 
-class ProveedorDeleteView(ModuleAccessMixin, DeleteView):
+class ProveedorToggleActivoView(ToggleActivoMixin, ModuleAccessMixin, View):
     model = Proveedor
     template_name = 'proveedores/proveedor_confirm_delete.html'
     success_url = reverse_lazy('proveedores:list')
     module_key = 'proveedores'
     allowed_roles = ('admin', 'almacenista', 'logistica')
 
-    def delete(self, request, *args, **kwargs):
-        self.object = self.get_object()
+    def post(self, request, *args, **kwargs):
+        from django.shortcuts import get_object_or_404, redirect
+        from django.contrib import messages
+        obj = get_object_or_404(Proveedor, pk=kwargs['pk'])
+        obj.activo = not obj.activo
+        obj.save(update_fields=['activo'])
+        accion = 'activado' if obj.activo else 'desactivado'
         ProveedorMovimiento.objects.create(
-            proveedor=self.object,
-            usuario=self.request.user,
-            accion='ELIMINADO',
-            detalles=f"Proveedor eliminado: {self.object.nombre}"
+            proveedor=obj,
+            usuario=request.user,
+            accion='ACTIVADO' if obj.activo else 'DESACTIVADO',
+            detalles=f"Proveedor {accion}: {obj.nombre}"
         )
-        return super().delete(request, *args, **kwargs)
+        messages.success(request, f'Proveedor {accion} correctamente.')
+        return redirect(self.success_url)
 
 
 @login_required

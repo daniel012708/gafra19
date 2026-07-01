@@ -8,7 +8,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.template.loader import render_to_string
 from gafra.utils_pdf import render_pdf_from_template
-from gafra.soft_delete import SoftDeleteMixin
+from gafra.soft_delete import ToggleActivoMixin
+from django.views import View
 from gafra.access import user_has_role
 from .models import Venta
 
@@ -387,12 +388,6 @@ from django.shortcuts import redirect, render
 from .forms import DetalleFormset, VentaForm
 from .models import Venta, DetalleVenta
 
-# Vista para eliminar una venta
-class VentaDeleteView(SoftDeleteMixin, LoginRequiredMixin, DeleteView):
-    model = Venta
-    template_name = 'ventas/venta_confirm_delete.html'
-    success_url = reverse_lazy('ventas:lista')
-
 # Vista de detalle para una venta
 class VentaDetailView(LoginRequiredMixin, DetailView):
     model = Venta
@@ -625,8 +620,8 @@ from django.shortcuts import redirect, render
 from .forms import DetalleFormset, VentaForm
 from .models import Venta, DetalleVenta
 
-# Vista para eliminar una venta
-class VentaDeleteView(SoftDeleteMixin, LoginRequiredMixin, DeleteView):
+# Vista para desactivar/activar una venta
+class VentaToggleActivoView(ToggleActivoMixin, LoginRequiredMixin, View):
     model = Venta
     template_name = 'ventas/venta_confirm_delete.html'
     success_url = reverse_lazy('ventas:lista')

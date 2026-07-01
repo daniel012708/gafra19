@@ -96,7 +96,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import ListView, CreateView, UpdateView, DeleteView, DetailView
+from django.views.generic import ListView, CreateView, UpdateView, DetailView, View
+from gafra.soft_delete import ToggleActivoMixin
 from django.utils import timezone
 from django.db import transaction
 
@@ -273,15 +274,12 @@ class OrdenProduccionUpdateView(ModuleAccessMixin, UpdateView):
         return super().get_queryset().filter(estado='pendiente')
 
 
-class OrdenProduccionDeleteView(ModuleAccessMixin, DeleteView):
+class OrdenProduccionToggleActivoView(ToggleActivoMixin, ModuleAccessMixin, View):
     model = OrdenProduccion
     template_name = 'produccion/produccion_confirm_delete.html'
     success_url = reverse_lazy('produccion:list')
     module_key = 'produccion'
     allowed_roles = ('admin', 'logistica')
-
-    def get_queryset(self):
-        return super().get_queryset().filter(estado='pendiente')
 
 
 def reportes(request):

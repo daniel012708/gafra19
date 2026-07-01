@@ -9,9 +9,10 @@ class Cliente(SoftDeleteModel):
     telefono = models.CharField(max_length=20, blank=True)
     email = models.EmailField(blank=True)
     fecha_registro = models.DateTimeField(auto_now_add=True)
+    activo = models.BooleanField(default=True)
 
     def __str__(self):
-        estado = " (ELIMINADO)" if self.deleted else ""
+        estado = " (Inactivo)" if not self.activo else ""
         return f"{self.nombre}{estado}"
 
     class Meta:

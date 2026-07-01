@@ -1,24 +1,27 @@
 {% extends 'base.html' %}
-{% block head_title %}Eliminar Orden de Producción{% endblock %}
-{% block header_title %}Eliminar Orden de Producción{% endblock %}
+{% block head_title %}{% if accion == 'desactivar' %}Desactivar{% else %}Activar{% endif %} Orden de Producción{% endblock %}
+{% block header_title %}{% if accion == 'desactivar' %}Desactivar{% else %}Activar{% endif %} Orden de Producción{% endblock %}
 {% block content %}
 <div class="card">
     <div class="card-header">
-        <h5 class="mb-0">Confirmar Eliminación</h5>
+        <h5 class="mb-0">{% if accion == 'desactivar' %}Desactivar{% else %}Activar{% endif %} Orden de Producción</h5>
     </div>
     <div class="card-body">
-        <p class="mb-4">¿Seguro que deseas eliminar la orden de producción de <strong>{{ object.producto.nombre }}</strong> (Cantidad: {{ object.cantidad_a_producir }})?</p>
-
-        {% if object.estado == 'EN_PROCESO' %}
-        <div class="alert alert-warning">
-            <strong>Advertencia:</strong> Esta orden está en proceso. Si la eliminas, no se podrá recuperar.
-        </div>
+        {% if accion == 'desactivar' %}
+          <p class="mb-4">¿Seguro que deseas <strong>desactivar</strong> la orden de producción de <strong>{{ object.producto.nombre }}</strong> (Cantidad: {{ object.cantidad_a_producir }})?</p>
+          <p class="text-muted">El registro no será eliminado. Podrá reactivarlo en cualquier momento.</p>
+        {% else %}
+          <p class="mb-4">¿Seguro que deseas <strong>activar</strong> la orden de producción de <strong>{{ object.producto.nombre }}</strong> (Cantidad: {{ object.cantidad_a_producir }})?</p>
         {% endif %}
 
         <form method="post">
             {% csrf_token %}
             <div class="d-flex gap-2">
-                <button type="submit" class="btn btn-danger">Sí, eliminar</button>
+                {% if accion == 'desactivar' %}
+                  <button type="submit" class="btn btn-warning"><i class="bi bi-slash-circle"></i> Desactivar</button>
+                {% else %}
+                  <button type="submit" class="btn btn-success"><i class="bi bi-check-circle"></i> Activar</button>
+                {% endif %}
                 <a href="{% url 'produccion:list' %}" class="btn btn-secondary">Cancelar</a>
             </div>
         </form>
